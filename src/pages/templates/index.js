@@ -1,32 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
+import { useDispatch, useSelector } from 'react-redux';
+
 import { Card } from "antd";
 import Chart from "../charts/index.js";
 
-const charts = [
-  {
-    name: "Grouped Bar Chart",
-    path: "GroupedBarChart",
-  }
-];
-
 function Templates() {
-  const [chartSelectedIndex, setchartSelectedIndex] = useState(-1);
+  const dispatch = useDispatch();
+  
+  const templates = useSelector(state => state.templates);
+  const {options, selectedOption} = templates;
 
-  if (chartSelectedIndex === -1) {
+
+  if (selectedOption === -1) {
     return (
-      <>
+      <React.Fragment>
         <h2>Choose a Template</h2>
         <div className="example-container">
-          {charts.map((d, i) => {
+          {options.map((d, i) => {
             return (
               <Card
-                onClick={() => setchartSelectedIndex(i)}
+                onClick={() => dispatch({ type: "set-chart", index: i })}
                 key={i}
                 hoverable
                 cover={
                   <img
                     alt="example"
-                    src="https://public.flourish.studio/uploads/ebed7412-cc56-4ef0-a3ba-97865643f545.png"
+                    src={d.icon}
                   />
                 }
               >
@@ -35,10 +34,10 @@ function Templates() {
             );
           })}
         </div>
-      </>
+      </React.Fragment>
     );
   } else {
-    return <Chart path={charts[chartSelectedIndex].path} />;
+    return <Chart />;
   }
 }
 

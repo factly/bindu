@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
-import spec from './spec.js';
+import templates from './templates.js';
+import chart from './chart.js';
 
 export default combineReducers({
-	spec
-})
+	templates,
+	chart
+});

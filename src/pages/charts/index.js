@@ -1,21 +1,19 @@
 import React from "react";
 import { connect } from "react-redux";
-import GroupedBarChartOptions from "./grouped_bar_chart/index.js";
-import GroupedBarChartSpec from "./grouped_bar_chart/default.json";
+
+import GroupedBarChartOptions from "./grouped_bar/index.js";
+
 import * as vega from "vega";
 import { compile } from "vega-lite";
 
-import { mergeDeep, setId } from "../../utils/index.js";
+import { mergeDeep } from "../../utils/index.js";
 import { deepEqual } from "vega-lite/build/src/util";
 
 const mapStateToProps = state => {
-  return { spec: state.spec };
+  return { spec: state.chart.spec, templates: state.templates };
 };
 
 class Chart extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
   componentDidMount() {
     this.renderVega();
@@ -54,12 +52,6 @@ class Chart extends React.Component {
         .initialize(this.refs.chart)
         .runAsync();
     }
-  };
-
-  onUpdate = (newSpec) => {
-    this.setState({
-      spec: mergeDeep({}, newSpec),
-    });
   };
 
   download = () => {
@@ -113,11 +105,21 @@ class Chart extends React.Component {
     setTimeout(send, step);
   };
 
+  getOptionComponent = () => {
+    const selectedChartName = this.props.templates.options[this.props.templates.selectedOption].name;
+    switch (selectedChartName) {
+      case 'Grouped Bar Chart':
+        return <GroupedBarChartOptions />
+      default:
+        return null
+    }
+  }
+
   render() {
     return (
       <div className="chart-wrapper">
         <div className="chart-container" ref="chart"></div>
-        {<GroupedBarChartOptions />}
+        {this.getOptionComponent()}
       </div>
     );
   }
