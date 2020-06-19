@@ -1,37 +1,140 @@
-import { mergeDeep } from "../../../utils/index.js";
+import produce from "immer";
+
 const barReducer = (state = {}, action) => {
-	const spec = mergeDeep({}, state.spec);
   switch (action.type) {
     case 'set-opacity':
-      spec.layer[0].encoding.opacity.value = parseFloat(action.value);
-      return {...state, spec: spec }
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.opacity.value = parseFloat(action.value);
+      });
+
     case 'set-corner-radius':
-      spec.layer[0].mark.cornerRadius = parseInt(action.value);
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].mark.cornerRadius = parseInt(action.value);
+      });
+
     case 'set-xaxis-title':
-      spec.layer[0].encoding.x.axis.title = action.value;
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.x.axis.title = action.value;
+      });
+
     case 'set-xaxis-position':
-      spec.layer[0].encoding.x.axis.orient = action.value;
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.x.axis.orient = action.value;
+      });
+
     case 'set-xaxis-label-format':
-      spec.layer[0].encoding.x.axis.format = action.value;
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.x.axis.format = action.value;
+      });
+
     case 'set-xaxis-label-color':
-      spec.layer[0].encoding.x.axis.labelColor = action.value;
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.x.axis.labelColor = action.value;
+      });
+
     case 'set-yaxis-title':
-      spec.layer[0].encoding.y.axis.title = action.value;
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.y.axis.title = action.value;
+      });
+
     case 'set-yaxis-position':
-      spec.layer[0].encoding.y.axis.orient = action.value;
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.y.axis.orient = action.value;
+      });
+
     case 'set-yaxis-label-format':
-      spec.layer[0].encoding.y.axis.format = action.value;
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.y.axis.format = action.value;
+      });
+
     case 'set-yaxis-label-color':
-      spec.layer[0].encoding.y.axis.labelColor = action.value;
-      return {...state, spec: spec }
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.y.axis.labelColor = action.value;
+      });
+    case 'set-legend-position':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.color.legend.orient = action.value;
+      });
+    case 'set-legend-background':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.color.legend.fillColor = action.value;
+      });
+    case 'set-legend-title':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.color.legend.title = action.value;
+      });
+    case 'set-legend-symbol':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.color.legend.symbolType = action.value;
+      });
+    case 'set-legend-symbol-size':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.color.legend.symbolSize = parseInt(action.value);
+      });
+    case 'set-legend-label-position':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.color.legend.labelAlign = action.value;
+      });
+    case 'set-legend-label-baseline':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.color.legend.labelBaseline = action.value;
+      });
+    case 'set-legend-label-color':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[0].encoding.color.legend.labelColor = action.value;
+      });
+
+    case 'set-data-labels':
+      return produce(state, draftState => {
+          if(action.value){
+            const encoding = draftState.spec.layer[0].encoding;
+            draftState.spec.layer.push({
+              "mark": { "type": "text", "dx": 0, "dy": 10, fontSize: 12 },
+              "encoding": {
+                "x": encoding.x,
+                "y": { ...encoding.y, "stack": "zero" },
+                "color": { ...encoding.color, scale: {range: ["#ffffff"]}, "legend": null },
+                "text": { ...encoding.y,"format": ".1f" }
+              }
+            });
+          } else {
+            draftState.spec.layer.splice(1, 1);  
+          }
+      });
+    case 'set-data-labels-color':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[1].encoding.color.scale.range = [action.value];
+      });
+
+    case 'set-data-labels-size':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[1].mark.fontSize = action.value;
+      });
+
+    case 'set-data-labels-format':
+
+      return produce(state, draftState => {
+          draftState.spec.layer[1].encoding.text.format = action.value;
+      });
     default:
       return state;
   }

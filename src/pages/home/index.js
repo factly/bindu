@@ -1,18 +1,10 @@
-import React, { useState } from "react";
-import { Button } from "antd";
+import React from "react";
+import { Link } from 'react-router-dom';
 
-import Templates from "../templates/index.js";
 function Home() {
-  const [isNewClicked, setNewClicked] = useState(false);
   return (
     <div className="container">
-      {!isNewClicked ? (
-        <Button type="primary" onClick={() => setNewClicked(true)}>
-          New Visualizations
-        </Button>
-      ) : (
-        <Templates />
-      )}
+      <Link to={'/templates'}>Templates</Link>
     </div>
   );
 }

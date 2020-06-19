@@ -1,26 +1,22 @@
 import React from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { Card } from "antd";
-import Chart from "../charts/index.js";
+import { Link } from 'react-router-dom';
 
+const { Meta } = Card;
 function Templates() {
-  const dispatch = useDispatch();
   
   const templates = useSelector(state => state.templates);
-  const {options, selectedOption} = templates;
-
-
-  if (selectedOption === -1) {
-    return (
-      <React.Fragment>
-        <h2>Choose a Template</h2>
-        <div className="example-container">
-          {options.map((d, i) => {
-            return (
+  const {options} = templates;
+  return (
+    <React.Fragment>
+      <h2>Choose a Template</h2>
+      <div className="example-container">
+        {options.map((d, i) => {
+          return (
+            <Link key={i} to={'/chart/'+i}>
               <Card
-                onClick={() => dispatch({ type: "set-chart", index: i })}
-                key={i}
                 hoverable
                 cover={
                   <img
@@ -29,16 +25,14 @@ function Templates() {
                   />
                 }
               >
-                {d.name}
+                <Meta title={d.name} />
               </Card>
-            );
-          })}
-        </div>
-      </React.Fragment>
-    );
-  } else {
-    return <Chart />;
-  }
+            </Link>
+          );
+        })}
+      </div>
+    </React.Fragment>
+  );
 }
 
 export default Templates;

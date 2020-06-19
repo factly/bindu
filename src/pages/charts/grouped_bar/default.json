@@ -3,9 +3,9 @@
   "data": { "url": "https://vega.github.io/editor/data/seattle-weather.csv" },
   "padding": { "left": 20, "top": 5, "right": 30, "bottom": 5 },
   "width": "container",
+  "height": "container",
   "resolve": { "scale": { "color": "independent" } },
   "background": "#ffffff",
-  "height": 300,
   "layer": [
     {
       "mark": {
@@ -13,6 +13,9 @@
         "cornerRadius": 1,
         "tooltip": true,
         "binSpacing": 1
+      },
+      "selection": {
+        "weather_selection": {"type": "multi", "fields": ["weather"], "bind": "legend"}
       },
       "encoding": {
         "x": {
@@ -24,17 +27,19 @@
         "y": {
           "aggregate": "count",
           "type": "quantitative",
+          "field": "weather",
           "axis": { "title": "Count", "orient": "left" }
         },
         "opacity": {
-          "value": 1
+          "condition": {"selection": "weather_selection", "value": 1},
+          "value": 0.2
         },
         "color": {
           "field": "weather",
           "type": "nominal",
           "scale": {
             "domain": ["sun", "fog", "drizzle", "rain", "snow"],
-            "range": ["#1d6996", "#edad08", "#73af48", "#94346e", "#38a6a5"]
+            "range": ["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"]
           },
           "legend": {
             "title": "Weather type",

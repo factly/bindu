@@ -3,11 +3,14 @@ import React, { useEffect } from "react";
 import { Collapse } from "antd";
 import ChartProperties from "../../../components/shared/chart_properties.js";
 import Colors from "../../../components/shared/colors.js";
-import Bars from "../../../components/bar/bars.js";
 import Legend from "../../../components/bar/legend.js";
 import LegendLabel from "../../../components/bar/legend_label.js";
 import XAxis from "../../../components/bar/x_axis.js";
 import YAxis from "../../../components/bar/y_axis.js";
+
+import Lines from "../../../components/line/lines.js";
+import Dots from "../../../components/line/dots.js";
+
 import DataLabels from "../../../components/bar/data_labels.js";
 import { useDispatch } from 'react-redux';
 
@@ -31,9 +34,6 @@ function GroupedBarChart() {
           <Panel className="option-item-panel" header={"Colors"} key="8">
             <Colors />
           </Panel>
-          <Panel className="option-item-panel" header={"Bars"} key="2">
-            <Bars />
-          </Panel>
           <Panel className="option-item-panel" header={"X Axis"} key="3">
             <XAxis />
           </Panel>
@@ -48,6 +48,12 @@ function GroupedBarChart() {
           </Panel>
           <Panel className="option-item-panel" header={"Data Labels"} key="7">
             <DataLabels />
+          </Panel>
+          <Panel className="option-item-panel" header={"Lines"} key="9">
+            <Lines />
+          </Panel>
+          <Panel className="option-item-panel" header={"Dots"} key="10">
+            <Dots />
           </Panel>
         </Collapse>
     </div>
