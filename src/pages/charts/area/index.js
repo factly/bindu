@@ -3,15 +3,11 @@ import React, { useEffect } from "react";
 import { Collapse } from "antd";
 import ChartProperties from "../../../components/shared/chart_properties.js";
 import Colors from "../../../components/shared/colors.js";
-import Legend from "../../../components/shared/legend.js";
-import LegendLabel from "../../../components/shared/legend_label.js";
 import XAxis from "../../../components/shared/x_axis.js";
 import YAxis from "../../../components/shared/y_axis.js";
-
-import Lines from "../../../components/line/lines.js";
-import Dots from "../../../components/line/dots.js";
-
 import DataLabels from "../../../components/shared/data_labels.js";
+
+import Dots from "../../../components/line/dots.js";
 import { useDispatch } from 'react-redux';
 
 import Spec from "./default.json";
@@ -22,7 +18,7 @@ function GroupedBarChart() {
 	useEffect(() => {
 		dispatch({type: "set-config", value: Spec});
 	}, []);
-
+  
   const properties = [
     {
       name: "Chart Properties",
@@ -33,16 +29,8 @@ function GroupedBarChart() {
       component: <Colors />
     },
     {
-      name: "Lines",
-      component: <Lines />
-    },
-    {
       name: "Dots",
       component: <Dots />
-    },
-    {
-      name: "Data Labels",
-      component: <DataLabels />
     },
     {
       name: "X Axis",
@@ -51,14 +39,6 @@ function GroupedBarChart() {
     {
       name: "Y Axis",
       component: <YAxis />
-    },
-    {
-      name: "Legend",
-      component: <Legend />
-    },
-    {
-      name: "Legend Label",
-      component: <LegendLabel />
     },
     {
       name: "Data Labels",

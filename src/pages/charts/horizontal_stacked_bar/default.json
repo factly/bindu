@@ -15,17 +15,17 @@
         "binSpacing": 1
       },
       "encoding": {
-        "x": {
+        "y": {
           "timeUnit": "month",
           "field": "date",
           "type": "ordinal",
-          "axis": { "title": "Month of the year", "orient": "bottom" }
+          "axis": { "title": "Month of the year", "orient": "left" }
         },
-        "y": {
+        "x": {
           "aggregate": "count",
           "type": "quantitative",
           "field": "weather",
-          "axis": { "title": "Count", "orient": "left" }
+          "axis": { "title": "Count", "orient": "top" }
         },
         "opacity": {
           "value": 1

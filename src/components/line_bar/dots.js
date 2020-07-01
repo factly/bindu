@@ -8,7 +8,7 @@ const { Option } = Select;
 
 function Dimensions() {
 	const spec = useSelector(state => state.chart.spec);
-	const mark = spec.layer[0].mark;
+	const mark = spec.layer[1].mark;
 
 	const dispatch = useDispatch();
 
@@ -19,7 +19,7 @@ function Dimensions() {
 				<label htmlFor="">Enable</label>
 			</Col>
 			<Col span={12}>
-				<Input type="checkbox" onChange={(e) => dispatch({type: "set-line-dots", value: e.target.checked, chart: "line"})} />
+				<Input type="checkbox" onChange={(e) => dispatch({type: "set-line-dots", value: e.target.checked, chart: "line_bar"})} />
 			</Col>
 		</Row>
 		{
@@ -30,7 +30,7 @@ function Dimensions() {
 							<label htmlFor="">Symbol</label>
 						</Col>
 						<Col span={12}>
-							<Select value={mark.point.shape} onChange = {(value) => dispatch({type: "set-line-dot-shape", value: value, chart: "line"})}>
+							<Select value={mark.point.shape} onChange = {(value) => dispatch({type: "set-line-dot-shape", value: value, chart: "line_bar"})}>
 						      <Option value="circle">Circle</Option>
 						      <Option value="square">Square</Option>
 						      <Option value="cross">Cross</Option>
@@ -47,7 +47,7 @@ function Dimensions() {
 							<label htmlFor="">Symbol Size</label>
 						</Col>
 						<Col span={12}>
-							<Input value={mark.point.size} placeholder="Symbol Size" type="number" onChange={(e) => dispatch({type: "set-line-dot-size", value: e.target.value, chart: "line"})} />
+							<Input value={mark.point.size} placeholder="Symbol Size" type="number" onChange={(e) => dispatch({type: "set-line-dot-size", value: e.target.value, chart: "line_bar"})} />
 						</Col>
 					</Row>
 					<Row gutter={[0, 12]}>
@@ -55,7 +55,7 @@ function Dimensions() {
 							<label htmlFor="">Hollow</label>
 						</Col>
 						<Col span={12}>
-							<Input value={mark.point.filled} type="checkbox" onChange={(e) => dispatch({type: "set-line-dots-hollow", value: e.target.checked, chart: "line"})} />
+							<Input value={mark.point.filled} type="checkbox" onChange={(e) => dispatch({type: "set-line-dots-hollow", value: e.target.checked, chart: "line_bar"})} />
 						</Col>
 					</Row>
 				</React.Fragment>

@@ -11,7 +11,6 @@ function Templates() {
   const {options} = templates;
   return (
     <React.Fragment>
-      <h2>Choose a Template</h2>
       <div className="example-container">
         {options.map((d, i) => {
           return (

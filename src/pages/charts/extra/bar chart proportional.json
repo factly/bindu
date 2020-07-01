@@ -25,7 +25,8 @@
           "aggregate": "count",
           "type": "quantitative",
           "field": "weather",
-          "axis": { "title": "Count", "orient": "left" }
+          "axis": { "title": "Count", "orient": "left" },
+          "stack":  "normalize"
         },
         "opacity": {
           "value": 1

@@ -1,5 +1,5 @@
 import React from "react";
-import { Input } from 'antd';
+import { Input, Row, Col } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import _ from "lodash";
@@ -13,12 +13,14 @@ function Dimensions() {
 
   return (
     <div className="property-container">
-		<div className="item-container">
-			<label htmlFor="">Colors</label>
-			<div>
+    	<Row gutter={[0, 12]}>
+			<Col span={12}>
+				<label htmlFor="">Colors</label>
+			</Col>
+			<Col span={12}>
 				{colors.map((d, i) => <Input type="color" value={d} key={i} onChange={(e) => dispatch({type: "set-color", index: i, value: e.target.value, chart: "shared"})}></Input>)}
-			</div>
-		</div>
+			</Col>
+		</Row>
     </div>
   );
 }
