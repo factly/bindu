@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector } from 'react-redux';
 import Area from "./area/index.js";
 import StackedArea from "./stacked_area/index.js";
 import StackedAreaProportional from "./stacked_area_proportional/index.js";

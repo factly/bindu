@@ -5,7 +5,7 @@ import "./index.css";
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Card, Tooltip, Button, Input, Collapse } from 'antd';
+import { Card, Tooltip, Button, Input } from 'antd';
 import { SaveOutlined, SettingOutlined, EditOutlined } from '@ant-design/icons';
 
 
