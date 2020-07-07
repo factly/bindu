@@ -2,7 +2,6 @@ import React from "react";
 import { Input, Select, Row, Col } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
-import _ from "lodash";
 
 const { Option } = Select;
 

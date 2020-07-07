@@ -3,7 +3,13 @@
     "description": "A simple pie chart with embedded data.",
     "width": 500,
     "height": 300,
-    "resolve": { "scale": { "color": "independent" } },
+    "resolve":
+    {
+        "scale":
+        {
+            "color": "independent"
+        }
+    },
     "data":
     {
         "values": [
@@ -67,33 +73,43 @@
             "value": 8,
             "gender": "female"
         }]
-    }
-    ,
-    "mark": {"type": "arc", "innerRadius": 0, "cornerRadius": 0, "padAngle": 0, "outerRadius": 150, "tooltip": true},
-        "encoding":
+    },
+    "mark":
+    {
+        "type": "arc",
+        "innerRadius": 0,
+        "cornerRadius": 0,
+        "padAngle": 0,
+        "outerRadius": 150,
+        "tooltip": true
+    },
+    "encoding":
+    {
+        "row":
         {
-            "row": {"field": "gender"},
-            "theta":
+            "field": "gender"
+        },
+        "theta":
+        {
+            "field": "value",
+            "type": "quantitative",
+            "stack": true
+        },
+        "color":
+        {
+            "field": "category",
+            "type": "nominal",
+            "scale":
             {
-                "field": "value",
-                "type": "quantitative",
-                "stack": true
+                "range": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
             },
-            "color":
+            "legend":
             {
-                "field": "category",
-                "type": "nominal",
-                "scale":
-                {
-                    "range": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
-                },
-                "legend":
-                {
-                    "title": "Category",
-                    "orient": "right",
-                    "symbolType": "circle",
-                    "fillColor": "#ffffff"
-                }
+                "title": "Category",
+                "orient": "right",
+                "symbolType": "circle",
+                "fillColor": "#ffffff"
             }
         }
+    }
 }

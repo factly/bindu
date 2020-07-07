@@ -1,12 +1,11 @@
 import React from "react";
 import { Layout, Card, Menu } from 'antd';
-import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
 
 import {
   Link
 } from "react-router-dom";
 
-const { Header, Content, Sider } = Layout;
+const { Header, Content } = Layout;
 
 function BasicLayout(props){
 	const { children } = props;

@@ -17,7 +17,7 @@ function GroupedBarChart() {
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch({type: "set-config", value: Spec});
-	}, []);
+	}, [dispatch]);
   
   const properties = [
     {
@@ -47,21 +47,19 @@ function GroupedBarChart() {
   ];
 
   return (
-    <div className="options-container">
-    		<Collapse
-          className="option-item-collapse"
-        >
-          {
-            properties.map((d, i) => {
-              return (
-                <Panel className="option-item-panel" header={d.name} key={i}>
-                  {d.component}
-                </Panel>
-              )
-            })
-          }
-        </Collapse>
-    </div>
+  		<Collapse
+        className="option-item-collapse"
+      >
+        {
+          properties.map((d, i) => {
+            return (
+              <Panel className="option-item-panel" header={d.name} key={i}>
+                {d.component}
+              </Panel>
+            )
+          })
+        }
+      </Collapse>
   );
 }
 

@@ -8,8 +8,8 @@
     ]
   },
   "padding": { "left": 20, "top": 5, "right": 30, "bottom": 5 },
-  "width": "container",
-  "height": "container",
+  "width": 500,
+  "height": 500,
   "resolve": { "scale": { "color": "independent" } },
   "background": "#ffffff",
   "layer": [

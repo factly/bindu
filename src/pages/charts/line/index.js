@@ -21,7 +21,7 @@ function GroupedBarChart() {
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch({type: "set-config", value: Spec});
-	}, []);
+	}, [dispatch]);
 
   const properties = [
     {

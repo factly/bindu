@@ -11,21 +11,32 @@
       "mark": {
         "type": "bar",
         "cornerRadius": 1,
-        "tooltip": true,
         "binSpacing": 1
       },
       "encoding": {
-        "y": {
+        "tooltip": [{
+          "aggregate": "count",
+          "type": "quantitative",
+          "field": "weather"}, 
+          {
+          "timeUnit": "month",
+          "field": "date",
+          "type": "ordinal"},{
+            "field": "weather",
+            "type": "nominal"
+          }],
+        "x": {
           "timeUnit": "month",
           "field": "date",
           "type": "ordinal",
-          "axis": { "title": "Month of the year", "orient": "left" }
+          "axis": { "title": "Month of the year", "orient": "bottom" }
         },
-        "x": {
+        "y": {
           "aggregate": "count",
           "type": "quantitative",
           "field": "weather",
-          "axis": { "title": "Count", "orient": "top" }
+          "axis": { "title": "Count", "orient": "left", "labelExpr": "datum.value*100" },
+          "stack":  "normalize"
         },
         "opacity": {
           "value": 1

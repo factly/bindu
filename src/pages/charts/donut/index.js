@@ -14,7 +14,7 @@ import { useDispatch } from 'react-redux';
 import Spec from "./default.json";
 const { Panel } = Collapse;
 
-function PieChart() {
+function PieChar() {
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch({type: "set-config", value: Spec});
@@ -59,4 +59,4 @@ function PieChart() {
   );
 }
 
-export default PieChart;
+export default PieChar;

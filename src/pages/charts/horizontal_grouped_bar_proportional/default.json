@@ -15,6 +15,17 @@
         "binSpacing": 1
       },
       "encoding": {
+        "tooltip": [{
+          "aggregate": "count",
+          "type": "quantitative",
+          "field": "weather"}, 
+          {
+          "timeUnit": "month",
+          "field": "date",
+          "type": "ordinal"},{
+            "field": "weather",
+            "type": "nominal"
+          }],
         "y": {
           "timeUnit": "month",
           "field": "date",
@@ -25,7 +36,8 @@
           "aggregate": "count",
           "type": "quantitative",
           "field": "weather",
-          "axis": { "title": "Count", "orient": "top" }
+          "axis": { "title": "Count", "orient": "top", "labelExpr": "datum.value*100" },
+          "stack": "normalize"
         },
         "opacity": {
           "value": 1

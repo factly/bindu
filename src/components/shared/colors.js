@@ -2,12 +2,14 @@ import React from "react";
 import { Input, Row, Col } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
-import _ from "lodash";
-
-function Dimensions() {
+function Colors() {
 	const spec = useSelector(state => state.chart.spec);
-	const colors = spec.layer[0].encoding.color.scale.range;
-
+	let colors = [];	
+	if (spec.layer[0].encoding.color.hasOwnProperty("field")){
+		colors = spec.layer[0].encoding.color.scale.range;
+	} else {
+		colors = [spec.layer[0].encoding.color.value];
+	}
 
 	const dispatch = useDispatch();
 
@@ -25,4 +27,4 @@ function Dimensions() {
   );
 }
 
-export default Dimensions;
+export default Colors;

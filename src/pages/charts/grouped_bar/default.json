@@ -2,8 +2,8 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
   "data": { "url": "https://vega.github.io/editor/data/seattle-weather.csv" },
   "padding": { "left": 20, "top": 5, "right": 30, "bottom": 5 },
-  "width": "container",
-  "height": "container",
+  "width": 500,
+  "height": 500,
   "resolve": { "scale": { "color": "independent" } },
   "background": "#ffffff",
   "layer": [

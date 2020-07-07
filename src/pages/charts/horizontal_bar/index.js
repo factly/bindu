@@ -4,8 +4,6 @@ import { Collapse } from "antd";
 import ChartProperties from "../../../components/shared/chart_properties.js";
 import Colors from "../../../components/shared/colors.js";
 import Bars from "../../../components/bar/bars.js";
-import Legend from "../../../components/shared/legend.js";
-import LegendLabel from "../../../components/shared/legend_label.js";
 import XAxis from "../../../components/shared/x_axis.js";
 import YAxis from "../../../components/shared/y_axis.js";
 import DataLabels from "../../../components/shared/data_labels.js";
@@ -18,7 +16,7 @@ function GroupedBarChart() {
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch({type: "set-config", value: Spec});
-	}, []);
+	}, [dispatch]);
   
   const properties = [
     {
@@ -40,14 +38,6 @@ function GroupedBarChart() {
     {
       name: "Y Axis",
       component: <YAxis />
-    },
-    {
-      name: "Legend",
-      component: <Legend />
-    },
-    {
-      name: "Legend Label",
-      component: <LegendLabel />
     },
     {
       name: "Data Labels",

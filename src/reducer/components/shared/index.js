@@ -19,6 +19,7 @@ const sharedReducer = (state = {}, action) => {
           draftState.spec.title = action.value;
       });
     case 'set-color':
+      const namePath;
       return produce(state, draftState => {
           if (draftState.spec.layer[0].encoding.color.hasOwnProperty("field")){
             draftState.spec.layer[0].encoding.color.scale.range[action.index] = action.value;

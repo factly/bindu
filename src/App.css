@@ -114,9 +114,3 @@
 .option-item-input.option-item-input-checkbox {
   width: 24px;
 }
-
-.options-container {
-  max-height: 100%;
-  height: 100%;
-  overflow: auto;
-}

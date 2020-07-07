@@ -2,7 +2,6 @@ import React from "react";
 import { Input, Row, Col } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
-import _ from "lodash";
 
 function Segment() {
 	const spec = useSelector(state => state.chart.spec);
