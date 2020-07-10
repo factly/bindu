@@ -1,0 +1,37 @@
+.extra-actions-container li{
+	float: left;
+	margin-left: 12px;
+	cursor: pointer;
+}
+
+.extra-actions-container ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.display-container {
+	padding: 1px;
+}
+
+.option-container {
+	position: relative;
+	transition: right 0.5s;
+	width: 250px;
+}
+
+.chart-name {
+	margin-right: 12px;
+	font-style: italic;
+}
+
+.chart-name-editable-container {
+	display: grid;
+	width: 160px;
+	grid-template-columns: 100px 50px;
+	column-gap: 10px;
+}
+
+.property-container .ant-select {
+	width: 100%;
+}
