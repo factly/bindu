@@ -1,23 +1,19 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import * as vega from "vega";
-import { compile } from "vega-lite";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import * as vega from 'vega';
+import { compile } from 'vega-lite';
 
 function Chart() {
-  const spec = useSelector((state) => state.chart.spec)
+  const spec = useSelector((state) => state.chart.spec);
 
   const refContainer = React.useRef(null);
-
-  React.useEffect(()=> {
-    renderVega();
-  },[spec])
 
   const getSpec = () => {
     return compile(spec).spec;
   };
 
   const renderVega = () => {
-    if(Object.keys(spec).length){
+    if (Object.keys(spec).length) {
       const spec = getSpec();
       let runtime = vega.parse(spec);
       const loader = vega.loader();
@@ -25,19 +21,15 @@ function Chart() {
         loader,
       }).hover();
 
-      view
-        .logLevel(vega.Warn)
-        .renderer("svg")
-        .initialize(refContainer.current)
-        .runAsync();
+      view.logLevel(vega.Warn).renderer('svg').initialize(refContainer.current).runAsync();
     }
   };
 
-  
-    return (
-        <div className="chart-container" ref={refContainer}></div>
-    );
+  React.useEffect(() => {
+    renderVega();
+  }, [spec]);
 
+  return <div className="chart-container" ref={refContainer}></div>;
 }
 
 export default Chart;

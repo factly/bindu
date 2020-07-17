@@ -1,75 +1,110 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
-import { Collapse } from "antd";
-import ChartProperties from "../../../components/shared/chart_properties.js";
-import Colors from "../../../components/shared/colors.js";
-import Bars from "../../../components/bar/bars.js";
-import Legend from "../../../components/shared/legend.js";
-import LegendLabel from "../../../components/shared/legend_label.js";
-import XAxis from "../../../components/shared/x_axis.js";
-import YAxis from "../../../components/shared/y_axis.js";
-import DataLabels from "../../../components/shared/data_labels.js";
+import { Collapse } from 'antd';
+import ChartProperties from '../../../components/shared/chart_properties.js';
+import Colors from '../../../components/shared/colors.js';
+import Bars from '../../../components/shared/bars.js';
+import XAxis from '../../../components/shared/x_axis.js';
+import YAxis from '../../../components/shared/y_axis.js';
+
 import { useDispatch } from 'react-redux';
 
-import Spec from "./default.json";
+import Spec from './default.json';
 const { Panel } = Collapse;
 
 function GroupedBarChart() {
-	const dispatch = useDispatch();
-	useEffect(() => {
-		dispatch({type: "set-config", value: Spec});
-	}, [dispatch]);
-  
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch({ type: 'set-config', value: Spec });
+  }, [dispatch]);
+
   const properties = [
     {
-      name: "Chart Properties",
-      component: <ChartProperties />
+      name: 'Chart Properties',
+      Component: ChartProperties,
     },
     {
-      name: "Colors",
-      component: <Colors />
+      name: 'Colors',
+      properties: [
+        {
+          prop: 'color',
+          type: 'array',
+          path: ['encoding', 'color', 'scale', 'range'],
+        },
+      ],
+      Component: Colors,
     },
     {
-      name: "Bars",
-      component: <Bars />
+      name: 'Bars',
+      properties: [
+        {
+          prop: 'opacity',
+          path: ['encoding', 'opacity', 'value'],
+        },
+        {
+          prop: 'corner_radius',
+          path: ['mark', 'cornerRadius'],
+        },
+      ],
+      Component: Bars,
     },
     {
-      name: "X Axis",
-      component: <XAxis />
+      name: 'X Axis',
+      properties: [
+        {
+          prop: 'title',
+          path: ['encoding', 'x', 'axis', 'title'],
+        },
+        {
+          prop: 'orient',
+          path: ['encoding', 'x', 'axis', 'orient'],
+        },
+        {
+          prop: 'format',
+          path: ['encoding', 'x', 'axis', 'format'],
+        },
+        {
+          prop: 'label_color',
+          path: ['encoding', 'x', 'axis', 'labelColor'],
+        },
+      ],
+      Component: XAxis,
     },
     {
-      name: "Y Axis",
-      component: <YAxis />
+      name: 'Y Axis',
+      properties: [
+        {
+          prop: 'title',
+          path: ['encoding', 'y', 'axis', 'title'],
+        },
+        {
+          prop: 'orient',
+          path: ['encoding', 'y', 'axis', 'orient'],
+        },
+        {
+          prop: 'format',
+          path: ['encoding', 'y', 'axis', 'format'],
+        },
+        {
+          prop: 'label_color',
+          path: ['encoding', 'y', 'axis', 'labelColor'],
+        },
+      ],
+      Component: YAxis,
     },
-    {
-      name: "Legend",
-      component: <Legend />
-    },
-    {
-      name: "Legend Label",
-      component: <LegendLabel />
-    },
-    {
-      name: "Data Labels",
-      component: <DataLabels />
-    }
   ];
 
   return (
     <div className="options-container">
-    		<Collapse
-          className="option-item-collapse"
-        >
-          {
-            properties.map((d, i) => {
-              return (
-                <Panel className="option-item-panel" header={d.name} key={i}>
-                  {d.component}
-                </Panel>
-              )
-            })
-          }
-        </Collapse>
+      <Collapse className="option-item-collapse">
+        {properties.map((d, i) => {
+          return (
+            <Panel className="option-item-panel" header={d.name} key={i}>
+              <d.Component properties={d.properties} />
+            </Panel>
+          );
+        })}
+      </Collapse>
     </div>
   );
 }

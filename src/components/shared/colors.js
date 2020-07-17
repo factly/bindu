@@ -1,28 +1,51 @@
-import React from "react";
+import React from 'react';
 import { Input, Row, Col } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
-function Colors() {
-	const spec = useSelector(state => state.chart.spec);
-	let colors = [];	
-	if (spec.layer[0].encoding.color.hasOwnProperty("field")){
-		colors = spec.layer[0].encoding.color.scale.range;
-	} else {
-		colors = [spec.layer[0].encoding.color.value];
-	}
+import { getValueFromNestedPath } from '../../utils/index.js';
 
-	const dispatch = useDispatch();
+import { SET_COLOR } from '../../constants/colors.js';
+
+function Colors(props) {
+  const spec = useSelector((state) => state.chart.spec);
+  const colorObj = props.properties.find((d) => d.prop === 'color');
+
+  let colors = getValueFromNestedPath(spec, colorObj.path);
+
+  if (colorObj.type === 'string') {
+    colors = [colors];
+  }
+
+  const dispatch = useDispatch();
+  const payload = {
+    path: colorObj.path,
+    type: colorObj.type,
+  };
 
   return (
     <div className="property-container">
-    	<Row gutter={[0, 12]}>
-			<Col span={12}>
-				<label htmlFor="">Colors</label>
-			</Col>
-			<Col span={12}>
-				{colors.map((d, i) => <Input type="color" value={d} key={i} onChange={(e) => dispatch({type: "set-color", index: i, value: e.target.value, chart: "shared"})}></Input>)}
-			</Col>
-		</Row>
+      <Row gutter={[0, 12]}>
+        <Col span={12}>
+          <label htmlFor="">Colors</label>
+        </Col>
+        <Col span={12}>
+          {colors &&
+            colors.map((d, i) => (
+              <Input
+                type="color"
+                value={d}
+                key={i}
+                onChange={(e) =>
+                  dispatch({
+                    type: SET_COLOR,
+                    payload: { index: i, value: e.target.value, ...payload },
+                    chart: 'shared',
+                  })
+                }
+              ></Input>
+            ))}
+        </Col>
+      </Row>
     </div>
   );
 }
