@@ -14,17 +14,22 @@
         "binSpacing": 1
       },
       "encoding": {
-        "tooltip": [{
-          "aggregate": "count",
-          "type": "quantitative",
-          "field": "weather"}, 
+        "tooltip": [
           {
-          "timeUnit": "month",
-          "field": "date",
-          "type": "ordinal"},{
+            "aggregate": "count",
+            "type": "quantitative",
+            "field": "weather"
+          },
+          {
+            "timeUnit": "month",
+            "field": "date",
+            "type": "ordinal"
+          },
+          {
             "field": "weather",
             "type": "nominal"
-          }],
+          }
+        ],
         "x": {
           "timeUnit": "month",
           "field": "date",
@@ -36,7 +41,7 @@
           "type": "quantitative",
           "field": "weather",
           "axis": { "title": "Count", "orient": "left", "labelExpr": "datum.value*100" },
-          "stack":  "normalize"
+          "stack": "normalize"
         },
         "opacity": {
           "value": 1
@@ -46,7 +51,18 @@
           "type": "nominal",
           "scale": {
             "domain": ["sun", "fog", "drizzle", "rain", "snow"],
-            "range": ["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"]
+            "range": [
+              "#1f77b4",
+              "#ff7f0e",
+              "#2ca02c",
+              "#d62728",
+              "#9467bd",
+              "#8c564b",
+              "#e377c2",
+              "#7f7f7f",
+              "#bcbd22",
+              "#17becf"
+            ]
           },
           "legend": {
             "title": "Weather type",

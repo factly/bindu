@@ -1,157 +1,153 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
-import { Collapse } from "antd";
-import ChartProperties from "../../../components/shared/chart_properties.js";
-import Colors from "../../../components/shared/colors.js";
-import XAxis from "../../../components/shared/x_axis.js";
-import YAxis from "../../../components/shared/y_axis.js";
-import DataLabels from "../../../components/shared/data_labels.js";
+import { Collapse } from 'antd';
+import ChartProperties from '../../../components/shared/chart_properties.js';
+import Colors from '../../../components/shared/colors.js';
+import XAxis from '../../../components/shared/x_axis.js';
+import YAxis from '../../../components/shared/y_axis.js';
+import DataLabels from '../../../components/shared/data_labels.js';
 
-import Dots from "../../../components/shared/dots.js";
-import Line from "../../../components/shared/area_lines.js";
+import Dots from '../../../components/shared/dots.js';
+import Line from '../../../components/shared/area_lines.js';
 import { useDispatch } from 'react-redux';
 
-import Spec from "./default.json";
+import Spec from './default.json';
 const { Panel } = Collapse;
 
 function GroupedBarChart() {
-	const dispatch = useDispatch();
-	useEffect(() => {
-		dispatch({type: "set-config", value: Spec});
-	}, [dispatch]);
-  
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch({ type: 'set-config', value: Spec });
+  }, [dispatch]);
+
   const props = [
     {
-      name: "Chart Properties",
+      name: 'Chart Properties',
       properties: [
         {
-          prop: "title",
-          path: ["title"]
+          prop: 'title',
+          path: ['title'],
         },
         {
-          prop: "width",
-          path: ["width"]
+          prop: 'width',
+          path: ['width'],
         },
         {
-          prop: "height",
-          path: ["height"]
+          prop: 'height',
+          path: ['height'],
         },
         {
-          prop: "background",
-          path: ["background"]
-        }
+          prop: 'background',
+          path: ['background'],
+        },
       ],
-      Component: ChartProperties
+      Component: ChartProperties,
     },
     {
-      name: "Colors",
+      name: 'Colors',
       properties: [
         {
-          prop: "color",
-          type: "string",
-          path: ["layer",0,"encoding","color","value"]
-        }
+          prop: 'color',
+          type: 'string',
+          path: ['layer', 0, 'encoding', 'color', 'value'],
+        },
       ],
-      Component: Colors
+      Component: Colors,
     },
     {
-      name: "Line",
+      name: 'Line',
       properties: [
         {
-          prop: "mark",
-          path: ["layer", 0, "mark"]
-        }
+          prop: 'mark',
+          path: ['layer', 0, 'mark'],
+        },
       ],
-      Component: Line
+      Component: Line,
     },
     {
-      name: "Dots",
+      name: 'Dots',
       properties: [
         {
-          prop: "mark",
-          path: ["layer", 0, "mark"]
-        }
+          prop: 'mark',
+          path: ['layer', 0, 'mark'],
+        },
       ],
-      Component: Dots
+      Component: Dots,
     },
     {
-      name: "X Axis",
+      name: 'X Axis',
       properties: [
         {
-          prop: "title",
-          path: ["layer", 0, "encoding","x","axis", "title"]
+          prop: 'title',
+          path: ['layer', 0, 'encoding', 'x', 'axis', 'title'],
         },
         {
-          prop: "orient",
-          path: ["layer", 0, "encoding","x","axis", "orient"]
+          prop: 'orient',
+          path: ['layer', 0, 'encoding', 'x', 'axis', 'orient'],
         },
         {
-          prop: "format",
-          path: ["layer", 0, "encoding","x","axis", "format"]
+          prop: 'format',
+          path: ['layer', 0, 'encoding', 'x', 'axis', 'format'],
         },
         {
-          prop: "label_color",
-          path: ["layer", 0, "encoding","x","axis", "labelColor"]
-        }
+          prop: 'label_color',
+          path: ['layer', 0, 'encoding', 'x', 'axis', 'labelColor'],
+        },
       ],
-      Component: XAxis
+      Component: XAxis,
     },
     {
-      name: "Y Axis",
+      name: 'Y Axis',
       properties: [
         {
-          prop: "title",
-          path: ["layer", 0, "encoding","y","axis", "title"]
+          prop: 'title',
+          path: ['layer', 0, 'encoding', 'y', 'axis', 'title'],
         },
         {
-          prop: "orient",
-          path: ["layer", 0, "encoding","y","axis", "orient"]
+          prop: 'orient',
+          path: ['layer', 0, 'encoding', 'y', 'axis', 'orient'],
         },
         {
-          prop: "format",
-          path: ["layer", 0, "encoding","y","axis", "format"]
+          prop: 'format',
+          path: ['layer', 0, 'encoding', 'y', 'axis', 'format'],
         },
         {
-          prop: "label_color",
-          path: ["layer", 0, "encoding","y","axis", "labelColor"]
-        }
+          prop: 'label_color',
+          path: ['layer', 0, 'encoding', 'y', 'axis', 'labelColor'],
+        },
       ],
-      Component: YAxis
+      Component: YAxis,
     },
     {
-      name: "Data Labels",
+      name: 'Data Labels',
       properties: [
         {
-          prop: "color",
-          path: ["layer", 1, "encoding", "color", "value"]
+          prop: 'color',
+          path: ['layer', 1, 'encoding', 'color', 'value'],
         },
         {
-          prop: "font_size",
-          path: ["layer", 1, "mark", "fontSize"]
+          prop: 'font_size',
+          path: ['layer', 1, 'mark', 'fontSize'],
         },
         {
-          prop: "format",
-          path: ["layer", 1, "encoding", "text", "format"]
-        }
+          prop: 'format',
+          path: ['layer', 1, 'encoding', 'text', 'format'],
+        },
       ],
-      Component: DataLabels
-    }
+      Component: DataLabels,
+    },
   ];
 
   return (
-  		<Collapse
-        className="option-item-collapse"
-      >
-        {
-          props.map((d, i) => {
-            return (
-              <Panel className="option-item-panel" header={d.name} key={i}>
-                  <d.Component properties = {d.properties}/>
-              </Panel>
-            )
-          })
-        }
-      </Collapse>
+    <Collapse className="option-item-collapse">
+      {props.map((d, i) => {
+        return (
+          <Panel className="option-item-panel" header={d.name} key={i}>
+            <d.Component properties={d.properties} />
+          </Panel>
+        );
+      })}
+    </Collapse>
   );
 }
 

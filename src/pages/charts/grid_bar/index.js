@@ -1,138 +1,134 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
-import { Collapse } from "antd";
-import ChartProperties from "../../../components/shared/chart_properties.js";
-import Colors from "../../../components/shared/colors.js";
-import Bars from "../../../components/shared/bars.js";
-import XAxis from "../../../components/shared/x_axis.js";
-import YAxis from "../../../components/shared/y_axis.js";
+import { Collapse } from 'antd';
+import ChartProperties from '../../../components/shared/chart_properties.js';
+import Colors from '../../../components/shared/colors.js';
+import Bars from '../../../components/shared/bars.js';
+import XAxis from '../../../components/shared/x_axis.js';
+import YAxis from '../../../components/shared/y_axis.js';
 
-import Facet from "../../../components/shared/facet.js";
+import Facet from '../../../components/shared/facet.js';
 
 import { useDispatch } from 'react-redux';
 
-import Spec from "./default.json";
+import Spec from './default.json';
 const { Panel } = Collapse;
 
 function GroupedBarChart() {
-	const dispatch = useDispatch();
-	useEffect(() => {
-		dispatch({type: "set-config", value: Spec});
-	}, [dispatch]);
-  
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch({ type: 'set-config', value: Spec });
+  }, [dispatch]);
+
   const properties = [
     {
-      name: "Chart Properties",
-      Component: ChartProperties
+      name: 'Chart Properties',
+      Component: ChartProperties,
     },
     {
-      name: "Colors",
+      name: 'Colors',
       properties: [
         {
-          prop: "color",
-          type: "array",
-          path: ["encoding","color","scale", "range"]
-        }
+          prop: 'color',
+          type: 'array',
+          path: ['encoding', 'color', 'scale', 'range'],
+        },
       ],
-      Component: Colors
+      Component: Colors,
     },
     {
-      name: "Grid",
+      name: 'Grid',
       properties: [
         {
-          prop: "column",
-          path: ["encoding","facet","columns"]
+          prop: 'column',
+          path: ['encoding', 'facet', 'columns'],
         },
         {
-          prop: "spacing",
-          path: ["encoding","facet","spacing"]
+          prop: 'spacing',
+          path: ['encoding', 'facet', 'spacing'],
         },
         {
-          prop: "xaxis",
-          path: ["resolve","axis","x"]
+          prop: 'xaxis',
+          path: ['resolve', 'axis', 'x'],
         },
         {
-          prop: "yaxis",
-          path: ["resolve","axis","y"]
-        }
+          prop: 'yaxis',
+          path: ['resolve', 'axis', 'y'],
+        },
       ],
-      Component: Facet
+      Component: Facet,
     },
     {
-      name: "Bars",
+      name: 'Bars',
       properties: [
         {
-          prop: "opacity",
-          path: ["encoding","opacity","value"]
+          prop: 'opacity',
+          path: ['encoding', 'opacity', 'value'],
         },
         {
-          prop: "corner_radius",
-          path: ["mark","cornerRadius"]
-        }
+          prop: 'corner_radius',
+          path: ['mark', 'cornerRadius'],
+        },
       ],
-      Component: Bars
+      Component: Bars,
     },
     {
-      name: "X Axis",
+      name: 'X Axis',
       properties: [
         {
-          prop: "title",
-          path: ["encoding","x","axis", "title"]
+          prop: 'title',
+          path: ['encoding', 'x', 'axis', 'title'],
         },
         {
-          prop: "orient",
-          path: ["encoding","x","axis", "orient"]
+          prop: 'orient',
+          path: ['encoding', 'x', 'axis', 'orient'],
         },
         {
-          prop: "format",
-          path: ["encoding","x","axis", "format"]
+          prop: 'format',
+          path: ['encoding', 'x', 'axis', 'format'],
         },
         {
-          prop: "label_color",
-          path: ["encoding","x","axis", "labelColor"]
-        }
+          prop: 'label_color',
+          path: ['encoding', 'x', 'axis', 'labelColor'],
+        },
       ],
-      Component: XAxis
+      Component: XAxis,
     },
     {
-      name: "Y Axis",
+      name: 'Y Axis',
       properties: [
         {
-          prop: "title",
-          path: ["encoding","y","axis", "title"]
+          prop: 'title',
+          path: ['encoding', 'y', 'axis', 'title'],
         },
         {
-          prop: "orient",
-          path: ["encoding","y","axis", "orient"]
+          prop: 'orient',
+          path: ['encoding', 'y', 'axis', 'orient'],
         },
         {
-          prop: "format",
-          path: ["encoding","y","axis", "format"]
+          prop: 'format',
+          path: ['encoding', 'y', 'axis', 'format'],
         },
         {
-          prop: "label_color",
-          path: ["encoding","y","axis", "labelColor"]
-        }
+          prop: 'label_color',
+          path: ['encoding', 'y', 'axis', 'labelColor'],
+        },
       ],
-      Component: YAxis
-    }
+      Component: YAxis,
+    },
   ];
 
   return (
     <div className="options-container">
-    		<Collapse
-          className="option-item-collapse"
-        >
-          {
-            properties.map((d, i) => {
-              return (
-                <Panel className="option-item-panel" header={d.name} key={i}>
-                  <d.Component properties = {d.properties}/>
-                </Panel>
-              )
-            })
-          }
-        </Collapse>
+      <Collapse className="option-item-collapse">
+        {properties.map((d, i) => {
+          return (
+            <Panel className="option-item-panel" header={d.name} key={i}>
+              <d.Component properties={d.properties} />
+            </Panel>
+          );
+        })}
+      </Collapse>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 export const getValueFromNestedPath = (object, path) => {
   let value = object;
-  if (path && path.length){
-    path.forEach(key => {
+  if (path && path.length) {
+    path.forEach((key) => {
       value = value[key];
     });
   }

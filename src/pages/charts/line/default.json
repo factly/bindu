@@ -1,66 +1,57 @@
 {
-    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-    "description": "Google's stock price over time.",
-    "data":
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "description": "Google's stock price over time.",
+  "data": {
+    "url": "https://vega.github.io/editor/data/stocks.csv"
+  },
+  "transform": [
     {
-        "url": "https://vega.github.io/editor/data/stocks.csv"
-    },
-    "transform": [
+      "filter": "datum.symbol==='GOOG'"
+    }
+  ],
+  "width": 500,
+  "height": 300,
+  "layer": [
     {
-        "filter": "datum.symbol==='GOOG'"
-    }],
-    "width": 500,
-    "height": 300,
-    "layer": [
-    {
-        "mark":
-        {
-            "type": "line",
-            "opacity": 1,
-            "strokeWidth": 1,
-            "interpolate": "linear",
-            "strokeDash": 0,
-            "tooltip": true
+      "mark": {
+        "type": "line",
+        "opacity": 1,
+        "strokeWidth": 1,
+        "interpolate": "linear",
+        "strokeDash": 0,
+        "tooltip": true
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "type": "temporal",
+          "axis": {
+            "title": "Time",
+            "orient": "bottom"
+          }
         },
-        "encoding":
-        {
-            "x":
-            {
-                "field": "date",
-                "type": "temporal",
-                "axis":
-                {
-                    "title": "Time",
-                    "orient": "bottom"
-                }
-            },
-            "y":
-            {
-                "field": "price",
-                "type": "quantitative",
-                "axis":
-                {
-                    "title": "Count",
-                    "orient": "left"
-                }
-            },
-            "color":
-            {
-                "field": "symbol",
-                "type": "nominal",
-                "scale":
-                {
-                    "range": ["#1f77b4"]
-                },
-                "legend":
-                {
-                    "title": "Time Series",
-                    "orient": "right",
-                    "symbolType": "circle",
-                    "fillColor": "#ffffff"
-                }
-            }
+        "y": {
+          "field": "price",
+          "type": "quantitative",
+          "axis": {
+            "title": "Count",
+            "orient": "left"
+          }
+        },
+        "color": {
+          "field": "symbol",
+          "type": "nominal",
+          "scale": {
+            "range": ["#1f77b4"]
+          },
+          "legend": {
+            "title": "Time Series",
+            "orient": "right",
+            "symbolType": "circle",
+            "fillColor": "#ffffff"
+          }
         }
-
-    }]
+      }
+    }
+  ]
 }
