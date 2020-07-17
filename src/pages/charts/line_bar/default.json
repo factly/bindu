@@ -40,7 +40,6 @@
       }
     },
     {
-
         "mark":
         {
             "type": "line",
@@ -63,7 +62,7 @@
                 "type": "quantitative"
             },
             "color": {
-              "value": "yellow"
+              "value": "#FFFF00"
             }
         }
     }

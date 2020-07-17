@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Collapse } from "antd";
 import ChartProperties from "../../../components/shared/chart_properties.js";
 import Colors from "../../../components/shared/colors.js";
-import Bars from "../../../components/bar/bars.js";
+import Bars from "../../../components/shared/bars.js";
 import Legend from "../../../components/shared/legend.js";
 import LegendLabel from "../../../components/shared/legend_label.js";
 import XAxis from "../../../components/shared/x_axis.js";

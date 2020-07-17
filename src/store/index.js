@@ -88,6 +88,26 @@ const defaultStore = {
 		    	id: 15,
 		    	name: "Horizontal Grouped Bar Chart(Proportional)",
 		    	icon: "https://public.flourish.studio/uploads/ebed7412-cc56-4ef0-a3ba-97865643f545.png"
+		  	},
+		  	{
+		    	id: 16,
+		    	name: "Grid of Pie Chart",
+		    	icon: "https://public.flourish.studio/uploads/55a3ab6f-9b55-41cf-847d-e38cd17d2dd2.png"
+		  	},
+		  	{
+		    	id: 17,
+		    	name: "Grid of Bar Chart",
+		    	icon: "https://public.flourish.studio/uploads/1c44c202-9de5-4fc6-a403-1c310cef0fa3.png"
+		  	},
+		  	{
+		    	id: 18,
+		    	name: "Grid of Line Chart",
+		    	icon: "https://public.flourish.studio/uploads/4f6b9081-4ada-481f-9232-110615db716e.png"
+		  	},
+		  	{
+		    	id: 19,
+		    	name: "Grouped Bar",
+		    	icon: "https://public.flourish.studio/uploads/b7f72bb3-9432-4a67-8082-f23370b6b412.png"
 		  	}
 		]
 	}

@@ -13,7 +13,7 @@
           "timeUnit": "yearmonth",
           "field": "date",
           "type": "temporal",
-          "axis": {"format": "%Y"}
+          "axis": {"format": "%Y", "orient": "bottom"}
         },
         "y": {
           "aggregate": "sum",
@@ -22,10 +22,7 @@
           "axis": {"title": "count", "orient": "left"}
         },
         "color": {
-          "type": "quantitative",
-          "scale": {
-            "range": ["#1f77b4"]
-          }
+          "value": "#1f77b4"
         }
       }
     }

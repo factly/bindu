@@ -7,7 +7,8 @@ import XAxis from "../../../components/shared/x_axis.js";
 import YAxis from "../../../components/shared/y_axis.js";
 import DataLabels from "../../../components/shared/data_labels.js";
 
-import Dots from "../../../components/line/dots.js";
+import Dots from "../../../components/shared/dots.js";
+import Line from "../../../components/shared/area_lines.js";
 import { useDispatch } from 'react-redux';
 
 import Spec from "./default.json";
@@ -19,30 +20,121 @@ function GroupedBarChart() {
 		dispatch({type: "set-config", value: Spec});
 	}, [dispatch]);
   
-  const properties = [
+  const props = [
     {
       name: "Chart Properties",
-      component: <ChartProperties />
+      properties: [
+        {
+          prop: "title",
+          path: ["title"]
+        },
+        {
+          prop: "width",
+          path: ["width"]
+        },
+        {
+          prop: "height",
+          path: ["height"]
+        },
+        {
+          prop: "background",
+          path: ["background"]
+        }
+      ],
+      Component: ChartProperties
     },
     {
       name: "Colors",
-      component: <Colors />
+      properties: [
+        {
+          prop: "color",
+          type: "string",
+          path: ["layer",0,"encoding","color","value"]
+        }
+      ],
+      Component: Colors
+    },
+    {
+      name: "Line",
+      properties: [
+        {
+          prop: "mark",
+          path: ["layer", 0, "mark"]
+        }
+      ],
+      Component: Line
     },
     {
       name: "Dots",
-      component: <Dots />
+      properties: [
+        {
+          prop: "mark",
+          path: ["layer", 0, "mark"]
+        }
+      ],
+      Component: Dots
     },
     {
       name: "X Axis",
-      component: <XAxis />
+      properties: [
+        {
+          prop: "title",
+          path: ["layer", 0, "encoding","x","axis", "title"]
+        },
+        {
+          prop: "orient",
+          path: ["layer", 0, "encoding","x","axis", "orient"]
+        },
+        {
+          prop: "format",
+          path: ["layer", 0, "encoding","x","axis", "format"]
+        },
+        {
+          prop: "label_color",
+          path: ["layer", 0, "encoding","x","axis", "labelColor"]
+        }
+      ],
+      Component: XAxis
     },
     {
       name: "Y Axis",
-      component: <YAxis />
+      properties: [
+        {
+          prop: "title",
+          path: ["layer", 0, "encoding","y","axis", "title"]
+        },
+        {
+          prop: "orient",
+          path: ["layer", 0, "encoding","y","axis", "orient"]
+        },
+        {
+          prop: "format",
+          path: ["layer", 0, "encoding","y","axis", "format"]
+        },
+        {
+          prop: "label_color",
+          path: ["layer", 0, "encoding","y","axis", "labelColor"]
+        }
+      ],
+      Component: YAxis
     },
     {
       name: "Data Labels",
-      component: <DataLabels />
+      properties: [
+        {
+          prop: "color",
+          path: ["layer", 1, "encoding", "color", "value"]
+        },
+        {
+          prop: "font_size",
+          path: ["layer", 1, "mark", "fontSize"]
+        },
+        {
+          prop: "format",
+          path: ["layer", 1, "encoding", "text", "format"]
+        }
+      ],
+      Component: DataLabels
     }
   ];
 
@@ -51,10 +143,10 @@ function GroupedBarChart() {
         className="option-item-collapse"
       >
         {
-          properties.map((d, i) => {
+          props.map((d, i) => {
             return (
               <Panel className="option-item-panel" header={d.name} key={i}>
-                {d.component}
+                  <d.Component properties = {d.properties}/>
               </Panel>
             )
           })

@@ -8,10 +8,6 @@ function Chart() {
 
   const refContainer = React.useRef(null);
 
-  React.useEffect(()=> {
-    renderVega();
-  },[spec])
-
   const getSpec = () => {
     return compile(spec).spec;
   };
@@ -32,6 +28,10 @@ function Chart() {
         .runAsync();
     }
   };
+
+  React.useEffect(()=> {
+    renderVega();
+  },[spec]);
 
   
     return (

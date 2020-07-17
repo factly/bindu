@@ -2,16 +2,25 @@ import React from "react";
 import { Input, Row, Col } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
-function Colors() {
+import {getValueFromNestedPath} from "../../utils/index.js";
+
+import {SET_COLOR} from "../../constants/colors.js";
+
+function Colors(props) {
 	const spec = useSelector(state => state.chart.spec);
-	let colors = [];	
-	if (spec.layer[0].encoding.color.hasOwnProperty("field")){
-		colors = spec.layer[0].encoding.color.scale.range;
-	} else {
-		colors = [spec.layer[0].encoding.color.value];
+	const colorObj = props.properties.find(d => d.prop === "color");
+	
+	let colors = getValueFromNestedPath(spec, colorObj.path);
+
+	if (colorObj.type === "string"){
+		colors = [colors];
 	}
 
 	const dispatch = useDispatch();
+	const payload = {
+		path: colorObj.path,
+		type : colorObj.type
+	};
 
   return (
     <div className="property-container">
@@ -20,7 +29,7 @@ function Colors() {
 				<label htmlFor="">Colors</label>
 			</Col>
 			<Col span={12}>
-				{colors.map((d, i) => <Input type="color" value={d} key={i} onChange={(e) => dispatch({type: "set-color", index: i, value: e.target.value, chart: "shared"})}></Input>)}
+				{colors && colors.map((d, i) => <Input type="color" value={d} key={i} onChange={(e) => dispatch({type: SET_COLOR, payload: {index: i, value: e.target.value, ...payload}, chart: "shared"})}></Input>)}
 			</Col>
 		</Row>
     </div>

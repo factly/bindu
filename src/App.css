@@ -37,16 +37,6 @@
   padding: 12px;
 }
 
-.example-container {
-  height: calc(100% - 33px);
-  background-color: rgb(251,251, 251);
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  grid-gap: 12px;
-  padding: 12px;
-}
-
 #root {
   height: 100%;
 }
@@ -54,13 +44,6 @@
 .App,
 .container {
   height: inherit;
-}
-
-.chart-wrapper {
-  display: grid;
-  grid-template-columns: 70% 30%;
-  grid-template-rows: minmax(0, 1fr);
-  height: 100%;
 }
 
 .option-item-container:not(:first-child) {

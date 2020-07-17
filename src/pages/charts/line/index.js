@@ -8,8 +8,8 @@ import LegendLabel from "../../../components/shared/legend_label.js";
 import XAxis from "../../../components/shared/x_axis.js";
 import YAxis from "../../../components/shared/y_axis.js";
 
-import Lines from "../../../components/line/lines.js";
-import Dots from "../../../components/line/dots.js";
+import Lines from "../../../components/shared/lines.js";
+import Dots from "../../../components/shared/dots.js";
 
 import DataLabels from "../../../components/shared/data_labels.js";
 import { useDispatch } from 'react-redux';
