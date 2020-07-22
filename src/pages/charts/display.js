@@ -4,12 +4,21 @@ import * as vega from 'vega';
 import { compile } from 'vega-lite';
 
 function Chart() {
-  const spec = useSelector((state) => state.chart.spec);
+  const { spec, mode } = useSelector((state) => {
+    return { spec: state.chart.spec, mode: state.chart.mode };
+  });
 
   const refContainer = React.useRef(null);
 
   const getSpec = () => {
-    return compile(spec).spec;
+    switch (mode) {
+      case 'vega':
+        return spec;
+      case 'vega-lite':
+        return compile(spec).spec;
+      default:
+        return spec;
+    }
   };
 
   const renderVega = () => {

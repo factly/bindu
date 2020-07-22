@@ -109,6 +109,11 @@ const defaultStore = {
         name: 'Grouped Bar',
         icon: 'https://public.flourish.studio/uploads/b7f72bb3-9432-4a67-8082-f23370b6b412.png',
       },
+      {
+        id: 20,
+        name: 'India States',
+        icon: 'https://public.flourish.studio/uploads/b7f72bb3-9432-4a67-8082-f23370b6b412.png',
+      },
     ],
   },
 };

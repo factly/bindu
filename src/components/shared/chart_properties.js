@@ -59,7 +59,6 @@ function Dimensions(props) {
               dispatch({
                 type: SET_WIDTH,
                 payload: { value: e.target.value, path: widthObj.path },
-                value: e.target.value,
                 chart: 'shared',
               })
             }
@@ -79,7 +78,6 @@ function Dimensions(props) {
               dispatch({
                 type: SET_HEIGHT,
                 payload: { value: e.target.value, path: heightObj.path },
-                value: e.target.value,
                 chart: 'shared',
               })
             }
@@ -98,7 +96,6 @@ function Dimensions(props) {
               dispatch({
                 type: SET_BACKGROUND,
                 payload: { value: e.target.value, path: backgroundObj.path },
-                value: e.target.value,
                 chart: 'shared',
               })
             }

@@ -7,7 +7,7 @@ const chartReducer = (state = {}, action) => {
     default:
       switch (action.type) {
         case 'set-config':
-          return { ...state, spec: action.value };
+          return { ...state, spec: action.value, mode: action.mode || 'vega-lite' };
         case 'set-options':
           return { ...state, showOptions: !state.showOptions };
         case 'edit-chart-name':

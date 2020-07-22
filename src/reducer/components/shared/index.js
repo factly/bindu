@@ -542,6 +542,140 @@ const sharedReducer = (state = {}, action) => {
         );
         paddingAngleObj[path[path.length - 1]] = parseFloat(value);
       });
+    /**
+     * REGIONS LAYER PROPERTIES
+     */
+    case 'set-map-stroke-width':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const paddingAngleObj = getValueFromNestedPath(
+          draftState.spec,
+          path.slice(0, path.length - 1),
+        );
+        paddingAngleObj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-stroke-color':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const paddingAngleObj = getValueFromNestedPath(
+          draftState.spec,
+          path.slice(0, path.length - 1),
+        );
+        paddingAngleObj[path[path.length - 1]] = value;
+      });
+
+    case 'set-map-stroke-opacity':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const paddingAngleObj = getValueFromNestedPath(
+          draftState.spec,
+          path.slice(0, path.length - 1),
+        );
+        paddingAngleObj[path[path.length - 1]] = parseFloat(value);
+      });
+
+    case 'set-map-color-scheme':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const paddingAngleObj = getValueFromNestedPath(
+          draftState.spec,
+          path.slice(0, path.length - 1),
+        );
+        paddingAngleObj[path[path.length - 1]] = value;
+      });
+
+    /**
+     * GRATICULE PROPERTIES
+     */
+
+    case 'set-map-graticule-long':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const longObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        longObj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-graticule-lat':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const latObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        latObj[path[path.length - 1]] = value;
+      });
+
+    case 'set-map-graticule-width':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const widthObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        widthObj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-graticule-dash':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const dashObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        dashObj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-graticule-opacity':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const opacityObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        opacityObj[path[path.length - 1]] = parseFloat(value);
+      });
+
+    case 'set-map-graticule-color':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const colorObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        colorObj[path[path.length - 1]] = value;
+      });
+
+    /**
+     * ZOOM PROPERTIES
+     */
+
+    case 'set-map-zoom-scale':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const scaleObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        scaleObj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-zoom-rotate0':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const rotate0Obj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        rotate0Obj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-zoom-rotate1':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const rotate1Obj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        rotate1Obj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-zoom-rotate2':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const rotate2Obj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        rotate2Obj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-zoom-center0':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const center0Obj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        center0Obj[path[path.length - 1]] = parseInt(value);
+      });
+
+    case 'set-map-zoom-center1':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const center1Obj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        center1Obj[path[path.length - 1]] = parseInt(value);
+      });
     default:
       return state;
   }

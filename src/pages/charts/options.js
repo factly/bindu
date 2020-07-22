@@ -19,6 +19,8 @@ import DivergingBar from './diverging_bar/index.js';
 import Donut from './donut/index.js';
 import GroupedBarProportional from './grouped_bar_proportional/index.js';
 import HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
+
+import IndiaStates from './india_states/index.js';
 import { useParams } from 'react-router-dom';
 
 function OptionComponent() {
@@ -65,6 +67,8 @@ function OptionComponent() {
       return <GridLine />;
     case 19:
       return <GroupedBar />;
+    case 20:
+      return <IndiaStates />;
     default:
       return null;
   }
