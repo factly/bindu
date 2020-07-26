@@ -11,7 +11,7 @@
     "titlePadding": 5,
     "columnPadding": 0.4,
     "ticksInXAxis": 5,
-    "duration": 1500,
+    "duration": 500,
     "maximumModelCount": 10,
     "title": "Bar Chart Race",
     "dateDisplayFormat": "%Y"

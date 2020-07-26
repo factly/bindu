@@ -8,6 +8,7 @@ export default function BarChartRace(ref, chartSettings) {
     chartSettings.height - (chartSettings.padding.top + chartSettings.padding.bottom);
 
   const chartDataSets = data;
+  let status;
   let chartTransition;
   let timerStart, timerEnd;
   let currentDataSetIndex = 0;
@@ -21,6 +22,19 @@ export default function BarChartRace(ref, chartSettings) {
   const xAxisTimeContainer = chartContainer.append('g').attr('class', 'x-time-axis');
   const yAxisContainer = chartContainer.append('g').attr('class', 'y-axis');
 
+  chartContainer
+    .append('g')
+    .attr('class', 'playback-button')
+    .on('click', () => {
+      toogleStatus();
+    })
+    .attr(
+      'transform',
+      `translate(${-chartSettings.padding.left / 2}, ${chartSettings.innerHeight})`,
+    )
+    .append('circle')
+    .attr('r', 17.5)
+    .attr('fill', '#333333');
   chartContainer.append('g').attr('class', 'columns');
   chartContainer.append('text').attr('class', 'chart-title');
   chartContainer.append('text').attr('class', 'current-date');
@@ -166,7 +180,7 @@ export default function BarChartRace(ref, chartSettings) {
       .transition(transition)
       .attr('transform', `translate(0,${innerHeight})`)
       .on('end', function () {
-        d3.select(this).attr('fill', 'none');
+        d3.select(this).remove();
       });
 
     bodyExit.select('.column-title').transition(transition).attr('x', 0);
@@ -193,6 +207,8 @@ export default function BarChartRace(ref, chartSettings) {
     currentDataSetIndex = index;
     timerStart = d3.now();
 
+    status = 'play';
+    renderPlayPauseIcon(status);
     chartTransition = chartContainer
       .transition()
       .duration(elapsedTime)
@@ -202,37 +218,79 @@ export default function BarChartRace(ref, chartSettings) {
           elapsedTime = chartSettings.duration;
           render(index + 1);
         } else {
-          d3.select('button').text('Play');
         }
       })
       .on('interrupt', () => {
+        status = 'pause';
+        renderPlayPauseIcon(status);
         timerEnd = d3.now();
       });
 
     if (index < chartDataSets.length) {
       draw(chartDataSets[index], chartTransition);
+    } else {
+      status = 'pause';
+      renderPlayPauseIcon(status);
+
+      elapsedTime = chartSettings.duration;
+      currentDataSetIndex = 0;
     }
 
     return this;
   }
 
   function stop() {
-    d3.select(`ref`).selectAll('*').interrupt();
-
+    d3.select(ref).selectAll('*').interrupt();
+    status = 'pause';
+    renderPlayPauseIcon(status);
     return this;
   }
 
   function start() {
     elapsedTime -= timerEnd - timerStart;
-
+    status = 'play';
+    renderPlayPauseIcon(status);
     render(currentDataSetIndex);
 
     return this;
   }
 
+  function renderPlayPauseIcon(status) {
+    d3.selectAll('.playback-button path').remove();
+    if (status == 'pause') {
+      d3.select('.playback-button')
+        .append('path')
+        .attr(
+          'd',
+          'M1576 927l-1328 738q-23 13-39.5 3t-16.5-36v-1472q0-26 16.5-36t39.5 3l1328 738q23 13 23 31t-23 31z',
+        )
+        .attr('transform', 'translate(-6.5625, -8.75) scale(0.009765625)')
+        .attr('fill', '#fff');
+    } else {
+      d3.select('.playback-button')
+        .append('path')
+        .attr(
+          'd',
+          'M144 479H48c-26.5 0-48-21.5-48-48V79c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v352c0 26.5-21.5 48-48 48zm304-48V79c0-26.5-21.5-48-48-48h-96c-26.5 0-48 21.5-48 48v352c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48z',
+        )
+        .attr('transform', 'translate(-7.65625, -8.75) scale(0.0341796875)')
+        .attr('fill', '#fff');
+    }
+  }
+
+  function toogleStatus() {
+    if (status == 'play') {
+      status = 'pause';
+      stop();
+    } else {
+      status = 'pause';
+      start();
+    }
+
+    renderPlayPauseIcon(status);
+  }
+
   return {
     render,
-    start,
-    stop,
   };
 }
