@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import * as vega from 'vega';
 import { compile } from 'vega-lite';
 
+import BarChartRace from './bar_chart_race/chart.js';
+
 function Chart() {
   const { spec, mode } = useSelector((state) => {
     return { spec: state.chart.spec, mode: state.chart.mode };
@@ -34,50 +36,35 @@ function Chart() {
     }
   };
 
+  const renderCustomChart = () => {
+    const type = spec.type;
+    switch (type) {
+      case 'bar-chart-race':
+        var customChart = new BarChartRace(refContainer.current, spec);
+        customChart.render();
+      default:
+        return null;
+    }
+  };
+
+  const renderChart = () => {
+    switch (mode) {
+      case 'vega':
+        return renderVega();
+      case 'vega-lite':
+        return renderVega();
+      case 'custom':
+        return renderCustomChart();
+      default:
+        return spec;
+    }
+  };
+
   React.useEffect(() => {
-    renderVega();
+    renderChart();
   }, [spec]);
 
-  return <div className="chart-container" ref={refContainer}></div>;
+  return <div id="chart" ref={refContainer}></div>;
 }
 
 export default Chart;
-
-/*<div className="download-container">
-          <button type="button" onClick={this.download}>
-            Download
-          </button>
-          <button type="button" onClick={this.openInEditor}>
-            Open in Editor
-          </button>
-        </div>*/
-// function Chart(props){
-// 	const chartEl = useRef(null);
-
-// 	const options = ChartConfigs[props.path].options;
-// 	const spec = ChartConfigs[props.path].spec;
-
-// 	function renderVega() {
-// 		const { renderer } = spec;
-
-// 	    let runtime = vega.parse(compile(spec).spec);
-// 	    const loader = vega.loader();
-// 	    const view = new vega.View(runtime, {
-// 	      loader,
-// 	    }).hover();
-// 		debugger;
-// 	    view.logLevel(vega.Warn).renderer(renderer).initialize(chartEl).runAsync();
-// 	}
-
-// 	useEffect(() => {
-
-// 	    renderVega();
-
-// 	  });
-
-// 	return (
-// 		<div ref={chartEl}></div>
-// 	);
-// }
-
-// export default Chart;

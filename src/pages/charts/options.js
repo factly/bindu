@@ -19,8 +19,10 @@ import DivergingBar from './diverging_bar/index.js';
 import Donut from './donut/index.js';
 import GroupedBarProportional from './grouped_bar_proportional/index.js';
 import HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
-
 import IndiaStates from './india_states/index.js';
+import TreeMap from './tree_map/index.js';
+import BarChartRace from './bar_chart_race/index.js';
+
 import { useParams } from 'react-router-dom';
 
 function OptionComponent() {
@@ -69,6 +71,11 @@ function OptionComponent() {
       return <GroupedBar />;
     case 20:
       return <IndiaStates />;
+    case 21:
+      return <TreeMap />;
+    case 22:
+      return <BarChartRace />;
+
     default:
       return null;
   }

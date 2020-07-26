@@ -97,3 +97,8 @@
 .option-item-input.option-item-input-checkbox {
   width: 24px;
 }
+
+.chart-icon {
+  width: 100px;
+  height: 150px;
+}

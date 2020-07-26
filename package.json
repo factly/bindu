@@ -16,7 +16,9 @@
     "react-scripts": "3.4.1",
     "redux": "^4.0.5",
     "vega": "^5.13.0",
-    "vega-lite": "^4.13.0"
+    "vega-lite": "^4.13.0",
+    "@types/d3": "5.7.2",
+    "d3": "5.15.0"
   },
   "husky": {
     "hooks": {

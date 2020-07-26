@@ -676,6 +676,24 @@ const sharedReducer = (state = {}, action) => {
         const center1Obj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
         center1Obj[path[path.length - 1]] = parseInt(value);
       });
+
+    /**
+     * TREE MAP PROPERTIES
+     */
+
+    case 'set-tree-map-layout':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const layoutObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        layoutObj[path[path.length - 1]] = value;
+      });
+
+    case 'set-tree-map-aspect-ratio':
+      return produce(state, (draftState) => {
+        const { path, value } = payload;
+        const ratioObj = getValueFromNestedPath(draftState.spec, path.slice(0, path.length - 1));
+        ratioObj[path[path.length - 1]] = parseFloat(value);
+      });
     default:
       return state;
   }
