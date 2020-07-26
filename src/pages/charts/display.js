@@ -42,6 +42,7 @@ function Chart() {
       case 'bar-chart-race':
         var customChart = new BarChartRace(refContainer.current, spec);
         customChart.render();
+        break;
       default:
         return null;
     }

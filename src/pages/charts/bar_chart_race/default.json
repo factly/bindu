@@ -2,11 +2,17 @@
 	"type": "bar-chart-race",
     "width": 1200,
     "height": 800,
-    "padding": 70,
+    "padding": {
+        "top": 40,
+        "bottom": 40,
+        "left": 70,
+        "right": 80
+    },
     "titlePadding": 5,
     "columnPadding": 0.4,
     "ticksInXAxis": 5,
     "duration": 1500,
     "maximumModelCount": 10,
-    "title": "Bar Chart Race"
+    "title": "Bar Chart Race",
+    "dateDisplayFormat": "%Y"
  }
