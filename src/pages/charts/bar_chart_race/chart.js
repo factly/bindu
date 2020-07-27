@@ -8,6 +8,11 @@ export default function BarChartRace(ref, chartSettings) {
     chartSettings.height - (chartSettings.padding.top + chartSettings.padding.bottom);
 
   const chartDataSets = data;
+
+  chartDataSets.forEach((d) => {
+    d.date = new Date(d.date);
+  });
+
   let status;
   let chartTransition;
   let timerStart, timerEnd;
@@ -20,6 +25,7 @@ export default function BarChartRace(ref, chartSettings) {
 
   const xAxisContainer = chartContainer.append('g').attr('class', 'x-axis');
   const xAxisTimeContainer = chartContainer.append('g').attr('class', 'x-time-axis');
+  const xAxisTimeOverlay = chartContainer.append('rect').attr('class', 'x-time-axis-overlay');
   const yAxisContainer = chartContainer.append('g').attr('class', 'y-axis');
 
   chartContainer
@@ -47,11 +53,30 @@ export default function BarChartRace(ref, chartSettings) {
     .padding(chartSettings.columnPadding);
 
   const timeScale = d3.scaleTime().range([0, chartSettings.innerWidth]);
-  timeScale.domain(d3.extent(chartDataSets, (d) => new Date(d.date)));
+  timeScale.domain(d3.extent(chartDataSets, (d) => d.date));
+
+  xAxisTimeOverlay.on('click', function () {
+    const coords = d3.mouse(this);
+    const currentTime = d3.timeFormat(chartSettings.dateDisplayFormat)(timeScale.invert(coords[0]));
+    const index = chartDataSets
+      .map((d) => d3.timeFormat(chartSettings.dateDisplayFormat)(d.date))
+      .indexOf(currentTime);
+
+    cursorPointer.attr('transform', () => `translate(${timeScale(chartDataSets[index].date)},0)`);
+
+    render(index);
+  });
 
   xAxisTimeContainer
     .attr('transform', 'translate(0,' + chartSettings.innerHeight + ')')
-    .call(d3.axisBottom(timeScale).tickFormat(d3.timeFormat('%Y')));
+    .call(d3.axisBottom(timeScale).tickFormat(d3.timeFormat(chartSettings.dateDisplayFormat)));
+
+  xAxisTimeOverlay
+    .attr('fill', 'transparent')
+    .attr('style', 'cursor:pointer;')
+    .attr('transform', 'translate(0,' + chartSettings.innerHeight + ')')
+    .attr('height', '25px')
+    .attr('width', chartSettings.innerWidth);
 
   const cursorPointer = xAxisTimeContainer
     .append('path')
@@ -88,7 +113,7 @@ export default function BarChartRace(ref, chartSettings) {
 
     chartContainer
       .select('.current-date')
-      .text(d3.timeFormat(chartSettings.dateDisplayFormat)(new Date(currentDate)));
+      .text(d3.timeFormat(chartSettings.dateDisplayFormat)(currentDate));
 
     xAxisScale.domain([0, dataSetDescendingOrder[0].value]);
     yAxisScale.domain(dataSetDescendingOrder.map(({ name }) => name));
@@ -145,7 +170,7 @@ export default function BarChartRace(ref, chartSettings) {
 
     cursorPointer
       .transition(transition)
-      .attr('transform', () => `translate(${timeScale(new Date(currentDate))},0)`);
+      .attr('transform', () => `translate(${timeScale(currentDate)},0)`);
 
     barUpdate
       .select('.column-rect')
