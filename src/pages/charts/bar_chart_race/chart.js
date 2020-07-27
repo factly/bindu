@@ -208,6 +208,7 @@ export default function BarChartRace(ref, chartSettings) {
     timerStart = d3.now();
 
     status = 'play';
+
     renderPlayPauseIcon(status);
     chartTransition = chartContainer
       .transition()
@@ -283,11 +284,9 @@ export default function BarChartRace(ref, chartSettings) {
       status = 'pause';
       stop();
     } else {
-      status = 'pause';
+      status = 'play';
       start();
     }
-
-    renderPlayPauseIcon(status);
   }
 
   return {
