@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 
+	"github.com/factly/bindu-server/action/chart"
 	"github.com/factly/bindu-server/action/medium"
 	"github.com/factly/bindu-server/action/tag"
 	"github.com/factly/bindu-server/action/template"
@@ -26,11 +27,17 @@ func RegisterRoutes() *chi.Mux {
 
 	// db migrations
 	config.DB.AutoMigrate(
+		&model.Chart{},
 		&model.Medium{},
 		&model.Tag{},
 		&model.Template{},
 		&model.Theme{},
 	)
+
+	// Adding foreignKey
+	config.DB.Model(&model.Chart{}).AddForeignKey("featured_medium_id", "bi_medium(id)", "RESTRICT", "RESTRICT")
+	config.DB.Model(&model.Chart{}).AddForeignKey("theme_id", "bi_theme(id)", "RESTRICT", "RESTRICT")
+	config.DB.Model(&model.Chart{}).AddForeignKey("template_id", "bi_template(id)", "RESTRICT", "RESTRICT")
 
 	// open log file
 	file, err := os.OpenFile("logrus.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -59,6 +66,7 @@ func RegisterRoutes() *chi.Mux {
 	}
 
 	r.With(util.CheckUser, util.GenerateOrganisation).Group(func(r chi.Router) {
+		r.Mount("/charts", chart.Router())
 		r.Mount("/media", medium.Router())
 		r.Mount("/tags", tag.Router())
 		r.Mount("/templates", template.Router())
