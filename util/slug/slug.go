@@ -11,9 +11,9 @@ type comman struct {
 }
 
 // Approve return slug
-func Approve(slug string, space int, table string) string {
+func Approve(slug string, organisation int, table string) string {
 	var result []comman
-	config.DB.Table(table).Select("slug, space_id").Where("slug LIKE ? AND space_id = ?", slug+"%", space).Scan(&result)
+	config.DB.Table(table).Select("slug, organisation_id").Where("slug LIKE ? AND organisation_id = ?", slug+"%", organisation).Scan(&result)
 	count := 0
 	for true {
 		flag := true
