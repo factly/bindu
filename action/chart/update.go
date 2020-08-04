@@ -58,6 +58,16 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Fetching old and new tags related to chart
+	oldTags := result.Tags
+	newTags := make([]model.Tag, 0)
+	config.DB.Model(&model.Tag{}).Where(chart.TagIDs).Find(&newTags)
+
+	// Fetching old and new categories related to chart
+	oldCategories := result.Categories
+	newCategories := make([]model.Category, 0)
+	config.DB.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&newCategories)
+
 	var chartSlug string
 
 	if result.Slug == chart.Slug {
@@ -68,26 +78,42 @@ func update(w http.ResponseWriter, r *http.Request) {
 		chartSlug = slug.Approve(slug.Make(chart.Title), oID, config.DB.NewScope(&model.Chart{}).TableName())
 	}
 
-	// check themes, templates & medium belong to same organisation or not
+	// check themes & medium belong to same organisation or not
 	err = chart.CheckOrganisation(config.DB)
 	if err != nil {
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 
+	// Deleting old associations
+	if len(oldTags) > 0 {
+		config.DB.Model(&result).Association("Tags").Delete(oldTags)
+	}
+	if len(oldCategories) > 0 {
+		config.DB.Model(&result).Association("Categories").Delete(oldCategories)
+	}
+
+	if len(newTags) == 0 {
+		newTags = nil
+	}
+	if len(newCategories) == 0 {
+		newCategories = nil
+	}
+
 	config.DB.Model(&result).Updates(model.Chart{
 		Title:            chart.Title,
-		Subtitle:         chart.Subtitle,
 		Slug:             slug.Approve(chartSlug, oID, config.DB.NewScope(&model.Chart{}).TableName()),
-		URL:              chart.URL,
+		DataURL:          chart.DataURL,
 		Description:      chart.Description,
 		Status:           chart.Status,
 		FeaturedMediumID: chart.FeaturedMediumID,
-		TemplateID:       chart.TemplateID,
+		Config:           chart.Config,
 		ThemeID:          chart.ThemeID,
 		PublishedDate:    chart.PublishedDate,
+		Tags:             newTags,
+		Categories:       newCategories,
 		OrganisationID:   uint(oID),
-	}).Preload("Medium").Preload("Template").Preload("Theme").First(&result).First(&result)
+	}).Preload("Medium").Preload("Theme").First(&result).First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)
 }

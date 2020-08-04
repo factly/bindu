@@ -55,32 +55,35 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	result := &model.Chart{
 		Title:            chart.Title,
-		Subtitle:         chart.Subtitle,
 		Slug:             slug.Approve(chartSlug, oID, config.DB.NewScope(&model.Chart{}).TableName()),
-		URL:              chart.URL,
+		DataURL:          chart.DataURL,
+		Config:           chart.Config,
 		Description:      chart.Description,
 		Status:           chart.Status,
 		FeaturedMediumID: chart.FeaturedMediumID,
-		TemplateID:       chart.TemplateID,
 		ThemeID:          chart.ThemeID,
 		PublishedDate:    chart.PublishedDate,
 		OrganisationID:   uint(oID),
 	}
 
-	// check themes, templates & medium belong to same organisation or not
+	// check themes & medium belong to same organisation or not
 	err = chart.CheckOrganisation(config.DB)
 	if err != nil {
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 
-	err = config.DB.Model(&model.Chart{}).Create(&result).Error
+	config.DB.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
+	config.DB.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
+
+	err = config.DB.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result).Error
 
 	if err != nil {
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 
-	config.DB.Model(&model.Chart{}).Preload("Medium").Preload("Template").Preload("Theme").First(&result)
+	config.DB.Model(&model.Chart{}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result)
 
 	renderx.JSON(w, http.StatusCreated, result)
 }

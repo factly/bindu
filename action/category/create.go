@@ -1,4 +1,4 @@
-package template
+package category
 
 import (
 	"encoding/json"
@@ -13,19 +13,19 @@ import (
 	"github.com/factly/x/validationx"
 )
 
-// create - Create template
-// @Summary Create template
-// @Description Create template
-// @Tags Template
-// @ID add-template
+// create - Create category
+// @Summary Create category
+// @Description Create category
+// @Tags Category
+// @ID add-category
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
 // @Param X-Organisation header string true "Organisation ID"
-// @Param Template body template true "Template Object"
-// @Success 201 {object} model.Template
+// @Param Category body category true "Category Object"
+// @Success 201 {object} model.Category
 // @Failure 400 {array} string
-// @Router /templates [post]
+// @Router /categories [post]
 func create(w http.ResponseWriter, r *http.Request) {
 
 	oID, err := util.GetOrganisation(r.Context())
@@ -35,33 +35,32 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	template := &template{}
+	category := &category{}
 
-	json.NewDecoder(r.Body).Decode(&template)
+	json.NewDecoder(r.Body).Decode(&category)
 
-	validationError := validationx.Check(template)
+	validationError := validationx.Check(category)
 
 	if validationError != nil {
 		errorx.Render(w, validationError)
 		return
 	}
 
-	var templateSlug string
-	if template.Slug != "" && slug.Check(template.Slug) {
-		templateSlug = template.Slug
+	var categorySlug string
+	if category.Slug != "" && slug.Check(category.Slug) {
+		categorySlug = category.Slug
 	} else {
-		templateSlug = slug.Make(template.Name)
+		categorySlug = slug.Make(category.Name)
 	}
 
-	result := &model.Template{
-		Name:           template.Name,
-		Slug:           slug.Approve(templateSlug, oID, config.DB.NewScope(&model.Template{}).TableName()),
-		Description:    template.Description,
-		URL:            template.URL,
+	result := &model.Category{
+		Name:           category.Name,
+		Slug:           slug.Approve(categorySlug, oID, config.DB.NewScope(&model.Category{}).TableName()),
+		Description:    category.Description,
 		OrganisationID: uint(oID),
 	}
 
-	err = config.DB.Model(&model.Template{}).Create(&result).Error
+	err = config.DB.Model(&model.Category{}).Create(&result).Error
 
 	if err != nil {
 		return

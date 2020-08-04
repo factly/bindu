@@ -1000,248 +1000,6 @@ var doc = `{
                 }
             }
         },
-        "/templates": {
-            "get": {
-                "description": "Get all templates",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Template"
-                ],
-                "summary": "Show all templates",
-                "operationId": "get-all-templates",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "limit per page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "page number",
-                        "name": "page",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Template"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create template",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Template"
-                ],
-                "summary": "Create template",
-                "operationId": "add-template",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Template Object",
-                        "name": "Template",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/template.template"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/model.Template"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/templates/{template_id}": {
-            "get": {
-                "description": "Get template by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Template"
-                ],
-                "summary": "Show a template by id",
-                "operationId": "get-template-by-id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Template ID",
-                        "name": "template_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Template"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update template by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Template"
-                ],
-                "summary": "Update a template by id",
-                "operationId": "update-template-by-id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Template ID",
-                        "name": "template_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Template",
-                        "name": "Template",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/template.template"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Template"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete template by ID",
-                "tags": [
-                    "Template"
-                ],
-                "summary": "Delete a template",
-                "operationId": "delete-template-by-id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Template ID",
-                        "name": "template_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {},
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/themes": {
             "get": {
                 "description": "Get all themes",
@@ -1506,11 +1264,22 @@ var doc = `{
         "chart.chart": {
             "type": "object",
             "required": [
-                "template_id",
                 "theme_id",
                 "title"
             ],
             "properties": {
+                "category_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "config": {
+                    "type": "string"
+                },
+                "data_url": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1529,19 +1298,16 @@ var doc = `{
                 "status": {
                     "type": "string"
                 },
-                "subtitle": {
-                    "type": "string"
-                },
-                "template_id": {
-                    "type": "integer"
+                "tag_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "theme_id": {
                     "type": "integer"
                 },
                 "title": {
-                    "type": "string"
-                },
-                "url": {
                     "type": "string"
                 }
             }
@@ -1549,36 +1315,15 @@ var doc = `{
         "medium.medium": {
             "type": "object",
             "required": [
-                "dimensions",
-                "file_size",
                 "name",
-                "slug",
-                "title",
-                "type"
+                "type",
+                "url"
             ],
             "properties": {
-                "alt_text": {
-                    "type": "string"
-                },
-                "caption": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "dimensions": {
-                    "type": "string"
-                },
-                "file_size": {
-                    "type": "integer"
-                },
                 "name": {
                     "type": "string"
                 },
                 "slug": {
-                    "type": "string"
-                },
-                "title": {
                     "type": "string"
                 },
                 "type": {
@@ -1596,6 +1341,12 @@ var doc = `{
                 "slug"
             ],
             "properties": {
+                "charts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Chart"
+                    }
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1625,7 +1376,19 @@ var doc = `{
         "model.Chart": {
             "type": "object",
             "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Category"
+                    }
+                },
+                "config": {
+                    "type": "string"
+                },
                 "created_at": {
+                    "type": "string"
+                },
+                "data_url": {
                     "type": "string"
                 },
                 "deleted_at": {
@@ -1656,15 +1419,11 @@ var doc = `{
                 "status": {
                     "type": "string"
                 },
-                "subtitle": {
-                    "type": "string"
-                },
-                "template": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.Template"
-                },
-                "template_id": {
-                    "type": "integer"
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Tag"
+                    }
                 },
                 "theme": {
                     "type": "object",
@@ -1678,35 +1437,17 @@ var doc = `{
                 },
                 "updated_at": {
                     "type": "string"
-                },
-                "url": {
-                    "type": "string"
                 }
             }
         },
         "model.Medium": {
             "type": "object",
             "properties": {
-                "alt_text": {
-                    "type": "string"
-                },
-                "caption": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
                 "deleted_at": {
                     "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "dimensions": {
-                    "type": "string"
-                },
-                "file_size": {
-                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -1718,9 +1459,6 @@ var doc = `{
                     "type": "integer"
                 },
                 "slug": {
-                    "type": "string"
-                },
-                "title": {
                     "type": "string"
                 },
                 "type": {
@@ -1737,6 +1475,12 @@ var doc = `{
         "model.Tag": {
             "type": "object",
             "properties": {
+                "charts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Chart"
+                    }
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1759,38 +1503,6 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Template": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "organisation_id": {
-                    "type": "integer"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "url": {
                     "type": "string"
                 }
             }
@@ -1798,18 +1510,16 @@ var doc = `{
         "model.Theme": {
             "type": "object",
             "required": [
-                "name",
-                "slug",
-                "url"
+                "name"
             ],
             "properties": {
+                "config": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
                 "deleted_at": {
-                    "type": "string"
-                },
-                "description": {
                     "type": "string"
                 },
                 "id": {
@@ -1821,13 +1531,7 @@ var doc = `{
                 "organisation_id": {
                     "type": "integer"
                 },
-                "slug": {
-                    "type": "string"
-                },
                 "updated_at": {
-                    "type": "string"
-                },
-                "url": {
                     "type": "string"
                 }
             }
@@ -1849,34 +1553,15 @@ var doc = `{
                 }
             }
         },
-        "template.template": {
-            "type": "object",
-            "required": [
-                "name",
-                "url"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
         "theme.theme": {
             "type": "object",
             "required": [
-                "name",
-                "url"
+                "name"
             ],
             "properties": {
+                "config": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1884,9 +1569,6 @@ var doc = `{
                     "type": "string"
                 },
                 "slug": {
-                    "type": "string"
-                },
-                "url": {
                     "type": "string"
                 }
             }

@@ -1,4 +1,4 @@
-package template
+package category
 
 import (
 	"net/http"
@@ -14,21 +14,21 @@ import (
 // list response
 type paging struct {
 	Total int              `json:"total"`
-	Nodes []model.Template `json:"nodes"`
+	Nodes []model.Category `json:"nodes"`
 }
 
-// list - Get all templates
-// @Summary Show all templates
-// @Description Get all templates
-// @Tags Template
-// @ID get-all-templates
+// list - Get all categories
+// @Summary Show all categories
+// @Description Get all categories
+// @Tags Category
+// @ID get-all-categories
 // @Produce  json
 // @Param X-User header string true "User ID"
 // @Param X-Organisation header string true "Organisation ID"
 // @Param limit query string false "limit per page"
 // @Param page query string false "page number"
-// @Success 200 {array} model.Template
-// @Router /templates [get]
+// @Success 200 {array} model.Category
+// @Router /categories [get]
 func list(w http.ResponseWriter, r *http.Request) {
 
 	oID, err := util.GetOrganisation(r.Context())
@@ -39,11 +39,11 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := paging{}
-	result.Nodes = make([]model.Template, 0)
+	result.Nodes = make([]model.Category, 0)
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	err = config.DB.Model(&model.Template{}).Where(&model.Template{
+	err = config.DB.Model(&model.Category{}).Where(&model.Category{
 		OrganisationID: uint(oID),
 	}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes).Error
 

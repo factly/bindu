@@ -46,7 +46,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 
 	err = config.DB.Model(&model.Chart{}).Where(&model.Chart{
 		OrganisationID: uint(oID),
-	}).Preload("Medium").Preload("Template").Preload("Theme").First(&result).Error
+	}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result).Error
 
 	if err != nil {
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))

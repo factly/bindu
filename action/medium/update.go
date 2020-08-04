@@ -71,14 +71,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 	config.DB.Model(&result).Updates(model.Medium{
 		Name:           medium.Name,
 		Slug:           mediumSlug,
-		Title:          medium.Title,
 		Type:           medium.Type,
-		Description:    medium.Description,
-		Caption:        medium.Caption,
-		AltText:        medium.AltText,
-		FileSize:       medium.FileSize,
 		URL:            medium.URL,
-		Dimensions:     medium.Dimensions,
 		OrganisationID: uint(oID),
 	}).First(&result)
 

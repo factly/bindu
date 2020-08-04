@@ -55,6 +55,16 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if tag is associated with charts
+	tag := new(model.Tag)
+	tag.ID = uint(id)
+	totAssociated := config.DB.Model(tag).Association("Charts").Count()
+
+	if totAssociated != 0 {
+		errorx.Render(w, errorx.Parser(errorx.CannotSaveChanges()))
+		return
+	}
+
 	config.DB.Delete(&result)
 
 	renderx.JSON(w, http.StatusOK, nil)

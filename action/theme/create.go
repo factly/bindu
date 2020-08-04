@@ -7,7 +7,6 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
@@ -46,18 +45,9 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var themeSlug string
-	if theme.Slug != "" && slug.Check(theme.Slug) {
-		themeSlug = theme.Slug
-	} else {
-		themeSlug = slug.Make(theme.Name)
-	}
-
 	result := &model.Theme{
 		Name:           theme.Name,
-		Slug:           slug.Approve(themeSlug, oID, config.DB.NewScope(&model.Theme{}).TableName()),
-		Description:    theme.Description,
-		URL:            theme.URL,
+		Config:         theme.Config,
 		OrganisationID: uint(oID),
 	}
 

@@ -13,16 +13,17 @@ import (
 // chart request model
 type chart struct {
 	Title            string         `json:"title" validate:"required,min=3,max=50"`
-	Subtitle         string         `json:"subtitle"`
 	Slug             string         `json:"slug"`
-	URL              string         `json:"url"`
+	DataURL          string         `json:"data_url"`
+	Config           postgres.Jsonb `json:"config"`
 	Description      postgres.Jsonb `json:"description"`
 	Status           string         `json:"status"`
 	FeaturedMediumID uint           `json:"featured_medium_id"`
-	TemplateID       uint           `json:"template_id" validate:"required"`
 	ThemeID          uint           `json:"theme_id" validate:"required"`
 	PublishedDate    time.Time      `json:"published_date"`
 	OrganisationID   uint           `json:"organisation_id"`
+	CategoryIDs      []uint         `json:"category_ids"`
+	TagIDs           []uint         `json:"tag_ids"`
 }
 
 // Router - Group of chart router
@@ -42,7 +43,7 @@ func Router() chi.Router {
 
 }
 
-// CheckOrganisation - validation for medium, theme & templates
+// CheckOrganisation - validation for medium & theme
 func (c *chart) CheckOrganisation(tx *gorm.DB) (e error) {
 
 	if c.FeaturedMediumID > 0 {
@@ -71,17 +72,22 @@ func (c *chart) CheckOrganisation(tx *gorm.DB) (e error) {
 		}
 	}
 
-	if c.TemplateID > 0 {
-		template := model.Template{}
-		template.ID = c.TemplateID
+	categories := []model.Category{}
+	err := tx.Model(&model.Category{}).Where(model.Category{
+		OrganisationID: c.OrganisationID,
+	}).Where(c.CategoryIDs).Find(&categories).Error
 
-		err := tx.Model(&model.Template{}).Where(model.Template{
-			OrganisationID: c.OrganisationID,
-		}).First(&template).Error
+	if err != nil || (len(c.CategoryIDs) != len(categories)) {
+		return errors.New("some categories do not belong to same space")
+	}
 
-		if err != nil {
-			return errors.New("template do not belong to same space")
-		}
+	tags := []model.Tag{}
+	err = tx.Model(&model.Tag{}).Where(model.Tag{
+		OrganisationID: c.OrganisationID,
+	}).Where(c.TagIDs).Find(&tags).Error
+
+	if err != nil || (len(c.TagIDs) != len(tags)) {
+		return errors.New("some tags do not belong to same space")
 	}
 
 	return nil
