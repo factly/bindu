@@ -1,13 +1,16 @@
 package theme
 
-import "github.com/go-chi/chi"
+import (
+	"github.com/go-chi/chi"
+	"github.com/jinzhu/gorm/dialects/postgres"
+)
 
 // theme request model
 type theme struct {
-	Name        string `json:"name" validate:"required,min=3,max=50"`
-	Slug        string `json:"slug"`
-	URL         string `json:"url" validate:"required"`
-	Description string `json:"description"`
+	Name        string         `json:"name" validate:"required,min=3,max=50"`
+	Slug        string         `json:"slug"`
+	Config      postgres.Jsonb `json:"config"`
+	Description string         `json:"description"`
 }
 
 // Router - Group of theme router

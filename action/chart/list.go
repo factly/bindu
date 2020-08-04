@@ -43,11 +43,12 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	err = config.DB.Model(&model.Chart{}).Where(&model.Chart{
+	err = config.DB.Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").Model(&model.Chart{}).Where(&model.Chart{
 		OrganisationID: uint(oID),
 	}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes).Error
 
 	if err != nil {
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 

@@ -8,7 +8,6 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/renderx"
 	"github.com/go-chi/chi"
@@ -58,21 +57,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var themeSlug string
-
-	if result.Slug == theme.Slug {
-		themeSlug = result.Slug
-	} else if theme.Slug != "" && slug.Check(theme.Slug) {
-		themeSlug = slug.Approve(theme.Slug, oID, config.DB.NewScope(&model.Theme{}).TableName())
-	} else {
-		themeSlug = slug.Approve(slug.Make(theme.Name), oID, config.DB.NewScope(&model.Theme{}).TableName())
-	}
-
 	config.DB.Model(&result).Updates(model.Theme{
-		Name:        theme.Name,
-		Slug:        themeSlug,
-		Description: theme.Description,
-		URL:         theme.URL,
+		Name:   theme.Name,
+		Config: theme.Config,
 	}).First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)

@@ -1,4 +1,4 @@
-package template
+package category
 
 import (
 	"net/http"
@@ -12,21 +12,21 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// details - Get template by id
-// @Summary Show a template by id
-// @Description Get template by ID
-// @Tags Template
-// @ID get-template-by-id
+// details - Get category by id
+// @Summary Show a category by id
+// @Description Get category by ID
+// @Tags Category
+// @ID get-category-by-id
 // @Produce  json
 // @Param X-User header string true "User ID"
 // @Param X-Organisation header string true "Organisation ID"
-// @Param template_id path string true "Template ID"
-// @Success 200 {object} model.Template
-// @Router /templates/{template_id} [get]
+// @Param category_id path string true "Category ID"
+// @Success 200 {object} model.Category
+// @Router /categories/{category_id} [get]
 func details(w http.ResponseWriter, r *http.Request) {
 
-	templateID := chi.URLParam(r, "template_id")
-	id, err := strconv.Atoi(templateID)
+	categoryID := chi.URLParam(r, "category_id")
+	id, err := strconv.Atoi(categoryID)
 
 	if err != nil {
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
@@ -40,11 +40,11 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := &model.Template{}
+	result := &model.Category{}
 
 	result.ID = uint(id)
 
-	err = config.DB.Model(&model.Template{}).Where(&model.Template{
+	err = config.DB.Model(&model.Category{}).Where(&model.Category{
 		OrganisationID: uint(oID),
 	}).First(&result).Error
 

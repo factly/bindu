@@ -56,14 +56,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 	result := &model.Medium{
 		Name:           medium.Name,
 		Slug:           slug.Approve(mediumSlug, oID, config.DB.NewScope(&model.Medium{}).TableName()),
-		Title:          medium.Title,
 		Type:           medium.Type,
-		Description:    medium.Description,
-		Caption:        medium.Caption,
-		AltText:        medium.AltText,
-		FileSize:       medium.FileSize,
 		URL:            medium.URL,
-		Dimensions:     medium.Dimensions,
 		OrganisationID: uint(oID),
 	}
 
