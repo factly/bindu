@@ -54,7 +54,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}).First(&result).Error
 
 	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
 		return
 	}
 
