@@ -62,7 +62,7 @@ func TestMediumCreate(t *testing.T) {
 
 		jsonStr = []byte(`
 		{
-			"name": "Bar chart"
+			"name": "Bar"
 		}`)
 		headers := map[string]string{
 			"X-Organisation": "1",
@@ -77,8 +77,8 @@ func TestMediumCreate(t *testing.T) {
 				statusCode, http.StatusCreated)
 		}
 
-		if respBody["slug"] != "Bar chart" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["slug"], "Bar chart")
+		if respBody["slug"] != "bar" {
+			t.Errorf("handler returned wrong title: got %v want %v", respBody["slug"], "bar")
 		}
 
 	})
