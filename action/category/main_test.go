@@ -13,7 +13,7 @@ func TestMain(m *testing.M) {
 
 	exitValue := m.Run()
 
-	//test.CleanTables()
+	test.CleanTables()
 
 	os.Exit(exitValue)
 }

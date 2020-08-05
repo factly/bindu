@@ -11,21 +11,21 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func TestCreateMedium(t *testing.T) {
+func TestMediumCreate(t *testing.T) {
 	r := chi.NewRouter()
 
 	r.With(util.CheckUser, util.GenerateOrganisation).Post("/media", create)
 
 	var jsonStr = []byte(`
 	{
-		"name": "pie-chart",
+		"name": "Pie chart",
 		"slug": "pie-chart"
 	}`)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	t.Run("media title required", func(t *testing.T) {
+	t.Run("Unprocessable medium", func(t *testing.T) {
 		headers := map[string]string{
 			"X-Organisation": "1",
 			"X-User":         "1",
@@ -38,7 +38,7 @@ func TestCreateMedium(t *testing.T) {
 		}
 	})
 
-	t.Run("create media", func(t *testing.T) {
+	t.Run("create medium", func(t *testing.T) {
 		headers := map[string]string{
 			"X-Organisation": "1",
 			"X-User":         "1",
@@ -52,17 +52,17 @@ func TestCreateMedium(t *testing.T) {
 				statusCode, http.StatusCreated)
 		}
 
-		if respBody["name"] != "pie-chart" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "pie-chart")
+		if respBody["name"] != "Pie chart" {
+			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Pie chart")
 		}
 
 	})
 
-	t.Run("slug is empty", func(t *testing.T) {
+	t.Run("create medium with slug is empty", func(t *testing.T) {
 
 		jsonStr = []byte(`
 		{
-			"name": "bar-chart"
+			"name": "Bar chart"
 		}`)
 		headers := map[string]string{
 			"X-Organisation": "1",
@@ -77,8 +77,8 @@ func TestCreateMedium(t *testing.T) {
 				statusCode, http.StatusCreated)
 		}
 
-		if respBody["slug"] != "bar-chart" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["slug"], "bar-chart")
+		if respBody["slug"] != "Bar chart" {
+			t.Errorf("handler returned wrong title: got %v want %v", respBody["slug"], "Bar chart")
 		}
 
 	})

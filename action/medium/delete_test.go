@@ -13,7 +13,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func TestDeleteMedium(t *testing.T) {
+func TestMediumDelete(t *testing.T) {
 	r := chi.NewRouter()
 
 	r.With(util.CheckUser, util.GenerateOrganisation).Delete("/media/{medium_id}", delete)
