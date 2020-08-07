@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/config"
@@ -21,18 +20,11 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:6620
+// @host localhost:8000
 // @BasePath /
 func main() {
 
 	godotenv.Load()
-
-	port, ok := os.LookupEnv("PORT")
-	if !ok {
-		port = "6620"
-	}
-
-	port = ":" + port
 
 	// db setup
 	config.SetupDB()
@@ -41,5 +33,5 @@ func main() {
 	r := action.RegisterRoutes()
 
 	fmt.Println("swagger-ui http://localhost:6620/swagger/index.html")
-	http.ListenAndServe(port, r)
+	http.ListenAndServe(":8000", r)
 }
