@@ -152,6 +152,13 @@ definitions:
       url:
         type: string
     type: object
+  model.Organisation:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
   model.Tag:
     properties:
       charts:
@@ -218,7 +225,7 @@ definitions:
     required:
     - name
     type: object
-host: localhost:6620
+host: localhost:8000
 info:
   contact:
     email: support@swagger.io
@@ -726,6 +733,41 @@ paths:
       summary: Update a medium by id
       tags:
       - Medium
+  /organisations:
+    get:
+      description: Get all organisations
+      operationId: get-all-organisations
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Organisation'
+            type: array
+      summary: Show all organisations
+      tags:
+      - Organisation
   /tags:
     get:
       description: Get all tags
