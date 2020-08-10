@@ -132,6 +132,8 @@ fabric.properties
 
 .env
 
+main
+
 #logs
 *.log
 
