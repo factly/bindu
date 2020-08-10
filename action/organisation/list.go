@@ -1,14 +1,10 @@
 package organisation
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/x/errorx"
 	"github.com/factly/x/renderx"
 )
 
@@ -32,35 +28,11 @@ type paging struct {
 // @Router /organisations [get]
 func list(w http.ResponseWriter, r *http.Request) {
 
-	uID, err := util.GetUser(r.Context())
+	orgs := util.RequestOrganisation(w, r)
 
-	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+	if orgs == nil {
 		return
 	}
-
-	req, err := http.NewRequest("GET", os.Getenv("KAVACH_URL")+"/organisations/my", nil)
-
-	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-User", fmt.Sprint(uID))
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.NetworkError()))
-		return
-	}
-
-	defer resp.Body.Close()
-
-	var orgs []interface{}
-	json.NewDecoder(resp.Body).Decode(&orgs)
 
 	result := paging{}
 	result.Nodes = make([]model.Organisation, 0)
@@ -75,6 +47,8 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 		result.Nodes = append(result.Nodes, org)
 	}
+
+	result.Total = len(orgs)
 
 	renderx.JSON(w, http.StatusOK, result)
 }
