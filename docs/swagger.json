@@ -14,7 +14,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:6620",
+    "host": "localhost:8000",
     "basePath": "/",
     "paths": {
         "/categories": {
@@ -743,6 +743,58 @@
                 }
             }
         },
+        "/organisations": {
+            "get": {
+                "description": "Get all organisations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organisation"
+                ],
+                "summary": "Show all organisations",
+                "operationId": "get-all-organisations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation ID",
+                        "name": "X-Organisation",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Organisation"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/tags": {
             "get": {
                 "description": "Get all tags",
@@ -1453,6 +1505,17 @@
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Organisation": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }
