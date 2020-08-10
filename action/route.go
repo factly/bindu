@@ -60,7 +60,7 @@ func RegisterRoutes() *chi.Mux {
 		r.Get("/swagger/*", httpSwagger.WrapHandler)
 	}
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Group(func(r chi.Router) {
+	r.With(util.CheckUser, util.CheckOrganisation).Group(func(r chi.Router) {
 		r.Mount("/categories", category.Router())
 		r.Mount("/charts", chart.Router())
 		r.Mount("/media", medium.Router())

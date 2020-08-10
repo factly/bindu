@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 
-	"github.com/factly/x/errorx"
+	"github.com/factly/bindu-server/model"
 )
 
 type ctxKeyOrganisationID int
@@ -17,10 +17,10 @@ type ctxKeyOrganisationID int
 // OrganisationIDKey is the key that holds the unique organisation ID in a request context.
 const OrganisationIDKey ctxKeyOrganisationID = 0
 
-// GenerateOrganisation check X-Organisation in header
-func GenerateOrganisation(h http.Handler) http.Handler {
+// CheckOrganisation check X-Organisation in header
+func CheckOrganisation(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Print("Orgs")
+
 		org := r.Header.Get("X-Organisation")
 		if org == "" {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -33,12 +33,15 @@ func GenerateOrganisation(h http.Handler) http.Handler {
 			return
 		}
 
-		orgs := RequestOrganisation(w, r)
-		foundOrg := false
+		orgs, err := RequestOrganisation(r)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 
+		foundOrg := false
 		for _, each := range orgs {
-			eachOrg := (each).(map[string]interface{})
-			if int((eachOrg["id"]).(float64)) == oID {
+			if each.Base.ID == uint(oID) {
 				foundOrg = true
 				break
 			}
@@ -68,37 +71,30 @@ func GetOrganisation(ctx context.Context) (int, error) {
 }
 
 // RequestOrganisation - request kavach to get all organisations of user
-func RequestOrganisation(w http.ResponseWriter, r *http.Request) []interface{} {
+func RequestOrganisation(r *http.Request) ([]model.Organisation, error) {
 
 	uID, err := GetUser(r.Context())
 
 	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return nil
+		return nil, err
 	}
 
 	req, err := http.NewRequest("GET", os.Getenv("KAVACH_URL")+"/organisations/my", nil)
-
-	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return nil
-	}
-
+	req.Header.Set("X-User", strconv.Itoa(uID))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-User", fmt.Sprint(uID))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.NetworkError()))
-		return nil
+		return nil, err
 	}
 
 	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
 
-	var orgs []interface{}
-	json.NewDecoder(resp.Body).Decode(&orgs)
+	orgs := []model.Organisation{}
+	err = json.Unmarshal(body, &orgs)
 
-	return orgs
+	return orgs, err
 }

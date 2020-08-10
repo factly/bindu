@@ -5,6 +5,7 @@ import (
 
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/x/errorx"
 	"github.com/factly/x/renderx"
 )
 
@@ -28,25 +29,17 @@ type paging struct {
 // @Router /organisations [get]
 func list(w http.ResponseWriter, r *http.Request) {
 
-	orgs := util.RequestOrganisation(w, r)
+	orgs, err := util.RequestOrganisation(r)
 
-	if orgs == nil {
+	if err != nil {
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}
 
 	result := paging{}
 	result.Nodes = make([]model.Organisation, 0)
 
-	for _, each := range orgs {
-		eachOrg := (each).(map[string]interface{})
-
-		org := model.Organisation{}
-
-		org.ID = int((eachOrg["id"]).(float64))
-		org.Title = (eachOrg["title"]).(string)
-
-		result.Nodes = append(result.Nodes, org)
-	}
+	result.Nodes = orgs
 
 	result.Total = len(orgs)
 
