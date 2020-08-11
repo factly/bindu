@@ -15,7 +15,7 @@ import (
 func TestChartList(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Get("/charts", list)
+	r.With(util.CheckUser, util.CheckOrganisation).Get("/charts", list)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

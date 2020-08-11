@@ -16,7 +16,7 @@ import (
 func TestThemeDetails(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Get("/themes/{theme_id}", details)
+	r.With(util.CheckUser, util.CheckOrganisation).Get("/themes/{theme_id}", details)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

@@ -16,7 +16,7 @@ import (
 func TestCategoryDetails(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Get("/categories/{category_id}", details)
+	r.With(util.CheckUser, util.CheckOrganisation).Get("/categories/{category_id}", details)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

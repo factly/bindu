@@ -14,7 +14,7 @@ import (
 func TestTagCreate(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Post("/tags", create)
+	r.With(util.CheckUser, util.CheckOrganisation).Post("/tags", create)
 
 	var jsonStr = []byte(`
 	{

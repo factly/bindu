@@ -16,7 +16,7 @@ import (
 func TestMediumDelete(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Delete("/media/{medium_id}", delete)
+	r.With(util.CheckUser, util.CheckOrganisation).Delete("/media/{medium_id}", delete)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

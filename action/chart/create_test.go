@@ -17,7 +17,7 @@ import (
 func TestChartCreate(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Post("/charts", create)
+	r.With(util.CheckUser, util.CheckOrganisation).Post("/charts", create)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

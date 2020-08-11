@@ -16,7 +16,7 @@ import (
 func TestCategoryDelete(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Delete("/categories/{category_id}", delete)
+	r.With(util.CheckUser, util.CheckOrganisation).Delete("/categories/{category_id}", delete)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

@@ -16,7 +16,7 @@ import (
 func TestChartDelete(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Delete("/charts/{chart_id}", delete)
+	r.With(util.CheckUser, util.CheckOrganisation).Delete("/charts/{chart_id}", delete)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

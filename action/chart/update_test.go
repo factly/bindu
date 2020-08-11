@@ -18,7 +18,7 @@ import (
 func TestChartUpdate(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Put("/charts/{chart_id}", update)
+	r.With(util.CheckUser, util.CheckOrganisation).Put("/charts/{chart_id}", update)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

@@ -17,7 +17,7 @@ import (
 func TestTagUpdate(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Put("/tags/{tag_id}", update)
+	r.With(util.CheckUser, util.CheckOrganisation).Put("/tags/{tag_id}", update)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

@@ -16,7 +16,7 @@ import (
 func TestThemeDelete(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Delete("/themes/{theme_id}", delete)
+	r.With(util.CheckUser, util.CheckOrganisation).Delete("/themes/{theme_id}", delete)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

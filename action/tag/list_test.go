@@ -15,7 +15,7 @@ import (
 func TestTagList(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Get("/tags", list)
+	r.With(util.CheckUser, util.CheckOrganisation).Get("/tags", list)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

@@ -17,7 +17,7 @@ import (
 func TestMediumUpdate(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Put("/media/{medium_id}", update)
+	r.With(util.CheckUser, util.CheckOrganisation).Put("/media/{medium_id}", update)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()

@@ -16,7 +16,7 @@ import (
 func TestTagDelete(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.GenerateOrganisation).Delete("/tags/{tag_id}", delete)
+	r.With(util.CheckUser, util.CheckOrganisation).Delete("/tags/{tag_id}", delete)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()
