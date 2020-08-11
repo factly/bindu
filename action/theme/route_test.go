@@ -2,7 +2,7 @@ package theme
 
 import "testing"
 
-func TestMediumRouter(t *testing.T) {
+func TestThemeRouter(t *testing.T) {
 	themeRouter := Router()
 	got := len(themeRouter.Routes()[0].Handlers)
 	expected := 2

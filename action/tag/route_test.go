@@ -2,7 +2,7 @@ package tag
 
 import "testing"
 
-func TestMediumRouter(t *testing.T) {
+func TestTagRouter(t *testing.T) {
 	tagRouter := Router()
 	got := len(tagRouter.Routes()[0].Handlers)
 	expected := 2
