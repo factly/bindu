@@ -8,7 +8,6 @@ import (
 // theme request model
 type theme struct {
 	Name        string         `json:"name" validate:"required,min=3,max=50"`
-	Slug        string         `json:"slug"`
 	Config      postgres.Jsonb `json:"config"`
 	Description string         `json:"description"`
 }

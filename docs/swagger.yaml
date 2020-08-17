@@ -57,8 +57,6 @@ definitions:
         type: string
     required:
     - name
-    - type
-    - url
     type: object
   model.Category:
     properties:
@@ -154,9 +152,20 @@ definitions:
     type: object
   model.Organisation:
     properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
       id:
         type: integer
+      permission:
+        $ref: '#/definitions/model.organisationUser'
+        type: object
+      slug:
+        type: string
       title:
+        type: string
+      updated_at:
         type: string
     type: object
   model.Tag:
@@ -201,6 +210,19 @@ definitions:
     required:
     - name
     type: object
+  model.organisationUser:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
   tag.tag:
     properties:
       description:
@@ -220,12 +242,10 @@ definitions:
         type: string
       name:
         type: string
-      slug:
-        type: string
     required:
     - name
     type: object
-host: localhost:8000
+host: localhost:7000
 info:
   contact:
     email: support@swagger.io

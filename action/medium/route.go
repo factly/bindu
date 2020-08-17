@@ -9,8 +9,8 @@ import (
 type medium struct {
 	Name string         `json:"name" validate:"required"`
 	Slug string         `json:"slug"`
-	Type string         `json:"type" validate:"required"`
-	URL  postgres.Jsonb `json:"url" validate:"required"`
+	Type string         `json:"type"`
+	URL  postgres.Jsonb `json:"url"`
 }
 
 // Router - Group of medium router

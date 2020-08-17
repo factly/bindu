@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/factly/bindu-server/action"
@@ -20,7 +19,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8000
+// @host localhost:7000
 // @BasePath /
 func main() {
 
@@ -32,6 +31,5 @@ func main() {
 	// register routes
 	r := action.RegisterRoutes()
 
-	fmt.Println("swagger-ui http://localhost:6620/swagger/index.html")
 	http.ListenAndServe(":8000", r)
 }

@@ -43,13 +43,9 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	err = config.DB.Model(&model.Tag{}).Where(&model.Tag{
+	config.DB.Model(&model.Tag{}).Where(&model.Tag{
 		OrganisationID: uint(oID),
-	}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes).Error
-
-	if err != nil {
-		return
-	}
+	}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
 
 	renderx.JSON(w, http.StatusOK, result)
 }
