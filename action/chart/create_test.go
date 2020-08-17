@@ -12,14 +12,17 @@ import (
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/go-chi/chi"
+	"gopkg.in/h2non/gock.v1"
 )
 
 func TestChartCreate(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Post("/charts", create)
+	r.With(util.CheckUser, util.CheckOrganisation).Mount("/charts", Router())
 
 	ts := httptest.NewServer(r)
+	gock.New(ts.URL).EnableNetworking().Persist()
+	defer gock.DisableNetworking()
 	defer ts.Close()
 
 	category := &model.Category{
@@ -75,8 +78,6 @@ func TestChartCreate(t *testing.T) {
 		resp, statusCode := test.Request(t, ts, "POST", "/charts", bytes.NewBuffer(requestByte), headers)
 
 		respBody := (resp).(map[string]interface{})
-
-		t.Log(respBody)
 
 		if statusCode != http.StatusCreated {
 			t.Errorf("handler returned wrong status code: got %v want %v",

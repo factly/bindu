@@ -24,7 +24,7 @@ func SetupDB() {
 	}
 
 	// Query log
-	DB.LogMode(true)
+	//DB.LogMode(true)
 
 	DB.SingularTable(true)
 

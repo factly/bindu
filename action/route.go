@@ -56,7 +56,7 @@ func RegisterRoutes() *chi.Mux {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	if envName, _ := os.LookupEnv("ENVIRONMENT_NAME"); envName == "development" {
+	if envName, _ := os.LookupEnv("ENV"); envName == "development" {
 		r.Get("/swagger/*", httpSwagger.WrapHandler)
 	}
 

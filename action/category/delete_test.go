@@ -11,14 +11,17 @@ import (
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/go-chi/chi"
+	"gopkg.in/h2non/gock.v1"
 )
 
 func TestCategoryDelete(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Delete("/categories/{category_id}", delete)
+	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
 
 	ts := httptest.NewServer(r)
+	gock.New(ts.URL).EnableNetworking().Persist()
+	defer gock.DisableNetworking()
 	defer ts.Close()
 
 	t.Run("invalid category id", func(t *testing.T) {

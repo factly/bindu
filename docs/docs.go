@@ -1367,9 +1367,7 @@ var doc = `{
         "medium.medium": {
             "type": "object",
             "required": [
-                "name",
-                "type",
-                "url"
+                "name"
             ],
             "properties": {
                 "name": {
@@ -1527,10 +1525,26 @@ var doc = `{
         "model.Organisation": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
+                "permission": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.organisationUser"
+                },
+                "slug": {
+                    "type": "string"
+                },
                 "title": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1599,6 +1613,26 @@ var doc = `{
                 }
             }
         },
+        "model.organisationUser": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "tag.tag": {
             "type": "object",
             "required": [
@@ -1630,9 +1664,6 @@ var doc = `{
                 },
                 "name": {
                     "type": "string"
-                },
-                "slug": {
-                    "type": "string"
                 }
             }
         }
@@ -1651,7 +1682,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "localhost:8000",
+	Host:        "localhost:7000",
 	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "Bindu API",

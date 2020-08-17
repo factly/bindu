@@ -14,7 +14,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8000",
+    "host": "localhost:7000",
     "basePath": "/",
     "paths": {
         "/categories": {
@@ -1352,9 +1352,7 @@
         "medium.medium": {
             "type": "object",
             "required": [
-                "name",
-                "type",
-                "url"
+                "name"
             ],
             "properties": {
                 "name": {
@@ -1512,10 +1510,26 @@
         "model.Organisation": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
+                "permission": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.organisationUser"
+                },
+                "slug": {
+                    "type": "string"
+                },
                 "title": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1584,6 +1598,26 @@
                 }
             }
         },
+        "model.organisationUser": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "tag.tag": {
             "type": "object",
             "required": [
@@ -1614,9 +1648,6 @@
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "slug": {
                     "type": "string"
                 }
             }

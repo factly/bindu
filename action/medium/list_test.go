@@ -10,14 +10,17 @@ import (
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/go-chi/chi"
+	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumList(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Get("/media", list)
+	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
 
 	ts := httptest.NewServer(r)
+	gock.New(ts.URL).EnableNetworking().Persist()
+	defer gock.DisableNetworking()
 	defer ts.Close()
 
 	t.Run("get media with pagination", func(t *testing.T) {

@@ -11,14 +11,17 @@ import (
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/go-chi/chi"
+	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumDetails(t *testing.T) {
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Get("/media/{medium_id}", details)
+	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
 
 	ts := httptest.NewServer(r)
+	gock.New(ts.URL).EnableNetworking().Persist()
+	defer gock.DisableNetworking()
 	defer ts.Close()
 
 	t.Run("invalid medium id", func(t *testing.T) {
