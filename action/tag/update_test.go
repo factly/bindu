@@ -1,8 +1,6 @@
 package tag
 
 import (
-	"bytes"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +8,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -20,126 +18,92 @@ func TestTagUpdate(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	tag := &model.Tag{
-		Name:           "Test",
-		Slug:           "test",
+		Name:           "Agri",
+		Slug:           "agriculture",
 		OrganisationID: 1,
 	}
 
 	config.DB.Model(&model.Tag{}).Create(&tag)
 
 	t.Run("invalid tag id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/tags/invalid_id", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT("/tags/{tag_id}").
+			WithPath("tag_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/tags/100", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT("/tags/{tag_id}").
+			WithPath("tag_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("update tag", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Tag{
+			Name: "Agriculture",
+			Slug: "agriculture",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Tag-1",
-			"slug": "test"
-		}`)
+		resObj := e.PUT("/tags/{tag_id}").
+			WithPath("tag_id", tag.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/tags/", tag.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Tag-1" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Tag-1")
-		}
+		resObj.Value("name").String().Equal("Agriculture")
 
 	})
 
 	t.Run("update tag by id with empty slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Tag{
+			Name: "Crop",
+			Slug: "",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Tag-2",
-			"slug": ""
-		}`)
+		resObj := e.PUT("/tags/{tag_id}").
+			WithPath("tag_id", tag.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/tags/", tag.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Tag-2" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Tag-2")
-		}
+		resObj.Value("name").String().Equal("Crop")
+		resObj.Value("slug").String().Equal("crop")
 
 	})
 
 	t.Run("update tag with different slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Tag{
+			Name: "Crop test",
+			Slug: "crop-test",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Test",
-			"slug": "testing"
-		}`)
+		resObj := e.PUT("/tags/{tag_id}").
+			WithPath("tag_id", tag.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/tags/", tag.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Test" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Test")
-		}
+		resObj.Value("name").String().Equal("Crop test")
+		resObj.Value("slug").String().Equal("crop-test")
 
 	})
 

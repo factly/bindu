@@ -1,7 +1,6 @@
 package tag
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -9,7 +8,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -19,53 +18,48 @@ func TestTagDelete(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid tag id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/tags/invalid_id", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE("/tags/{tag_id}").
+			WithPath("tag_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
+
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/tags/100", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE("/tags/{tag_id}").
+			WithPath("tag_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("check tag associated with other entity", func(t *testing.T) {
 
 		tag := model.Tag{
-			Name:           "sample",
+			Name:           "Entertainment",
 			OrganisationID: 1,
 		}
 
 		theme := &model.Theme{
-			Name: "Sample Theme",
+			Name: "Light theme",
 		}
 
 		config.DB.Model(&model.Tag{}).Create(&tag)
 		config.DB.Model(&model.Theme{}).Create(&theme)
 
 		chart := &model.Chart{
-			Title:          "Sample chart",
+			Title:          "Bar chart",
 			OrganisationID: 1,
 			ThemeID:        theme.Base.ID,
 			Tags:           []model.Tag{tag},
@@ -73,37 +67,26 @@ func TestTagDelete(t *testing.T) {
 
 		config.DB.Model(&model.Chart{}).Create(&chart)
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/tags/", tag.Base.ID), nil, headers)
-
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
+		e.DELETE("/tags/{tag_id}").
+			WithPath("tag_id", tag.Base.ID).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
 	})
 
 	t.Run("tag record deleted", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		result := &model.Tag{
-			Name:           "Football",
+		tag := &model.Tag{
+			Name:           "Cricket",
 			OrganisationID: 1,
 		}
 
-		config.DB.Model(&model.Tag{}).Create(&result)
+		config.DB.Model(&model.Tag{}).Create(&tag)
 
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/tags/", result.Base.ID), nil, headers)
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
+		e.DELETE("/tags/{tag_id}").
+			WithPath("tag_id", tag.Base.ID).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK)
 	})
 
 }

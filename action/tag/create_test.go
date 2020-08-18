@@ -1,13 +1,13 @@
 package tag
 
 import (
-	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -17,73 +17,54 @@ func TestTagCreate(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
 
-	var jsonStr = []byte(`
-	{
-		"name": "Corruption",
-		"slug": "corruption"
-	}`)
+	tagOne := model.Tag{
+		Name: "Elections",
+		Slug: "elections",
+	}
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	// tag with slug empty
+	tagTwo := model.Tag{
+		Name: "Football",
+	}
+
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("Unprocessable tag", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "POST", "/tags", nil, headers)
+		e.POST("/tags").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
 
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
 	})
 
 	t.Run("create tag", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "POST", "/tags", bytes.NewBuffer(jsonStr), headers)
+		resObj := e.POST("/tags").
+			WithHeaders(headers).
+			WithJSON(tagOne).
+			Expect().
+			Status(http.StatusCreated).JSON().Object()
 
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusCreated {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusCreated)
-		}
-
-		if respBody["name"] != "Corruption" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Corruption")
-		}
+		resObj.Value("name").String().Equal("Elections")
+		resObj.Value("slug").String().Equal("elections")
 
 	})
 
-	t.Run("create tags with slug is empty", func(t *testing.T) {
+	t.Run("create tag with slug is empty", func(t *testing.T) {
 
-		jsonStr = []byte(`
-		{
-			"name": "Murder"
-		}`)
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "POST", "/tags", bytes.NewBuffer(jsonStr), headers)
+		resObj := e.POST("/tags").
+			WithHeaders(headers).
+			WithJSON(tagTwo).
+			Expect().
+			Status(http.StatusCreated).JSON().Object()
 
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusCreated {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusCreated)
-		}
-
-		if respBody["slug"] != "murder" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["slug"], "murder")
-		}
-
+		resObj.Value("name").String().Equal("Football")
+		resObj.Value("slug").String().Equal("football")
 	})
 
 }
