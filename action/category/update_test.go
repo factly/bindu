@@ -1,8 +1,6 @@
 package category
 
 import (
-	"bytes"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +8,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -20,126 +18,92 @@ func TestCategoryUpdate(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	category := &model.Category{
-		Name:           "Test",
-		Slug:           "test",
+		Name:           "Agri",
+		Slug:           "agriculture",
 		OrganisationID: 1,
 	}
 
 	config.DB.Model(&model.Category{}).Create(&category)
 
 	t.Run("invalid category id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/categories/invalid_id", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT("/categories/{category_id}").
+			WithPath("category_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/categories/100", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT("/categories/{category_id}").
+			WithPath("category_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("update category", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Category{
+			Name: "Agriculture",
+			Slug: "agriculture",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Category-1",
-			"slug": "test"
-		}`)
+		resObj := e.PUT("/categories/{category_id}").
+			WithPath("category_id", category.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/categories/", category.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Category-1" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Category-1")
-		}
+		resObj.Value("name").String().Equal("Agriculture")
 
 	})
 
 	t.Run("update category by id with empty slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Category{
+			Name: "Crop",
+			Slug: "",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Category-2",
-			"slug": ""
-		}`)
+		resObj := e.PUT("/categories/{category_id}").
+			WithPath("category_id", category.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/categories/", category.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Category-2" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Category-2")
-		}
+		resObj.Value("name").String().Equal("Crop")
+		resObj.Value("slug").String().Equal("crop")
 
 	})
 
 	t.Run("update category with different slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Category{
+			Name: "Crop test",
+			Slug: "crop-test",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Category-test",
-			"slug": "testing"
-		}`)
+		resObj := e.PUT("/categories/{category_id}").
+			WithPath("category_id", category.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/categories/", category.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Category-test" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Category-test")
-		}
+		resObj.Value("name").String().Equal("Crop test")
+		resObj.Value("slug").String().Equal("crop-test")
 
 	})
 

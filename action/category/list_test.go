@@ -8,7 +8,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -18,10 +18,13 @@ func TestCategoryList(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("get categories with pagination", func(t *testing.T) {
 		categoryOne := &model.Category{
@@ -41,31 +44,17 @@ func TestCategoryList(t *testing.T) {
 			OrganisationID: 1,
 		}).Count(&total).Order("id desc").Offset(1).Limit(1).Find(&categories)
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "GET", "/categories?limit=1&page=2", nil, headers)
+		resObj := e.GET("/categories").
+			WithQueryObject(map[string]string{
+				"limit": "1",
+				"page":  "2",
+			}).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		respBody := (resp).(map[string]interface{})
-
-		nodes := (respBody["nodes"]).([]interface{})
-		category := (nodes[0]).(map[string]interface{})
-		gotTotal := (respBody["total"]).(float64)
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if category["name"] != categories[0].Name {
-			t.Errorf("handler returned wrong title: got %v want %v", category["name"], categories[0].Name)
-		}
-
-		if int(gotTotal) != total {
-			t.Errorf("handler returned wrong total: got %v want %v",
-				int(gotTotal), total)
-		}
+		resObj.Value("nodes").Array().Element(0).Object().Value("name").String().Equal(categories[0].Name)
+		resObj.Value("total").Number().Equal(total)
 
 	})
 

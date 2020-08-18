@@ -9,7 +9,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -19,35 +19,28 @@ func TestCategoryDelete(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid category id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/categories/invalid_id", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE("/categories/invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
+
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/categories/100", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE("/categories/100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("check category associated with other entity", func(t *testing.T) {
@@ -73,37 +66,24 @@ func TestCategoryDelete(t *testing.T) {
 
 		config.DB.Model(&model.Chart{}).Create(&chart)
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/categories/", category.Base.ID), nil, headers)
-
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
+		e.DELETE(fmt.Sprint("/categories/", category.Base.ID)).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
 	})
 
 	t.Run("category record deleted", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		result := &model.Category{
+		category := &model.Category{
 			Name:           "Cricket",
 			OrganisationID: 1,
 		}
 
-		config.DB.Model(&model.Category{}).Create(&result)
+		config.DB.Model(&model.Category{}).Create(&category)
 
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/categories/", result.Base.ID), nil, headers)
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
+		e.DELETE(fmt.Sprint("/categories/", category.Base.ID)).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK)
 	})
 
 }
