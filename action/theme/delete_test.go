@@ -1,7 +1,6 @@
 package theme
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -9,7 +8,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -19,85 +18,69 @@ func TestThemeDelete(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/themes", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid theme id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/themes/invalid_id", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE("/themes/{theme_id}").
+			WithPath("theme_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
+
 	})
 
 	t.Run("theme record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/themes/100", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE("/themes/{theme_id}").
+			WithPath("theme_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("check theme associated with other entity", func(t *testing.T) {
 
-		theme := &model.Theme{
-			Name:           "Sample Theme",
+		theme := model.Theme{
+			Name:           "Entertainment",
 			OrganisationID: 1,
 		}
 
 		config.DB.Model(&model.Theme{}).Create(&theme)
 
 		chart := &model.Chart{
-			Title:          "Sample chart",
+			Title:          "Bar chart",
 			OrganisationID: 1,
 			ThemeID:        theme.Base.ID,
 		}
 
 		config.DB.Model(&model.Chart{}).Create(&chart)
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/themes/", theme.Base.ID), nil, headers)
-
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
+		e.DELETE("/themes/{theme_id}").
+			WithPath("theme_id", theme.Base.ID).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
 	})
 
 	t.Run("theme record deleted", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		result := &model.Theme{
-			Name:           "testing",
+		theme := &model.Theme{
+			Name:           "History",
 			OrganisationID: 1,
 		}
 
-		config.DB.Model(&model.Theme{}).Create(&result)
+		config.DB.Model(&model.Theme{}).Create(&theme)
 
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/themes/", result.Base.ID), nil, headers)
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
+		e.DELETE("/themes/{theme_id}").
+			WithPath("theme_id", theme.Base.ID).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK)
 	})
 
 }
