@@ -1,9 +1,6 @@
 package chart
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,7 +8,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -21,10 +18,13 @@ func TestChartUpdate(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/charts", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	theme := &model.Theme{
 		Name:           "Theme sample",
@@ -47,46 +47,35 @@ func TestChartUpdate(t *testing.T) {
 
 	result := &model.Chart{
 		Title:          "Test",
+		Slug:           "maps",
 		ThemeID:        theme.Base.ID,
 		OrganisationID: 1,
 	}
 
-	config.DB.Model(&model.Chart{}).Create(&result)
+	config.DB.Model(&model.Tag{}).Where(tag.Base.ID).Find(&result.Tags)
+	config.DB.Model(&model.Category{}).Where(category.Base.ID).Find(&result.Categories)
+
+	config.DB.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result)
 
 	t.Run("invalid chart id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/charts/invalid_id", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT("/charts/{chart_id}").
+			WithPath("chart_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("chart record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/charts/100", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT("/charts/{chart_id}").
+			WithPath("chart_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("update chart", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-
-		reqBody := &chart{
+		body := &chart{
 			Title:          "Maps",
 			Slug:           "maps",
 			ThemeID:        theme.Base.ID,
@@ -99,76 +88,52 @@ func TestChartUpdate(t *testing.T) {
 			},
 		}
 
-		requestByte, _ := json.Marshal(reqBody)
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/charts/", result.Base.ID), bytes.NewBuffer(requestByte), headers)
+		resObj := e.PUT("/charts/{chart_id}").
+			WithPath("chart_id", result.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["title"] != "Maps" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["title"], "Maps")
-		}
+		resObj.Value("title").String().Equal("Maps")
 
 	})
 
 	t.Run("update chart by id with empty slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		reqBody := &model.Chart{
-			Title: "Maps",
+		body := &model.Chart{
+			Title: "Pie",
 			Slug:  "",
 		}
 
-		requestByte, _ := json.Marshal(reqBody)
+		resObj := e.PUT("/charts/{chart_id}").
+			WithPath("chart_id", result.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/charts/", result.Base.ID), bytes.NewBuffer(requestByte), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["title"] != "Maps" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["title"], "Maps")
-		}
+		resObj.Value("title").String().Equal("Pie")
+		resObj.Value("slug").String().Equal("pie")
 
 	})
 
 	t.Run("update chart with different slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-
-		reqBody := &model.Chart{
-			Title: "Maps",
+		body := &model.Chart{
+			Title: "Chart test",
 			Slug:  "map-sample",
 		}
 
-		requestByte, _ := json.Marshal(reqBody)
+		resObj := e.PUT("/charts/{chart_id}").
+			WithPath("chart_id", result.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/charts/", result.Base.ID), bytes.NewBuffer(requestByte), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["title"] != "Maps" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["title"], "Maps")
-		}
+		resObj.Value("title").String().Equal("Chart test")
+		resObj.Value("slug").String().Equal("map-sample")
 
 	})
 

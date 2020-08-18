@@ -9,6 +9,11 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
+var headers = map[string]string{
+	"X-Organisation": "1",
+	"X-User":         "1",
+}
+
 func TestMain(m *testing.M) {
 
 	test.Init()

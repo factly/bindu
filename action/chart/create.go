@@ -66,8 +66,6 @@ func create(w http.ResponseWriter, r *http.Request) {
 		OrganisationID:   uint(oID),
 	}
 
-	// check themes & medium belong to same organisation or not
-	err = chart.CheckOrganisation(config.DB)
 	if err != nil {
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
