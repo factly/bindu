@@ -1,13 +1,13 @@
 package medium
 
 import (
-	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -17,73 +17,54 @@ func TestMediumCreate(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
 
-	var jsonStr = []byte(`
-	{
-		"name": "Pie chart",
-		"slug": "pie-chart"
-	}`)
+	mediumOne := model.Medium{
+		Name: "Bar graph",
+		Slug: "bar-graph",
+	}
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	// medium with slug empty
+	mediumTwo := model.Medium{
+		Name: "Chart",
+	}
+
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("Unprocessable medium", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "POST", "/media", nil, headers)
+		e.POST("/media").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
 
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
 	})
 
 	t.Run("create medium", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "POST", "/media", bytes.NewBuffer(jsonStr), headers)
+		resObj := e.POST("/media").
+			WithHeaders(headers).
+			WithJSON(mediumOne).
+			Expect().
+			Status(http.StatusCreated).JSON().Object()
 
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusCreated {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusCreated)
-		}
-
-		if respBody["name"] != "Pie chart" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Pie chart")
-		}
+		resObj.Value("name").String().Equal("Bar graph")
+		resObj.Value("slug").String().Equal("bar-graph")
 
 	})
 
 	t.Run("create medium with slug is empty", func(t *testing.T) {
 
-		jsonStr = []byte(`
-		{
-			"name": "Bar"
-		}`)
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "POST", "/media", bytes.NewBuffer(jsonStr), headers)
+		resObj := e.POST("/media").
+			WithHeaders(headers).
+			WithJSON(mediumTwo).
+			Expect().
+			Status(http.StatusCreated).JSON().Object()
 
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusCreated {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusCreated)
-		}
-
-		if respBody["slug"] != "bar" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["slug"], "bar")
-		}
-
+		resObj.Value("name").String().Equal("Chart")
+		resObj.Value("slug").String().Equal("chart")
 	})
 
 }

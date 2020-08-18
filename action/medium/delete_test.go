@@ -1,7 +1,6 @@
 package medium
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -9,7 +8,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -19,91 +18,80 @@ func TestMediumDelete(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid medium id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/media/invalid_id", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE("/media/{medium_id}").
+			WithPath("medium_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
+
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/media/100", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE("/media/{medium_id}").
+			WithPath("medium_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("check medium associated with other entity", func(t *testing.T) {
 
-		medium := &model.Medium{
-			Name:           "sample",
+		medium := model.Medium{
+			Name:           "Entertainment",
 			OrganisationID: 1,
 		}
 
 		theme := &model.Theme{
-			Name: "Sample Theme",
+			Name:           "Light theme",
+			OrganisationID: 1,
 		}
 
 		config.DB.Model(&model.Medium{}).Create(&medium)
 		config.DB.Model(&model.Theme{}).Create(&theme)
 
+		t.Log(medium)
+
 		chart := &model.Chart{
-			Title:            "Sample chart",
+			Title:            "Bar chart",
 			OrganisationID:   1,
-			FeaturedMediumID: medium.Base.ID,
 			ThemeID:          theme.Base.ID,
+			FeaturedMediumID: medium.Base.ID,
 		}
 
 		config.DB.Model(&model.Chart{}).Create(&chart)
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/media/", medium.Base.ID), nil, headers)
+		t.Log(chart)
 
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
+		e.DELETE("/media/{medium_id}").
+			WithPath("medium_id", medium.Base.ID).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
 	})
 
 	t.Run("medium record deleted", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		result := &model.Medium{
-			Name:           "testing",
+		medium := &model.Medium{
+			Name:           "Cricket",
 			OrganisationID: 1,
 		}
 
-		config.DB.Model(&model.Medium{}).Create(&result)
+		config.DB.Model(&model.Medium{}).Create(&medium)
 
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/media/", result.Base.ID), nil, headers)
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
+		e.DELETE("/media/{medium_id}").
+			WithPath("medium_id", medium.Base.ID).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK)
 	})
 
 }

@@ -1,8 +1,6 @@
 package medium
 
 import (
-	"bytes"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +8,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -20,126 +18,92 @@ func TestMediumUpdate(t *testing.T) {
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	medium := &model.Medium{
-		Name:           "Chart",
-		Slug:           "chart",
+		Name:           "Agri",
+		Slug:           "agriculture",
 		OrganisationID: 1,
 	}
 
 	config.DB.Model(&model.Medium{}).Create(&medium)
 
 	t.Run("invalid medium id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/media/invalid_id", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT("/media/{medium_id}").
+			WithPath("medium_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/media/100", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT("/media/{medium_id}").
+			WithPath("medium_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("update medium", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Medium{
+			Name: "Agriculture",
+			Slug: "agriculture",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Chart sample image",
-			"slug": "chart"
-		}`)
+		resObj := e.PUT("/media/{medium_id}").
+			WithPath("medium_id", medium.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/media/", medium.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Chart sample image" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Chart sample image")
-		}
+		resObj.Value("name").String().Equal("Agriculture")
 
 	})
 
 	t.Run("update medium by id with empty slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Medium{
+			Name: "Crop",
+			Slug: "",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Chart sample image",
-			"slug": ""
-		}`)
+		resObj := e.PUT("/media/{medium_id}").
+			WithPath("medium_id", medium.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/media/", medium.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Chart sample image" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Chart sample image")
-		}
+		resObj.Value("name").String().Equal("Crop")
+		resObj.Value("slug").String().Equal("crop")
 
 	})
 
 	t.Run("update medium with different slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		body := model.Medium{
+			Name: "Crop test",
+			Slug: "crop-test",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Chart sample image",
-			"slug": "chart-image"
-		}`)
+		resObj := e.PUT("/media/{medium_id}").
+			WithPath("medium_id", medium.Base.ID).
+			WithHeaders(headers).
+			WithJSON(body).
+			Expect().
+			Status(http.StatusOK).JSON().Object()
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/media/", medium.Base.ID), bytes.NewBuffer(jsonStr), headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Chart sample image" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Chart sample image")
-		}
+		resObj.Value("name").String().Equal("Crop test")
+		resObj.Value("slug").String().Equal("crop-test")
 
 	})
 
