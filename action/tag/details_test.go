@@ -4,16 +4,18 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestTagDetails(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
@@ -35,6 +37,10 @@ func TestTagDetails(t *testing.T) {
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(tagProps))
+
 		e.GET("/tags/{tag_id}").
 			WithPath("tag_id", "100").
 			WithHeaders(headers).
@@ -43,20 +49,17 @@ func TestTagDetails(t *testing.T) {
 	})
 
 	t.Run("get tag by id", func(t *testing.T) {
-		tag := &model.Tag{
-			Name:           "Crime",
-			OrganisationID: 1,
-		}
 
-		config.DB.Model(&model.Tag{}).Create(&tag)
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(tagProps).
+				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
 
-		resObj := e.GET("/tags/{tag_id}").
-			WithPath("tag_id", tag.Base.ID).
+		e.GET("/tags/{tag_id}").
+			WithPath("tag_id", 1).
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("name").String().Equal("Crime")
+			Status(http.StatusOK).JSON().Object().ContainsMap(data)
 	})
 
 }

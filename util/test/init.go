@@ -1,16 +1,13 @@
 package test
 
 import (
-	"os"
-
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 )
 
 // Init - Initialize test db
 func Init() {
-	os.Setenv("DSN", "postgres://postgres:postgres@localhost:5432/bindu-test?sslmode=disable")
-	config.SetupDB()
+	config.SetupDB("postgres://postgres:postgres@localhost:5432/bindu-test?sslmode=disable")
 
 	// db migrations
 	config.DB.AutoMigrate(

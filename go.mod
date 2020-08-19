@@ -13,4 +13,5 @@ require (
 	github.com/swaggo/swag v1.6.7
 	gopkg.in/h2non/gock.v1 v1.0.15
 	github.com/gavv/httpexpect/v2 v2.1.0
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 )

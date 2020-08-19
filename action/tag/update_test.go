@@ -1,19 +1,22 @@
 package tag
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestTagUpdate(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
@@ -26,13 +29,10 @@ func TestTagUpdate(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
-	tag := &model.Tag{
-		Name:           "Agri",
-		Slug:           "agriculture",
-		OrganisationID: 1,
+	var updatedTag = map[string]interface{}{
+		"name": "Politics",
+		"slug": "politics",
 	}
-
-	config.DB.Model(&model.Tag{}).Create(&tag)
 
 	t.Run("invalid tag id", func(t *testing.T) {
 		e.PUT("/tags/{tag_id}").
@@ -43,6 +43,9 @@ func TestTagUpdate(t *testing.T) {
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(tagProps))
 
 		e.PUT("/tags/{tag_id}").
 			WithPath("tag_id", "100").
@@ -53,57 +56,103 @@ func TestTagUpdate(t *testing.T) {
 
 	t.Run("update tag", func(t *testing.T) {
 
-		body := model.Tag{
-			Name: "Agriculture",
-			Slug: "agriculture",
-		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, "Elections", "politics"))
 
-		resObj := e.PUT("/tags/{tag_id}").
-			WithPath("tag_id", tag.Base.ID).
+		mock.ExpectBegin()
+		mock.ExpectExec(`UPDATE \"bi_tag\" SET (.+)  WHERE (.+) \"bi_tag\".\"id\" = `).
+			WithArgs(updatedTag["name"], updatedTag["slug"], test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, updatedTag["name"], updatedTag["slug"]))
+
+		e.PUT("/tags/{tag_id}").
+			WithPath("tag_id", 1).
 			WithHeaders(headers).
-			WithJSON(body).
+			WithJSON(updatedTag).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("name").String().Equal("Agriculture")
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedTag)
 
 	})
 
 	t.Run("update tag by id with empty slug", func(t *testing.T) {
 
-		body := model.Tag{
-			Name: "Crop",
-			Slug: "",
+		updatedTag := map[string]interface{}{
+			"name": "Politics",
+			"slug": "",
+		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, "Politics", "politics"))
+
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_tag"`).
+			WithArgs("politics%", 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, "Politics", "politics"))
+
+		mock.ExpectBegin()
+		mock.ExpectExec(`UPDATE \"bi_tag\" SET (.+)  WHERE (.+) \"bi_tag\".\"id\" = `).
+			WithArgs(updatedTag["name"], "politics-1", test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, updatedTag["name"], "politics-1"))
+
+		resObj := map[string]interface{}{
+			"name": "Politics",
+			"slug": "politics-1",
 		}
 
-		resObj := e.PUT("/tags/{tag_id}").
-			WithPath("tag_id", tag.Base.ID).
+		e.PUT("/tags/{tag_id}").
+			WithPath("tag_id", 1).
 			WithHeaders(headers).
-			WithJSON(body).
+			WithJSON(updatedTag).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("name").String().Equal("Crop")
-		resObj.Value("slug").String().Equal("crop")
+			Status(http.StatusOK).JSON().Object().ContainsMap(resObj)
 
 	})
 
 	t.Run("update tag with different slug", func(t *testing.T) {
-
-		body := model.Tag{
-			Name: "Crop test",
-			Slug: "crop-test",
+		updatedTag := map[string]interface{}{
+			"name": "Politics",
+			"slug": "testing-slug",
 		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, "Politics", "slug"))
 
-		resObj := e.PUT("/tags/{tag_id}").
-			WithPath("tag_id", tag.Base.ID).
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_tag"`).
+			WithArgs(fmt.Sprint(updatedTag["slug"], "%"), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
+
+		mock.ExpectBegin()
+		mock.ExpectExec(`UPDATE \"bi_tag\" SET (.+)  WHERE (.+) \"bi_tag\".\"id\" = `).
+			WithArgs(updatedTag["name"], "testing-slug", test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, updatedTag["name"], "testing-slug"))
+
+		e.PUT("/tags/{tag_id}").
+			WithPath("tag_id", 1).
 			WithHeaders(headers).
-			WithJSON(body).
+			WithJSON(updatedTag).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("name").String().Equal("Crop test")
-		resObj.Value("slug").String().Equal("crop-test")
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedTag)
 
 	})
 

@@ -4,16 +4,18 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestTagList(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
 	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
@@ -26,35 +28,82 @@ func TestTagList(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
+	taglist := []map[string]interface{}{
+		{"name": "Test Tag 1", "slug": "test-tag-1"},
+		{"name": "Test Tag 2", "slug": "test-tag-2"},
+	}
+
+	t.Run("get empty list of tags", func(t *testing.T) {
+
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(tagProps))
+
+		e.GET("/tags").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": 0})
+
+		mock.ExpectationsWereMet()
+	})
+
+	t.Run("get non-empty list of tags", func(t *testing.T) {
+
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(taglist)))
+
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(tagProps).
+				AddRow(1, time.Now(), time.Now(), nil, taglist[0]["name"], taglist[0]["slug"]).
+				AddRow(2, time.Now(), time.Now(), nil, taglist[1]["name"], taglist[1]["slug"]))
+
+		e.GET("/tags").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(taglist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(taglist[0])
+
+		mock.ExpectationsWereMet()
+	})
+
 	t.Run("get tags with pagination", func(t *testing.T) {
-		tagOne := &model.Tag{
-			Name:           "AP",
-			OrganisationID: 1,
-		}
-		tagTwo := &model.Tag{
-			Name:           "Telangana",
-			OrganisationID: 1,
-		}
-		tags := []model.Tag{}
-		total := 0
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(taglist)))
 
-		config.DB.Model(&model.Tag{}).Create(&tagOne)
-		config.DB.Model(&model.Tag{}).Create(&tagTwo)
-		config.DB.Model(&model.Tag{}).Where(&model.Tag{
-			OrganisationID: 1,
-		}).Count(&total).Order("id desc").Offset(1).Limit(1).Find(&tags)
+		mock.ExpectQuery(paginationQuery).
+			WillReturnRows(sqlmock.NewRows(tagProps).
+				AddRow(2, time.Now(), time.Now(), nil, taglist[1]["name"], taglist[1]["slug"]))
 
-		resObj := e.GET("/tags").
-			WithQueryObject(map[string]string{
+		e.GET("/tags").
+			WithQueryObject(map[string]interface{}{
 				"limit": "1",
 				"page":  "2",
 			}).
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(taglist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(taglist[1])
 
-		resObj.Value("nodes").Array().Element(0).Object().Value("name").String().Equal(tags[0].Name)
-		resObj.Value("total").Number().Equal(total)
+		mock.ExpectationsWereMet()
 
 	})
 }

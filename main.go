@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/config"
@@ -25,8 +26,10 @@ func main() {
 
 	godotenv.Load()
 
+	DSN := os.Getenv("DSN")
+
 	// db setup
-	config.SetupDB()
+	config.SetupDB(DSN)
 
 	// register routes
 	r := action.RegisterRoutes()
