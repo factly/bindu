@@ -1,23 +1,24 @@
 package category
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestCategoryDelete(t *testing.T) {
-	r := chi.NewRouter()
+	mock := test.SetupMockDB()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
+	r := chi.NewRouter()
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -29,7 +30,8 @@ func TestCategoryDelete(t *testing.T) {
 
 	t.Run("invalid category id", func(t *testing.T) {
 
-		e.DELETE("/categories/invalid_id").
+		e.DELETE(urlWithPath).
+			WithPath("category_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusNotFound)
@@ -37,7 +39,13 @@ func TestCategoryDelete(t *testing.T) {
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
-		e.DELETE("/categories/100").
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(categoryProps))
+
+		e.DELETE(urlWithPath).
+			WithPath("category_id", "100").
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusNotFound)
@@ -45,42 +53,40 @@ func TestCategoryDelete(t *testing.T) {
 
 	t.Run("check category associated with other entity", func(t *testing.T) {
 
-		category := model.Category{
-			Name:           "sample",
-			OrganisationID: 1,
-		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
 
-		theme := &model.Theme{
-			Name: "Sample Theme",
-		}
+		mock.ExpectQuery(chartQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("1"))
 
-		config.DB.Model(&model.Category{}).Create(&category)
-		config.DB.Model(&model.Theme{}).Create(&theme)
-
-		chart := &model.Chart{
-			Title:          "Sample chart",
-			OrganisationID: 1,
-			ThemeID:        theme.Base.ID,
-			Categories:     []model.Category{category},
-		}
-
-		config.DB.Model(&model.Chart{}).Create(&chart)
-
-		e.DELETE(fmt.Sprint("/categories/", category.Base.ID)).
+		e.DELETE(urlWithPath).
+			WithPath("category_id", 1).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusUnprocessableEntity)
 	})
 
 	t.Run("category record deleted", func(t *testing.T) {
-		category := &model.Category{
-			Name:           "Cricket",
-			OrganisationID: 1,
-		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
 
-		config.DB.Model(&model.Category{}).Create(&category)
+		mock.ExpectQuery(chartQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
 
-		e.DELETE(fmt.Sprint("/categories/", category.Base.ID)).
+		mock.ExpectBegin()
+		mock.ExpectExec(deleteQuery).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
+
+		e.DELETE(urlWithPath).
+			WithPath("category_id", 1).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK)
