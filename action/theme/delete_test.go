@@ -4,19 +4,21 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestThemeDelete(t *testing.T) {
-	r := chi.NewRouter()
+	mock := test.SetupMockDB()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/themes", Router())
+	r := chi.NewRouter()
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -28,7 +30,7 @@ func TestThemeDelete(t *testing.T) {
 
 	t.Run("invalid theme id", func(t *testing.T) {
 
-		e.DELETE("/themes/{theme_id}").
+		e.DELETE(urlWithPath).
 			WithPath("theme_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -37,7 +39,12 @@ func TestThemeDelete(t *testing.T) {
 	})
 
 	t.Run("theme record not found", func(t *testing.T) {
-		e.DELETE("/themes/{theme_id}").
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(themeProps))
+
+		e.DELETE(urlWithPath).
 			WithPath("theme_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -46,38 +53,41 @@ func TestThemeDelete(t *testing.T) {
 
 	t.Run("check theme associated with other entity", func(t *testing.T) {
 
-		theme := model.Theme{
-			Name:           "Entertainment",
-			OrganisationID: 1,
-		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "config"}).
+				AddRow(1, time.Now(), time.Now(), nil, data["name"], byteData))
 
-		config.DB.Model(&model.Theme{}).Create(&theme)
+		mock.ExpectQuery(chartQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("1"))
 
-		chart := &model.Chart{
-			Title:          "Bar chart",
-			OrganisationID: 1,
-			ThemeID:        theme.Base.ID,
-		}
-
-		config.DB.Model(&model.Chart{}).Create(&chart)
-
-		e.DELETE("/themes/{theme_id}").
-			WithPath("theme_id", theme.Base.ID).
+		e.DELETE(urlWithPath).
+			WithPath("theme_id", 1).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusUnprocessableEntity)
 	})
 
 	t.Run("theme record deleted", func(t *testing.T) {
-		theme := &model.Theme{
-			Name:           "History",
-			OrganisationID: 1,
-		}
 
-		config.DB.Model(&model.Theme{}).Create(&theme)
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "config"}).
+				AddRow(1, time.Now(), time.Now(), nil, data["name"], byteData))
 
-		e.DELETE("/themes/{theme_id}").
-			WithPath("theme_id", theme.Base.ID).
+		mock.ExpectQuery(chartQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+
+		mock.ExpectBegin()
+		mock.ExpectExec(deleteQuery).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
+
+		e.DELETE(urlWithPath).
+			WithPath("theme_id", 1).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK)

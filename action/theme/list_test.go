@@ -1,22 +1,25 @@
 package theme
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestThemeList(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/themes", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -26,35 +29,97 @@ func TestThemeList(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
+	themelist := []map[string]interface{}{
+		{"name": "Test Theme 1", "config": `{"image": { 
+			"src": "Images/Sun.png",
+			"name": "sun1",
+			"hOffset": 250,
+			"vOffset": 250,
+			"alignment": "center"
+		}}`},
+		{"name": "Test Theme 2", "config": `{"image": { 
+			"src": "Images/Sun.png",
+			"name": "sun2",
+			"hOffset": 250,
+			"vOffset": 250,
+			"alignment": "center"
+		}}`},
+	}
+
+	byteData0, _ := json.Marshal(themelist[0]["config"])
+	byteData1, _ := json.Marshal(themelist[1]["config"])
+
+	t.Run("get empty list of themes", func(t *testing.T) {
+
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(themeProps))
+
+		e.GET(url).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": 0})
+
+		mock.ExpectationsWereMet()
+	})
+
+	t.Run("get non-empty list of themes", func(t *testing.T) {
+
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(themelist)))
+
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(themeProps).
+				AddRow(1, time.Now(), time.Now(), nil, themelist[0]["name"], byteData0).
+				AddRow(2, time.Now(), time.Now(), nil, themelist[1]["name"], byteData1))
+
+		e.GET(url).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(themelist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(themelist[0])
+
+		mock.ExpectationsWereMet()
+	})
+
 	t.Run("get themes with pagination", func(t *testing.T) {
-		themeOne := &model.Theme{
-			Name:           "Light theme",
-			OrganisationID: 1,
-		}
-		themeTwo := &model.Theme{
-			Name:           "Dark theme",
-			OrganisationID: 1,
-		}
-		themes := []model.Theme{}
-		total := 0
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(themelist)))
 
-		config.DB.Model(&model.Theme{}).Create(&themeOne)
-		config.DB.Model(&model.Theme{}).Create(&themeTwo)
-		config.DB.Model(&model.Theme{}).Where(&model.Theme{
-			OrganisationID: 1,
-		}).Count(&total).Order("id desc").Offset(1).Limit(1).Find(&themes)
+		mock.ExpectQuery(paginationQuery).
+			WillReturnRows(sqlmock.NewRows(themeProps).
+				AddRow(2, time.Now(), time.Now(), nil, themelist[1]["name"], byteData1))
 
-		resObj := e.GET("/themes").
-			WithQueryObject(map[string]string{
+		e.GET(url).
+			WithQueryObject(map[string]interface{}{
 				"limit": "1",
 				"page":  "2",
 			}).
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(themelist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(themelist[1])
 
-		resObj.Value("nodes").Array().Element(0).Object().Value("name").String().Equal(themes[0].Name)
-		resObj.Value("total").Number().Equal(total)
+		mock.ExpectationsWereMet()
 
 	})
 }
