@@ -26,7 +26,10 @@
     }
   },
   "lint-staged": {
-    "*": "npm run format"
+    "*": [
+      "npm run format",
+      "git add"
+    ]
   },
   "scripts": {
     "start": "react-scripts start",
@@ -64,8 +67,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "prettier": "2.0.5",
-    "redux-devtools": "^3.5.0",
-    "semantic-release": "^17.1.1"
+    "redux-devtools": "^3.5.0"
   },
   "config": {
     "commitizen": {
