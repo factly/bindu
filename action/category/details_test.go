@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
@@ -50,10 +49,7 @@ func TestCategoryDetails(t *testing.T) {
 
 	t.Run("get category by id", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows(categoryProps).
-				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
+		categorySelectMock(mock)
 
 		e.GET(urlWithPath).
 			WithPath("category_id", 1).

@@ -4,7 +4,9 @@ import (
 	"os"
 	"regexp"
 	"testing"
+	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/joho/godotenv"
 	"gopkg.in/h2non/gock.v1"
@@ -35,6 +37,19 @@ var paginationQuery = `SELECT \* FROM "bi_category" (.+) LIMIT 1 OFFSET 1`
 
 var url = "/categories"
 var urlWithPath = "/categories/{category_id}"
+
+func categorySelectMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1, 1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+			AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
+}
+
+func categoryChartExpect(mock sqlmock.Sqlmock, count int) {
+	mock.ExpectQuery(chartQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
+}
 
 func TestMain(m *testing.M) {
 
