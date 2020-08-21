@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
@@ -53,14 +52,9 @@ func TestMediumDelete(t *testing.T) {
 
 	t.Run("check medium associated with other entity", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug", "type", "url"}).
-				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"], data["type"], byteData))
+		mediumSelectMock(mock)
 
-		mock.ExpectQuery(chartQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("1"))
+		mediumChartExpect(mock, 1)
 
 		e.DELETE(urlWithPath).
 			WithPath("medium_id", 1).
@@ -70,14 +64,9 @@ func TestMediumDelete(t *testing.T) {
 	})
 
 	t.Run("medium record deleted", func(t *testing.T) {
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug", "type", "url"}).
-				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"], data["type"], byteData))
+		mediumSelectMock(mock)
 
-		mock.ExpectQuery(chartQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+		mediumChartExpect(mock, 0)
 
 		mock.ExpectBegin()
 		mock.ExpectExec(deleteQuery).

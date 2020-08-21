@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
@@ -50,10 +49,7 @@ func TestMediumDetails(t *testing.T) {
 
 	t.Run("get medium by id", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
-				AddRow(1, time.Now(), time.Now(), nil, 1, data["name"], data["slug"], data["type"], byteData))
+		mediumSelectMock(mock)
 
 		e.GET(urlWithPath).
 			WithPath("medium_id", 1).

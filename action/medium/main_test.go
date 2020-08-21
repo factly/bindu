@@ -5,7 +5,9 @@ import (
 	"os"
 	"regexp"
 	"testing"
+	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/joho/godotenv"
 	"gopkg.in/h2non/gock.v1"
@@ -54,6 +56,19 @@ var paginationQuery = `SELECT \* FROM "bi_medium" (.+) LIMIT 1 OFFSET 1`
 
 var url = "/media"
 var urlWithPath = "/media/{medium_id}"
+
+func mediumSelectMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1, 1).
+		WillReturnRows(sqlmock.NewRows(mediumProps).
+			AddRow(1, time.Now(), time.Now(), nil, 1, data["name"], data["slug"], data["type"], byteData))
+}
+
+func mediumChartExpect(mock sqlmock.Sqlmock, count int) {
+	mock.ExpectQuery(chartQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
+}
 
 func TestMain(m *testing.M) {
 
