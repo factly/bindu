@@ -4,19 +4,21 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestChartDelete(t *testing.T) {
-	r := chi.NewRouter()
+	mock := test.SetupMockDB()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/charts", Router())
+	r := chi.NewRouter()
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -26,23 +28,23 @@ func TestChartDelete(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
-	theme := &model.Theme{
-		Name:           "Theme sample",
-		OrganisationID: 1,
-	}
-
-	config.DB.Model(&model.Theme{}).Create(&theme)
-
 	t.Run("invalid chart id", func(t *testing.T) {
-		e.DELETE("/charts/{chart_id}").
+
+		e.DELETE(urlWithPath).
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusNotFound)
+
 	})
 
 	t.Run("chart record not found", func(t *testing.T) {
-		e.DELETE("/charts/{chart_id}").
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(chartColumns))
+
+		e.DELETE(urlWithPath).
 			WithPath("chart_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -50,20 +52,23 @@ func TestChartDelete(t *testing.T) {
 	})
 
 	t.Run("chart record deleted", func(t *testing.T) {
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(chartColumns).
+				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 
-		chart := model.Chart{
-			Title:          "Sample chart",
-			ThemeID:        theme.Base.ID,
-			OrganisationID: 1,
-		}
-		config.DB.Model(&model.Theme{}).Create(&chart)
+		mock.ExpectBegin()
+		mock.ExpectExec(deleteQuery).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
 
-		e.DELETE("/charts/{chart_id}").
-			WithPath("chart_id", chart.Base.ID).
+		e.DELETE(urlWithPath).
+			WithPath("chart_id", 1).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK)
-
 	})
 
 }
