@@ -55,7 +55,7 @@ func TestCategoryDelete(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "slug"}).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
 				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
 
 		mock.ExpectQuery(chartQuery).
@@ -72,7 +72,7 @@ func TestCategoryDelete(t *testing.T) {
 	t.Run("category record deleted", func(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "slug"}).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
 				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
 
 		mock.ExpectQuery(chartQuery).

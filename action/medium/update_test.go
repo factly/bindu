@@ -1,22 +1,26 @@
 package medium
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumUpdate(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -26,16 +30,8 @@ func TestMediumUpdate(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
-	medium := &model.Medium{
-		Name:           "Agri",
-		Slug:           "agriculture",
-		OrganisationID: 1,
-	}
-
-	config.DB.Model(&model.Medium{}).Create(&medium)
-
 	t.Run("invalid medium id", func(t *testing.T) {
-		e.PUT("/media/{medium_id}").
+		e.PUT(urlWithPath).
 			WithPath("medium_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -43,8 +39,11 @@ func TestMediumUpdate(t *testing.T) {
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps))
 
-		e.PUT("/media/{medium_id}").
+		e.PUT(urlWithPath).
 			WithPath("medium_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -52,58 +51,146 @@ func TestMediumUpdate(t *testing.T) {
 	})
 
 	t.Run("update medium", func(t *testing.T) {
-
-		body := model.Medium{
-			Name: "Agriculture",
-			Slug: "agriculture",
+		updatedMedium := map[string]interface{}{
+			"name": "Elections",
+			"slug": "testing",
+			"type": "jpg",
+			"url": `{"image": { 
+				"src": "Images/election/Sun.png",
+				"name": "sun1",
+				"hOffset": 250,
+				"vOffset": 250,
+				"alignment": "center"
+			}}`,
 		}
 
-		resObj := e.PUT("/media/{medium_id}").
-			WithPath("medium_id", medium.Base.ID).
-			WithHeaders(headers).
-			WithJSON(body).
-			Expect().
-			Status(http.StatusOK).JSON().Object()
+		updatedByteData, _ := json.Marshal(updatedMedium["url"])
 
-		resObj.Value("name").String().Equal("Agriculture")
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, "Elections", "testing", "png", updatedByteData))
+
+		mock.ExpectBegin()
+		mock.ExpectExec(`UPDATE \"bi_medium\" SET (.+)  WHERE (.+) \"bi_medium\".\"id\" = `).
+			WithArgs(updatedMedium["name"], updatedMedium["slug"], updatedMedium["type"], test.AnyTime{}, updatedByteData, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, updatedMedium["name"], updatedMedium["slug"], updatedMedium["type"], updatedByteData))
+
+		e.PUT(urlWithPath).
+			WithPath("medium_id", 1).
+			WithHeaders(headers).
+			WithJSON(updatedMedium).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedMedium)
 
 	})
 
 	t.Run("update medium by id with empty slug", func(t *testing.T) {
-
-		body := model.Medium{
-			Name: "Crop",
-			Slug: "",
+		updatedMedium := map[string]interface{}{
+			"name": "Sun",
+			"slug": "",
+			"type": "jpg",
+			"url": `{"image": {
+				"src": "Images/Sun.png",
+				"name": "sun1",
+				"hOffset": 250,
+				"vOffset": 250,
+				"alignment": "right"
+			}}`,
 		}
 
-		resObj := e.PUT("/media/{medium_id}").
-			WithPath("medium_id", medium.Base.ID).
-			WithHeaders(headers).
-			WithJSON(body).
-			Expect().
-			Status(http.StatusOK).JSON().Object()
+		updatedByteData, _ := json.Marshal(updatedMedium["url"])
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, "Sun", "sun", "png", byteData))
 
-		resObj.Value("name").String().Equal("Crop")
-		resObj.Value("slug").String().Equal("crop")
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_medium"`).
+			WithArgs("sun%", 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, "Sun", "sun", "png", byteData))
+
+		mock.ExpectBegin()
+		mock.ExpectExec(`UPDATE \"bi_medium\" SET (.+)  WHERE (.+) \"bi_medium\".\"id\" = `).
+			WithArgs(updatedMedium["name"], "sun-1", updatedMedium["type"], test.AnyTime{}, updatedByteData, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, updatedMedium["name"], "sun-1", updatedMedium["type"], updatedByteData))
+
+		resObj := map[string]interface{}{
+			"name": "Sun",
+			"slug": "sun-1",
+			"type": "jpg",
+			"url": `{"image": {
+				"src": "Images/Sun.png",
+				"name": "sun1",
+				"hOffset": 250,
+				"vOffset": 250,
+				"alignment": "right"
+			}}`,
+		}
+
+		e.PUT(urlWithPath).
+			WithPath("medium_id", 1).
+			WithHeaders(headers).
+			WithJSON(updatedMedium).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(resObj)
 
 	})
 
 	t.Run("update medium with different slug", func(t *testing.T) {
 
-		body := model.Medium{
-			Name: "Crop test",
-			Slug: "crop-test",
+		updatedMedium := map[string]interface{}{
+			"name": "Graph",
+			"slug": "testing-slug",
+			"type": "jpg",
+			"url": `{"image": { 
+				"src": "Images/graphs/Bar.png",
+				"name": "Graph",
+				"hOffset": 250,
+				"vOffset": 250,
+				"alignment": "center"
+			}}`,
 		}
+		updatedByteData, _ := json.Marshal(updatedMedium["url"])
 
-		resObj := e.PUT("/media/{medium_id}").
-			WithPath("medium_id", medium.Base.ID).
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, "Graph", "testing", "png", updatedByteData))
+
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_medium"`).
+			WithArgs(fmt.Sprint(updatedMedium["slug"], "%"), 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps))
+
+		mock.ExpectBegin()
+		mock.ExpectExec(`UPDATE \"bi_medium\" SET (.+)  WHERE (.+) \"bi_medium\".\"id\" = `).
+			WithArgs(updatedMedium["name"], "testing-slug", updatedMedium["type"], test.AnyTime{}, updatedByteData, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, updatedMedium["name"], "testing-slug", updatedMedium["type"], updatedByteData))
+
+		e.PUT(urlWithPath).
+			WithPath("medium_id", 1).
 			WithHeaders(headers).
-			WithJSON(body).
+			WithJSON(updatedMedium).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("name").String().Equal("Crop test")
-		resObj.Value("slug").String().Equal("crop-test")
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedMedium)
 
 	})
 

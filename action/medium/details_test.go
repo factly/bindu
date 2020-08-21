@@ -4,19 +4,21 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumDetails(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -27,7 +29,7 @@ func TestMediumDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid medium id", func(t *testing.T) {
-		e.GET("/media/{medium_id}").
+		e.GET(urlWithPath).
 			WithPath("medium_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -35,7 +37,11 @@ func TestMediumDetails(t *testing.T) {
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
-		e.GET("/media/{medium_id}").
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps))
+
+		e.GET(urlWithPath).
 			WithPath("medium_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -43,20 +49,17 @@ func TestMediumDetails(t *testing.T) {
 	})
 
 	t.Run("get medium by id", func(t *testing.T) {
-		medium := &model.Medium{
-			Name:           "Theme sample",
-			OrganisationID: 1,
-		}
 
-		config.DB.Model(&model.Medium{}).Create(&medium)
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, data["name"], data["slug"], data["type"], byteData))
 
-		resObj := e.GET("/media/{medium_id}").
-			WithPath("medium_id", medium.Base.ID).
+		e.GET(urlWithPath).
+			WithPath("medium_id", 1).
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("name").String().Equal("Theme sample")
+			Status(http.StatusOK).JSON().Object().ContainsMap(data)
 	})
 
 }

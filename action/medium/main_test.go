@@ -1,7 +1,9 @@
 package medium
 
 import (
+	"encoding/json"
 	"os"
+	"regexp"
 	"testing"
 
 	"github.com/factly/bindu-server/util/test"
@@ -14,9 +16,47 @@ var headers = map[string]string{
 	"X-User":         "1",
 }
 
+var data = map[string]interface{}{
+	"name": "Politics",
+	"slug": "politics",
+	"type": "jpg",
+	"url": `{"image": { 
+        "src": "Images/Sun.png",
+        "name": "sun1",
+        "hOffset": 250,
+        "vOffset": 250,
+        "alignment": "center"
+    }}`,
+}
+
+var mediumWithoutSlug = map[string]interface{}{
+	"name": "Politics",
+	"slug": "",
+	"type": "jpg",
+	"url": `{"image": { 
+        "src": "Images/Sun.png",
+        "name": "sun1",
+        "hOffset": 250,
+        "vOffset": 250,
+        "alignment": "center"
+    }}`,
+}
+
+var byteData, _ = json.Marshal(data["url"])
+
+var mediumProps = []string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}
+
+var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_medium"`)
+var chartQuery = regexp.QuoteMeta(`SELECT count(*) FROM "bi_chart"`)
+var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_medium" SET "deleted_at"=`)
+var countQuery = regexp.QuoteMeta(`SELECT count(*) FROM "bi_medium"`)
+var paginationQuery = `SELECT \* FROM "bi_medium" (.+) LIMIT 1 OFFSET 1`
+
+var url = "/media"
+var urlWithPath = "/media/{medium_id}"
+
 func TestMain(m *testing.M) {
 
-	test.Init()
 	godotenv.Load("../../.env")
 
 	// Mock kavach server and allowing persisted external traffic
@@ -25,8 +65,6 @@ func TestMain(m *testing.M) {
 	defer gock.DisableNetworking()
 
 	exitValue := m.Run()
-
-	test.CleanTables()
 
 	os.Exit(exitValue)
 }

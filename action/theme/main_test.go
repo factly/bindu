@@ -17,7 +17,7 @@ var headers = map[string]string{
 }
 
 var data = map[string]interface{}{
-	"name": "Politics",
+	"name": "Light theme",
 	"config": `{"image": { 
         "src": "Images/Sun.png",
         "name": "sun1",
