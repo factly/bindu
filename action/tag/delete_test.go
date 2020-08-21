@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
@@ -18,7 +17,7 @@ func TestTagDelete(t *testing.T) {
 	mock := test.SetupMockDB()
 
 	r := chi.NewRouter()
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -30,7 +29,7 @@ func TestTagDelete(t *testing.T) {
 
 	t.Run("invalid tag id", func(t *testing.T) {
 
-		e.DELETE("/tags/{tag_id}").
+		e.DELETE(urlWithPath).
 			WithPath("tag_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -44,7 +43,7 @@ func TestTagDelete(t *testing.T) {
 			WithArgs(100, 1).
 			WillReturnRows(sqlmock.NewRows(tagProps))
 
-		e.DELETE("/tags/{tag_id}").
+		e.DELETE(urlWithPath).
 			WithPath("tag_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -53,16 +52,11 @@ func TestTagDelete(t *testing.T) {
 
 	t.Run("check tag associated with other entity", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "slug"}).
-				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
+		tagSelectMock(mock)
 
-		mock.ExpectQuery(chartQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("1"))
+		tagChartExpect(mock, 1)
 
-		e.DELETE("/tags/{tag_id}").
+		e.DELETE(urlWithPath).
 			WithPath("tag_id", 1).
 			WithHeaders(headers).
 			Expect().
@@ -70,14 +64,9 @@ func TestTagDelete(t *testing.T) {
 	})
 
 	t.Run("tag record deleted", func(t *testing.T) {
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "slug"}).
-				AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
+		tagSelectMock(mock)
 
-		mock.ExpectQuery(chartQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+		tagChartExpect(mock, 0)
 
 		mock.ExpectBegin()
 		mock.ExpectExec(deleteQuery).
@@ -85,7 +74,7 @@ func TestTagDelete(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
-		e.DELETE("/tags/{tag_id}").
+		e.DELETE(urlWithPath).
 			WithPath("tag_id", 1).
 			WithHeaders(headers).
 			Expect().

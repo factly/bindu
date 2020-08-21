@@ -19,7 +19,7 @@ func TestTagUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -35,7 +35,7 @@ func TestTagUpdate(t *testing.T) {
 	}
 
 	t.Run("invalid tag id", func(t *testing.T) {
-		e.PUT("/tags/{tag_id}").
+		e.PUT(urlWithPath).
 			WithPath("tag_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -47,7 +47,7 @@ func TestTagUpdate(t *testing.T) {
 			WithArgs(100, 1).
 			WillReturnRows(sqlmock.NewRows(tagProps))
 
-		e.PUT("/tags/{tag_id}").
+		e.PUT(urlWithPath).
 			WithPath("tag_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -72,7 +72,7 @@ func TestTagUpdate(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
 				AddRow(1, time.Now(), time.Now(), nil, updatedTag["name"], updatedTag["slug"]))
 
-		e.PUT("/tags/{tag_id}").
+		e.PUT(urlWithPath).
 			WithPath("tag_id", 1).
 			WithHeaders(headers).
 			WithJSON(updatedTag).
@@ -113,7 +113,7 @@ func TestTagUpdate(t *testing.T) {
 			"slug": "politics-1",
 		}
 
-		e.PUT("/tags/{tag_id}").
+		e.PUT(urlWithPath).
 			WithPath("tag_id", 1).
 			WithHeaders(headers).
 			WithJSON(updatedTag).
@@ -147,7 +147,7 @@ func TestTagUpdate(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
 				AddRow(1, time.Now(), time.Now(), nil, updatedTag["name"], "testing-slug"))
 
-		e.PUT("/tags/{tag_id}").
+		e.PUT(urlWithPath).
 			WithPath("tag_id", 1).
 			WithHeaders(headers).
 			WithJSON(updatedTag).

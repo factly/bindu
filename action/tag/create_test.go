@@ -21,7 +21,7 @@ func TestTagCreate(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -33,7 +33,7 @@ func TestTagCreate(t *testing.T) {
 
 	t.Run("Unprocessable tag", func(t *testing.T) {
 
-		e.POST("/tags").
+		e.POST(url).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusUnprocessableEntity)
@@ -56,7 +56,7 @@ func TestTagCreate(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
 				AddRow(1, time.Now(), time.Now(), nil, 1, data["name"], data["slug"]))
 
-		e.POST("/tags").
+		e.POST(url).
 			WithHeaders(headers).
 			WithJSON(data).
 			Expect().
@@ -86,7 +86,7 @@ func TestTagCreate(t *testing.T) {
 			"slug": slug,
 		}
 
-		e.POST("/tags").
+		e.POST(url).
 			WithHeaders(headers).
 			WithJSON(tagWithoutSlug).
 			Expect().

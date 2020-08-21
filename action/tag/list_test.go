@@ -18,7 +18,7 @@ func TestTagList(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -41,7 +41,7 @@ func TestTagList(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(tagProps))
 
-		e.GET("/tags").
+		e.GET(url).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -62,7 +62,7 @@ func TestTagList(t *testing.T) {
 				AddRow(1, time.Now(), time.Now(), nil, taglist[0]["name"], taglist[0]["slug"]).
 				AddRow(2, time.Now(), time.Now(), nil, taglist[1]["name"], taglist[1]["slug"]))
 
-		e.GET("/tags").
+		e.GET(url).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -86,7 +86,7 @@ func TestTagList(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows(tagProps).
 				AddRow(2, time.Now(), time.Now(), nil, taglist[1]["name"], taglist[1]["slug"]))
 
-		e.GET("/tags").
+		e.GET(url).
 			WithQueryObject(map[string]interface{}{
 				"limit": "1",
 				"page":  "2",
