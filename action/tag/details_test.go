@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
@@ -17,7 +16,7 @@ func TestTagDetails(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -28,7 +27,7 @@ func TestTagDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid tag id", func(t *testing.T) {
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("tag_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -36,11 +35,9 @@ func TestTagDetails(t *testing.T) {
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(tagProps))
+		recordNotFoundMock(mock)
 
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("tag_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -48,10 +45,9 @@ func TestTagDetails(t *testing.T) {
 	})
 
 	t.Run("get tag by id", func(t *testing.T) {
-
 		tagSelectMock(mock)
 
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("tag_id", 1).
 			WithHeaders(headers).
 			Expect().

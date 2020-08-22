@@ -27,7 +27,7 @@ type paging struct {
 // @Param X-Organisation header string true "Organisation ID"
 // @Param limit query string false "limit per page"
 // @Param page query string false "page number"
-// @Success 200 {array} model.Tag
+// @Success 200 {array} paging
 // @Router /tags [get]
 func list(w http.ResponseWriter, r *http.Request) {
 

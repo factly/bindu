@@ -18,7 +18,7 @@ func TestTagList(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -35,13 +35,12 @@ func TestTagList(t *testing.T) {
 
 	t.Run("get empty list of tags", func(t *testing.T) {
 
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+		tagCountQuery(mock, 0)
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(tagProps))
+			WillReturnRows(sqlmock.NewRows(columns))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -49,20 +48,19 @@ func TestTagList(t *testing.T) {
 			Object().
 			ContainsMap(map[string]interface{}{"total": 0})
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get non-empty list of tags", func(t *testing.T) {
 
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(taglist)))
+		tagCountQuery(mock, len(taglist))
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(tagProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, taglist[0]["name"], taglist[0]["slug"]).
 				AddRow(2, time.Now(), time.Now(), nil, taglist[1]["name"], taglist[1]["slug"]))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -75,18 +73,17 @@ func TestTagList(t *testing.T) {
 			Object().
 			ContainsMap(taglist[0])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get tags with pagination", func(t *testing.T) {
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(taglist)))
+		tagCountQuery(mock, len(taglist))
 
 		mock.ExpectQuery(paginationQuery).
-			WillReturnRows(sqlmock.NewRows(tagProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(2, time.Now(), time.Now(), nil, taglist[1]["name"], taglist[1]["slug"]))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{
 				"limit": "1",
 				"page":  "2",
@@ -103,7 +100,7 @@ func TestTagList(t *testing.T) {
 			Object().
 			ContainsMap(taglist[1])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 }
