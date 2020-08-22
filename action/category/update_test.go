@@ -15,11 +15,18 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
+func selectAfterUpdate(mock sqlmock.Sqlmock, category map[string]interface{}) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows(columns).
+			AddRow(1, time.Now(), time.Now(), nil, category["name"], category["slug"]))
+}
+
 func TestCategoryUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -29,13 +36,8 @@ func TestCategoryUpdate(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
-	var updatedCategory = map[string]interface{}{
-		"name": "Politics",
-		"slug": "politics",
-	}
-
 	t.Run("invalid category id", func(t *testing.T) {
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("category_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -43,11 +45,9 @@ func TestCategoryUpdate(t *testing.T) {
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(categoryProps))
+		recordNotFoundMock(mock)
 
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("category_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -56,23 +56,18 @@ func TestCategoryUpdate(t *testing.T) {
 
 	t.Run("update category", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
-				AddRow(1, time.Now(), time.Now(), nil, "Elections", "politics"))
+		updatedCategory := map[string]interface{}{
+			"name": "Politics",
+			"slug": "politics",
+		}
 
-		mock.ExpectBegin()
-		mock.ExpectExec(`UPDATE \"bi_category\" SET (.+)  WHERE (.+) \"bi_category\".\"id\" = `).
-			WithArgs(updatedCategory["name"], updatedCategory["slug"], test.AnyTime{}, 1).
-			WillReturnResult(sqlmock.NewResult(1, 1))
-		mock.ExpectCommit()
+		categorySelectMock(mock)
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
-				AddRow(1, time.Now(), time.Now(), nil, updatedCategory["name"], updatedCategory["slug"]))
+		categoryUpdateMock(mock, updatedCategory)
 
-		e.PUT(urlWithPath).
+		selectAfterUpdate(mock, updatedCategory)
+
+		e.PUT(path).
 			WithPath("category_id", 1).
 			WithHeaders(headers).
 			WithJSON(updatedCategory).
@@ -85,40 +80,25 @@ func TestCategoryUpdate(t *testing.T) {
 
 		updatedCategory := map[string]interface{}{
 			"name": "Politics",
-			"slug": "",
+			"slug": "politics-1",
 		}
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
-				AddRow(1, time.Now(), time.Now(), nil, "Politics", "politics"))
+		categorySelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_category"`).
 			WithArgs("politics%", 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, "Politics", "politics"))
 
-		mock.ExpectBegin()
-		mock.ExpectExec(`UPDATE \"bi_category\" SET (.+)  WHERE (.+) \"bi_category\".\"id\" = `).
-			WithArgs(updatedCategory["name"], "politics-1", test.AnyTime{}, 1).
-			WillReturnResult(sqlmock.NewResult(1, 1))
-		mock.ExpectCommit()
+		categoryUpdateMock(mock, updatedCategory)
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
-				AddRow(1, time.Now(), time.Now(), nil, updatedCategory["name"], "politics-1"))
+		selectAfterUpdate(mock, updatedCategory)
 
-		resObj := map[string]interface{}{
-			"name": "Politics",
-			"slug": "politics-1",
-		}
-
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("category_id", 1).
 			WithHeaders(headers).
-			WithJSON(updatedCategory).
+			WithJSON(dataWithoutSlug).
 			Expect().
-			Status(http.StatusOK).JSON().Object().ContainsMap(resObj)
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedCategory)
 
 	})
 
@@ -127,27 +107,17 @@ func TestCategoryUpdate(t *testing.T) {
 			"name": "Politics",
 			"slug": "testing-slug",
 		}
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
-				AddRow(1, time.Now(), time.Now(), nil, "Politics", "slug"))
+		categorySelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_category"`).
 			WithArgs(fmt.Sprint(updatedCategory["slug"], "%"), 1).
 			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
 
-		mock.ExpectBegin()
-		mock.ExpectExec(`UPDATE \"bi_category\" SET (.+)  WHERE (.+) \"bi_category\".\"id\" = `).
-			WithArgs(updatedCategory["name"], "testing-slug", test.AnyTime{}, 1).
-			WillReturnResult(sqlmock.NewResult(1, 1))
-		mock.ExpectCommit()
+		categoryUpdateMock(mock, updatedCategory)
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}).
-				AddRow(1, time.Now(), time.Now(), nil, updatedCategory["name"], "testing-slug"))
+		selectAfterUpdate(mock, updatedCategory)
 
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("category_id", 1).
 			WithHeaders(headers).
 			WithJSON(updatedCategory).

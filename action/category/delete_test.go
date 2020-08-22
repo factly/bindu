@@ -17,7 +17,7 @@ func TestCategoryDelete(t *testing.T) {
 	mock := test.SetupMockDB()
 
 	r := chi.NewRouter()
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -28,8 +28,7 @@ func TestCategoryDelete(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid category id", func(t *testing.T) {
-
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("category_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -38,12 +37,9 @@ func TestCategoryDelete(t *testing.T) {
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
+		recordNotFoundMock(mock)
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(categoryProps))
-
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("category_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -51,12 +47,11 @@ func TestCategoryDelete(t *testing.T) {
 	})
 
 	t.Run("check category associated with other entity", func(t *testing.T) {
-
 		categorySelectMock(mock)
 
 		categoryChartExpect(mock, 1)
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("category_id", 1).
 			WithHeaders(headers).
 			Expect().
@@ -74,7 +69,7 @@ func TestCategoryDelete(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("category_id", 1).
 			WithHeaders(headers).
 			Expect().

@@ -18,7 +18,7 @@ func TestCategoryList(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -35,13 +35,12 @@ func TestCategoryList(t *testing.T) {
 
 	t.Run("get empty list of categories", func(t *testing.T) {
 
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+		categoryCountQuery(mock, 0)
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(categoryProps))
+			WillReturnRows(sqlmock.NewRows(columns))
 
-		e.GET("/categories").
+		e.GET(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -49,20 +48,19 @@ func TestCategoryList(t *testing.T) {
 			Object().
 			ContainsMap(map[string]interface{}{"total": 0})
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get non-empty list of categories", func(t *testing.T) {
 
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(categorylist)))
+		categoryCountQuery(mock, len(categorylist))
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(categoryProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, categorylist[0]["name"], categorylist[0]["slug"]).
 				AddRow(2, time.Now(), time.Now(), nil, categorylist[1]["name"], categorylist[1]["slug"]))
 
-		e.GET("/categories").
+		e.GET(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -75,18 +73,17 @@ func TestCategoryList(t *testing.T) {
 			Object().
 			ContainsMap(categorylist[0])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get categories with pagination", func(t *testing.T) {
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(categorylist)))
+		categoryCountQuery(mock, len(categorylist))
 
 		mock.ExpectQuery(paginationQuery).
-			WillReturnRows(sqlmock.NewRows(categoryProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(2, time.Now(), time.Now(), nil, categorylist[1]["name"], categorylist[1]["slug"]))
 
-		e.GET("/categories").
+		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{
 				"limit": "1",
 				"page":  "2",
@@ -103,7 +100,7 @@ func TestCategoryList(t *testing.T) {
 			Object().
 			ContainsMap(categorylist[1])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 }
