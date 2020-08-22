@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
@@ -18,7 +17,7 @@ func TestThemeDelete(t *testing.T) {
 	mock := test.SetupMockDB()
 
 	r := chi.NewRouter()
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -30,7 +29,7 @@ func TestThemeDelete(t *testing.T) {
 
 	t.Run("invalid theme id", func(t *testing.T) {
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("theme_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -40,11 +39,9 @@ func TestThemeDelete(t *testing.T) {
 
 	t.Run("theme record not found", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(themeProps))
+		recordNotFoundMock(mock)
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("theme_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -53,16 +50,11 @@ func TestThemeDelete(t *testing.T) {
 
 	t.Run("check theme associated with other entity", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "config"}).
-				AddRow(1, time.Now(), time.Now(), nil, data["name"], byteData))
+		themeSelectMock(mock)
 
-		mock.ExpectQuery(chartQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("1"))
+		themeChartExpect(mock, 1)
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("theme_id", 1).
 			WithHeaders(headers).
 			Expect().
@@ -71,14 +63,9 @@ func TestThemeDelete(t *testing.T) {
 
 	t.Run("theme record deleted", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "title", "config"}).
-				AddRow(1, time.Now(), time.Now(), nil, data["name"], byteData))
+		themeSelectMock(mock)
 
-		mock.ExpectQuery(chartQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+		themeChartExpect(mock, 0)
 
 		mock.ExpectBegin()
 		mock.ExpectExec(deleteQuery).
@@ -86,7 +73,7 @@ func TestThemeDelete(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("theme_id", 1).
 			WithHeaders(headers).
 			Expect().

@@ -4,9 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
@@ -18,7 +16,7 @@ func TestThemeDetails(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -29,7 +27,7 @@ func TestThemeDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid theme id", func(t *testing.T) {
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("theme_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -37,11 +35,9 @@ func TestThemeDetails(t *testing.T) {
 	})
 
 	t.Run("theme record not found", func(t *testing.T) {
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(themeProps))
+		recordNotFoundMock(mock)
 
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("theme_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -50,12 +46,9 @@ func TestThemeDetails(t *testing.T) {
 
 	t.Run("get theme by id", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows(themeProps).
-				AddRow(1, time.Now(), time.Now(), nil, data["name"], byteData))
+		themeSelectMock(mock)
 
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("theme_id", 1).
 			WithHeaders(headers).
 			Expect().

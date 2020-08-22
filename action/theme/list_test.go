@@ -19,7 +19,7 @@ func TestThemeList(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -51,13 +51,12 @@ func TestThemeList(t *testing.T) {
 
 	t.Run("get empty list of themes", func(t *testing.T) {
 
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+		themeCountQuery(mock, 0)
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(themeProps))
+			WillReturnRows(sqlmock.NewRows(columns))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -69,16 +68,14 @@ func TestThemeList(t *testing.T) {
 	})
 
 	t.Run("get non-empty list of themes", func(t *testing.T) {
-
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(themelist)))
+		themeCountQuery(mock, len(themelist))
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(themeProps).
-				AddRow(1, time.Now(), time.Now(), nil, themelist[0]["name"], byteData0).
-				AddRow(2, time.Now(), time.Now(), nil, themelist[1]["name"], byteData1))
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(1, time.Now(), time.Now(), nil, 1, themelist[0]["name"], byteData0).
+				AddRow(2, time.Now(), time.Now(), nil, 1, themelist[1]["name"], byteData1))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -95,14 +92,13 @@ func TestThemeList(t *testing.T) {
 	})
 
 	t.Run("get themes with pagination", func(t *testing.T) {
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(themelist)))
+		themeCountQuery(mock, len(themelist))
 
 		mock.ExpectQuery(paginationQuery).
-			WillReturnRows(sqlmock.NewRows(themeProps).
-				AddRow(2, time.Now(), time.Now(), nil, themelist[1]["name"], byteData1))
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(2, time.Now(), time.Now(), nil, 1, themelist[1]["name"], byteData1))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{
 				"limit": "1",
 				"page":  "2",

@@ -19,7 +19,7 @@ func TestThemeUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -43,7 +43,7 @@ func TestThemeUpdate(t *testing.T) {
 	updatedByteData, _ := json.Marshal(updatedTheme["config"])
 
 	t.Run("invalid theme id", func(t *testing.T) {
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("theme_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -51,11 +51,9 @@ func TestThemeUpdate(t *testing.T) {
 	})
 
 	t.Run("theme record not found", func(t *testing.T) {
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(themeProps))
+		recordNotFoundMock(mock)
 
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("theme_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -64,10 +62,7 @@ func TestThemeUpdate(t *testing.T) {
 
 	t.Run("update theme", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "config"}).
-				AddRow(1, time.Now(), time.Now(), nil, "Elections", byteData))
+		themeSelectMock(mock)
 
 		mock.ExpectBegin()
 		mock.ExpectExec(`UPDATE \"bi_theme\" SET (.+)  WHERE (.+) \"bi_theme\".\"id\" = `).
@@ -77,10 +72,10 @@ func TestThemeUpdate(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "name", "config"}).
-				AddRow(1, time.Now(), time.Now(), nil, updatedTheme["name"], updatedByteData))
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(1, time.Now(), time.Now(), nil, 1, updatedTheme["name"], updatedByteData))
 
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("theme_id", 1).
 			WithHeaders(headers).
 			WithJSON(updatedTheme).
