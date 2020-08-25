@@ -22,7 +22,7 @@ func TestCategoryCreate(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
-	t.Run("cannot decode category decode", func(t *testing.T) {
+	t.Run("cannot decode category", func(t *testing.T) {
 
 		e.POST(basePath).
 			WithHeaders(headers).
