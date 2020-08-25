@@ -7,7 +7,7 @@ import (
 
 // medium model
 type medium struct {
-	Name string         `json:"name" validate:"required"`
+	Name string         `json:"name" validate:"required,min=3,max=50"`
 	Slug string         `json:"slug"`
 	Type string         `json:"type"`
 	URL  postgres.Jsonb `json:"url"`

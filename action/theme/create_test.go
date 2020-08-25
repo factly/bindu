@@ -55,7 +55,7 @@ func TestCategoryCreate(t *testing.T) {
 			WithJSON(data).
 			Expect().
 			Status(http.StatusCreated).JSON().Object().ContainsMap(data)
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 
