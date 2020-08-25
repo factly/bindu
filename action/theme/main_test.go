@@ -2,13 +2,17 @@ package theme
 
 import (
 	"encoding/json"
+	"net/http"
 	"os"
 	"regexp"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/factly/x/loggerx"
+	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -68,6 +72,13 @@ func themeChartExpect(mock sqlmock.Sqlmock, count int) {
 func themeCountQuery(mock sqlmock.Sqlmock, count int) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_theme"`)).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
+}
+
+func Routes() http.Handler {
+	r := chi.NewRouter()
+	r.Use(loggerx.Init())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
+	return r
 }
 
 func TestMain(m *testing.M) {
