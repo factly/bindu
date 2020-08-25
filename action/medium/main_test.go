@@ -3,13 +3,17 @@ package medium
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"regexp"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/factly/x/loggerx"
+	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -54,8 +58,8 @@ var chartQuery = regexp.QuoteMeta(`SELECT count(*) FROM "bi_chart"`)
 var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_medium" SET "deleted_at"=`)
 var paginationQuery = `SELECT \* FROM "bi_medium" (.+) LIMIT 1 OFFSET 1`
 
-var url = "/media"
-var urlWithPath = "/media/{medium_id}"
+var basePath = "/media"
+var path = "/media/{medium_id}"
 
 func mediumSelectMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
@@ -94,6 +98,13 @@ func mediumInsertMock(mock sqlmock.Sqlmock) {
 func mediumCountQuery(mock sqlmock.Sqlmock, count int) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_medium"`)).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
+}
+
+func Routes() http.Handler {
+	r := chi.NewRouter()
+	r.Use(loggerx.Init())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
+	return r
 }
 
 func TestMain(m *testing.M) {

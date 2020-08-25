@@ -5,21 +5,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -29,7 +24,7 @@ func TestMediumCreate(t *testing.T) {
 
 	t.Run("Unprocessable medium", func(t *testing.T) {
 
-		e.POST(url).
+		e.POST(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusUnprocessableEntity)
@@ -42,7 +37,7 @@ func TestMediumCreate(t *testing.T) {
 
 		mediumInsertMock(mock)
 
-		e.POST(url).
+		e.POST(basePath).
 			WithHeaders(headers).
 			WithJSON(data).
 			Expect().
@@ -57,7 +52,7 @@ func TestMediumCreate(t *testing.T) {
 
 		mediumInsertMock(mock)
 
-		e.POST(url).
+		e.POST(basePath).
 			WithHeaders(headers).
 			WithJSON(mediumWithoutSlug).
 			Expect().

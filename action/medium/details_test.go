@@ -5,20 +5,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumDetails(t *testing.T) {
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -27,7 +22,7 @@ func TestMediumDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid medium id", func(t *testing.T) {
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("medium_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -37,7 +32,7 @@ func TestMediumDetails(t *testing.T) {
 	t.Run("medium record not found", func(t *testing.T) {
 		recordNotFoundMock(mock)
 
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("medium_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -48,7 +43,7 @@ func TestMediumDetails(t *testing.T) {
 
 		mediumSelectMock(mock)
 
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("medium_id", 1).
 			WithHeaders(headers).
 			Expect().
