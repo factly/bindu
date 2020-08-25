@@ -66,11 +66,6 @@ func create(w http.ResponseWriter, r *http.Request) {
 		OrganisationID:   uint(oID),
 	}
 
-	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.DBError()))
-		return
-	}
-
 	config.DB.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
 	config.DB.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
 

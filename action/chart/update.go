@@ -95,7 +95,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	config.DB.Model(&result).Updates(model.Chart{
 		Title:            chart.Title,
-		Slug:             slug.Approve(chartSlug, oID, config.DB.NewScope(&model.Chart{}).TableName()),
+		Slug:             chartSlug,
 		DataURL:          chart.DataURL,
 		Description:      chart.Description,
 		Status:           chart.Status,
@@ -105,7 +105,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 		PublishedDate:    chart.PublishedDate,
 		Tags:             newTags,
 		Categories:       newCategories,
-		OrganisationID:   uint(oID),
 	}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)

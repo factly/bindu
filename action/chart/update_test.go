@@ -1,22 +1,59 @@
 package chart
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
+var updateData = map[string]interface{}{
+	"title": "Pie",
+	"description": `{
+		"data": [
+			{
+			"type": "sport",
+			"id": "3",
+			"attributes": {
+				"title": "JSON:API paints my bikeshed!",
+				"body": "The shortest article. Ever.",
+				"created": "2015-05-22T14:56:29.000Z",
+				"updated": "2015-05-22T14:56:28.000Z"
+			}
+			}
+		]
+		}`,
+	"data_url": "http://data.com/sports?page[number]=3&page[size]=1",
+	"config": `{
+		"links": {
+			"self": "http://example.com/sport?page[number]=3&page[size]=1",
+			"first": "http://example.com/sport?page[number]=1&page[size]=1",
+			"prev": "http://example.com/sport?page[number]=2&page[size]=1",
+			"next": "http://example.com/sport?page[number]=4&page[size]=1",
+			"last": "http://example.com/sport?page[number]=13&page[size]=1"
+		  }
+	}`,
+	"status":             "unavailable",
+	"featured_medium_id": uint(1),
+	"theme_id":           uint(1),
+	"published_date":     time.Time{},
+	"category_ids":       []int{1},
+	"tag_ids":            []int{1},
+}
+
 func TestChartUpdate(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/charts", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -25,40 +62,40 @@ func TestChartUpdate(t *testing.T) {
 
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
-
-	theme := &model.Theme{
-		Name:           "Theme sample",
-		OrganisationID: 1,
+	res := map[string]interface{}{
+		"title": "Pie",
+		"description": `{
+			"data": [
+				{
+				"type": "sport",
+				"id": "3",
+				"attributes": {
+					"title": "JSON:API paints my bikeshed!",
+					"body": "The shortest article. Ever.",
+					"created": "2015-05-22T14:56:29.000Z",
+					"updated": "2015-05-22T14:56:28.000Z"
+				}
+				}
+			]
+			}`,
+		"data_url": "http://data.com/sports?page[number]=3&page[size]=1",
+		"config": `{
+			"links": {
+				"self": "http://example.com/sport?page[number]=3&page[size]=1",
+				"first": "http://example.com/sport?page[number]=1&page[size]=1",
+				"prev": "http://example.com/sport?page[number]=2&page[size]=1",
+				"next": "http://example.com/sport?page[number]=4&page[size]=1",
+				"last": "http://example.com/sport?page[number]=13&page[size]=1"
+			  }
+		}`,
+		"status":             "unavailable",
+		"featured_medium_id": uint(1),
+		"theme_id":           uint(1),
+		"published_date":     time.Time{},
 	}
-
-	category := &model.Category{
-		Name:           "Sports",
-		OrganisationID: 1,
-	}
-
-	tag := &model.Tag{
-		Name:           "Agriculture",
-		OrganisationID: 1,
-	}
-
-	config.DB.Model(&model.Tag{}).Create(&tag)
-	config.DB.Model(&model.Category{}).Create(&category)
-	config.DB.Model(&model.Theme{}).Create(&theme)
-
-	result := &model.Chart{
-		Title:          "Test",
-		Slug:           "maps",
-		ThemeID:        theme.Base.ID,
-		OrganisationID: 1,
-	}
-
-	config.DB.Model(&model.Tag{}).Where(tag.Base.ID).Find(&result.Tags)
-	config.DB.Model(&model.Category{}).Where(category.Base.ID).Find(&result.Categories)
-
-	config.DB.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result)
 
 	t.Run("invalid chart id", func(t *testing.T) {
-		e.PUT("/charts/{chart_id}").
+		e.PUT(urlWithPath).
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -66,7 +103,11 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("chart record not found", func(t *testing.T) {
-		e.PUT("/charts/{chart_id}").
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(chartColumns))
+
+		e.PUT(urlWithPath).
 			WithPath("chart_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -74,66 +115,137 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("update chart", func(t *testing.T) {
+		updateCategory := updateData
+		updateCategory["slug"] = "pie"
 
-		body := &chart{
-			Title:          "Maps",
-			Slug:           "maps",
-			ThemeID:        theme.Base.ID,
-			OrganisationID: 1,
-			TagIDs: []uint{
-				tag.Base.ID,
-			},
-			CategoryIDs: []uint{
-				category.Base.ID,
-			},
-		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(chartColumns).
+				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
+		mock.ExpectQuery(tagQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
 
-		resObj := e.PUT("/charts/{chart_id}").
-			WithPath("chart_id", result.Base.ID).
+		mock.ExpectQuery(categoryQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+
+		mock.ExpectQuery(tagQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
+
+		mock.ExpectQuery(categoryQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+
+		chartUpdateMock(mock, updateCategory)
+		res["slug"] = "pie"
+		selectAfterUpdate(mock, res)
+
+		e.PUT(urlWithPath).
+			WithPath("chart_id", 1).
 			WithHeaders(headers).
-			WithJSON(body).
+			WithJSON(updateCategory).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("title").String().Equal("Maps")
+			Status(http.StatusOK).JSON().Object().ContainsMap(res)
 
 	})
 
 	t.Run("update chart by id with empty slug", func(t *testing.T) {
 
-		body := &model.Chart{
-			Title: "Pie",
-			Slug:  "",
-		}
+		updateCategory := updateData
+		updateCategory["slug"] = "pie"
 
-		resObj := e.PUT("/charts/{chart_id}").
-			WithPath("chart_id", result.Base.ID).
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(chartColumns).
+				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
+		mock.ExpectQuery(tagQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
+
+		mock.ExpectQuery(categoryQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+
+		mock.ExpectQuery(tagQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
+
+		mock.ExpectQuery(categoryQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+
+		slugCheckMock(mock)
+
+		chartUpdateMock(mock, updateCategory)
+		res["slug"] = "pie"
+		selectAfterUpdate(mock, res)
+
+		updateCategory["slug"] = ""
+
+		e.PUT(urlWithPath).
+			WithPath("chart_id", 1).
 			WithHeaders(headers).
-			WithJSON(body).
+			WithJSON(updateCategory).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("title").String().Equal("Pie")
-		resObj.Value("slug").String().Equal("pie")
+			Status(http.StatusOK).JSON().Object().ContainsMap(res)
 
 	})
 
 	t.Run("update chart with different slug", func(t *testing.T) {
+		updateCategory := updateData
+		updateCategory["slug"] = "pie-test"
 
-		body := &model.Chart{
-			Title: "Chart test",
-			Slug:  "map-sample",
-		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(chartColumns).
+				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
+		mock.ExpectQuery(tagQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
 
-		resObj := e.PUT("/charts/{chart_id}").
-			WithPath("chart_id", result.Base.ID).
+		mock.ExpectQuery(categoryQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+
+		mock.ExpectQuery(tagQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
+
+		mock.ExpectQuery(categoryQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_chart"`).
+			WithArgs(fmt.Sprint(updateCategory["slug"], "%"), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
+
+		chartUpdateMock(mock, updateCategory)
+		res["slug"] = "pie-test"
+		selectAfterUpdate(mock, res)
+
+		e.PUT(urlWithPath).
+			WithPath("chart_id", 1).
 			WithHeaders(headers).
-			WithJSON(body).
+			WithJSON(updateCategory).
 			Expect().
-			Status(http.StatusOK).JSON().Object()
-
-		resObj.Value("title").String().Equal("Chart test")
-		resObj.Value("slug").String().Equal("map-sample")
+			Status(http.StatusOK).JSON().Object().ContainsMap(res)
 
 	})
 
