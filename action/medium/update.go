@@ -69,11 +69,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.DB.Model(&result).Updates(model.Medium{
-		Name:           medium.Name,
-		Slug:           mediumSlug,
-		Type:           medium.Type,
-		URL:            medium.URL,
-		OrganisationID: uint(oID),
+		Name: medium.Name,
+		Slug: mediumSlug,
+		Type: medium.Type,
+		URL:  medium.URL,
 	}).First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)

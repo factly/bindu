@@ -1,89 +1,69 @@
 package category
 
 import (
-	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestCategoryCreate(t *testing.T) {
+
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
-	var jsonStr = []byte(`
-	{
-		"name": "Politics",
-		"slug": "politics"
-	}`)
-
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("Unprocessable category", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "POST", "/categories", nil, headers)
 
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
+		e.POST(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
 	})
 
 	t.Run("create category", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "POST", "/categories", bytes.NewBuffer(jsonStr), headers)
 
-		respBody := (resp).(map[string]interface{})
+		slugCheckMock(mock)
 
-		if statusCode != http.StatusCreated {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusCreated)
-		}
+		categoryInsertMock(mock)
 
-		if respBody["name"] != "Politics" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Politics")
-		}
+		e.POST(basePath).
+			WithHeaders(headers).
+			WithJSON(data).
+			Expect().
+			Status(http.StatusCreated).JSON().Object().ContainsMap(data)
+		test.ExpectationsMet(t, mock)
 
 	})
 
-	t.Run("create categories with slug is empty", func(t *testing.T) {
+	t.Run("create category with slug is empty", func(t *testing.T) {
 
-		jsonStr = []byte(`
-		{
-			"name": "Crime"
-		}`)
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "POST", "/categories", bytes.NewBuffer(jsonStr), headers)
+		slugCheckMock(mock)
 
-		respBody := (resp).(map[string]interface{})
+		categoryInsertMock(mock)
 
-		if statusCode != http.StatusCreated {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusCreated)
-		}
+		e.POST(basePath).
+			WithHeaders(headers).
+			WithJSON(dataWithoutSlug).
+			Expect().
+			Status(http.StatusCreated).JSON().Object().ContainsMap(data)
 
-		if respBody["slug"] != "crime" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["slug"], "crime")
-		}
-
+		test.ExpectationsMet(t, mock)
 	})
 
 }

@@ -1,145 +1,128 @@
 package category
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
+func selectAfterUpdate(mock sqlmock.Sqlmock, category map[string]interface{}) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows(columns).
+			AddRow(1, time.Now(), time.Now(), nil, category["name"], category["slug"]))
+}
+
 func TestCategoryUpdate(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
 
-	category := &model.Category{
-		Name:           "Test",
-		Slug:           "test",
-		OrganisationID: 1,
-	}
-
-	config.DB.Model(&model.Category{}).Create(&category)
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid category id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/categories/invalid_id", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT(path).
+			WithPath("category_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/categories/100", nil, headers)
+		recordNotFoundMock(mock)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT(path).
+			WithPath("category_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("update category", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		updatedCategory := map[string]interface{}{
+			"name": "Politics",
+			"slug": "politics",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Category-1",
-			"slug": "test"
-		}`)
+		categorySelectMock(mock)
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/categories/", category.Base.ID), bytes.NewBuffer(jsonStr), headers)
+		categoryUpdateMock(mock, updatedCategory)
 
-		respBody := (resp).(map[string]interface{})
+		selectAfterUpdate(mock, updatedCategory)
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Category-1" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Category-1")
-		}
+		e.PUT(path).
+			WithPath("category_id", 1).
+			WithHeaders(headers).
+			WithJSON(updatedCategory).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedCategory)
 
 	})
 
 	t.Run("update category by id with empty slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		updatedCategory := map[string]interface{}{
+			"name": "Politics",
+			"slug": "politics-1",
 		}
+		categorySelectMock(mock)
 
-		var jsonStr = []byte(`
-		{
-			"name": "Category-2",
-			"slug": ""
-		}`)
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_category"`).
+			WithArgs("politics%", 1).
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(1, time.Now(), time.Now(), nil, "Politics", "politics"))
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/categories/", category.Base.ID), bytes.NewBuffer(jsonStr), headers)
+		categoryUpdateMock(mock, updatedCategory)
 
-		respBody := (resp).(map[string]interface{})
+		selectAfterUpdate(mock, updatedCategory)
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Category-2" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Category-2")
-		}
+		e.PUT(path).
+			WithPath("category_id", 1).
+			WithHeaders(headers).
+			WithJSON(dataWithoutSlug).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedCategory)
 
 	})
 
 	t.Run("update category with different slug", func(t *testing.T) {
-
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		updatedCategory := map[string]interface{}{
+			"name": "Politics",
+			"slug": "testing-slug",
 		}
+		categorySelectMock(mock)
 
-		var jsonStr = []byte(`
-		{
-			"name": "Category-test",
-			"slug": "testing"
-		}`)
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_category"`).
+			WithArgs(fmt.Sprint(updatedCategory["slug"], "%"), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/categories/", category.Base.ID), bytes.NewBuffer(jsonStr), headers)
+		categoryUpdateMock(mock, updatedCategory)
 
-		respBody := (resp).(map[string]interface{})
+		selectAfterUpdate(mock, updatedCategory)
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Category-test" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Category-test")
-		}
+		e.PUT(path).
+			WithPath("category_id", 1).
+			WithHeaders(headers).
+			WithJSON(updatedCategory).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedCategory)
 
 	})
 

@@ -12,4 +12,6 @@ require (
 	github.com/swaggo/http-swagger v0.0.0-20200308142732-58ac5e232fba
 	github.com/swaggo/swag v1.6.7
 	gopkg.in/h2non/gock.v1 v1.0.15
+	github.com/gavv/httpexpect/v2 v2.1.0
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 )

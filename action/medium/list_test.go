@@ -1,72 +1,131 @@
 package medium
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumList(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
 
-	t.Run("get media with pagination", func(t *testing.T) {
-		mediumOne := &model.Medium{
-			Name:           "Sample-1",
-			OrganisationID: 1,
-		}
-		mediumTwo := &model.Medium{
-			Name:           "Sample-2",
-			OrganisationID: 1,
-		}
-		media := []model.Medium{}
-		total := 0
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
-		config.DB.Model(&model.Medium{}).Create(&mediumOne)
-		config.DB.Model(&model.Medium{}).Create(&mediumTwo)
-		config.DB.Model(&model.Medium{}).Where(&model.Medium{
-			OrganisationID: 1,
-		}).Count(&total).Order("id desc").Offset(1).Limit(1).Find(&media)
+	mediumlist := []map[string]interface{}{
+		{"name": "Test Medium 1",
+			"type": "png",
+			"slug": "test-medium-1",
+			"url": `{"image": { 
+			"src": "Images/Sun.png",
+			"name": "sun1",
+			"hOffset": 250,
+			"vOffset": 250,
+			"alignment": "center"
+		}}`},
+		{"name": "Test Medium 2",
+			"type": "jpg",
+			"slug": "test-medium-2",
+			"url": `{"image": { 
+			"src": "Images/Sun.png",
+			"name": "sun2",
+			"hOffset": 250,
+			"vOffset": 250,
+			"alignment": "center"
+		}}`},
+	}
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "GET", "/media?limit=1&page=2", nil, headers)
+	byteData0, _ := json.Marshal(mediumlist[0]["url"])
+	byteData1, _ := json.Marshal(mediumlist[1]["url"])
 
-		respBody := (resp).(map[string]interface{})
+	t.Run("get empty list of media", func(t *testing.T) {
 
-		nodes := (respBody["nodes"]).([]interface{})
-		medium := (nodes[0]).(map[string]interface{})
-		gotTotal := (respBody["total"]).(float64)
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(mediumProps))
 
-		if medium["name"] != media[0].Name {
-			t.Errorf("handler returned wrong title: got %v want %v", medium["name"], media[0].Name)
-		}
+		e.GET(url).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": 0})
 
-		if int(gotTotal) != total {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				int(gotTotal), total)
-		}
-
+		mock.ExpectationsWereMet()
 	})
 
+	t.Run("get non-empty list of media", func(t *testing.T) {
+
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(mediumlist)))
+
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(1, time.Now(), time.Now(), nil, 1, mediumlist[0]["name"], mediumlist[0]["slug"], mediumlist[0]["type"], byteData0).
+				AddRow(2, time.Now(), time.Now(), nil, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], byteData1))
+
+		e.GET(url).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(mediumlist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(mediumlist[0])
+
+		mock.ExpectationsWereMet()
+	})
+
+	t.Run("get media with pagination", func(t *testing.T) {
+		mock.ExpectQuery(countQuery).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(mediumlist)))
+
+		mock.ExpectQuery(paginationQuery).
+			WillReturnRows(sqlmock.NewRows(mediumProps).
+				AddRow(2, time.Now(), time.Now(), nil, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], byteData1))
+
+		e.GET(url).
+			WithQueryObject(map[string]interface{}{
+				"limit": "1",
+				"page":  "2",
+			}).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(mediumlist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(mediumlist[1])
+
+		mock.ExpectationsWereMet()
+
+	})
 }

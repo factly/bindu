@@ -1,89 +1,100 @@
 package medium
 
 import (
-	"bytes"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"testing"
+	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumCreate(t *testing.T) {
+
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
-	var jsonStr = []byte(`
-	{
-		"name": "Pie chart",
-		"slug": "pie-chart"
-	}`)
-
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("Unprocessable medium", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "POST", "/media", nil, headers)
 
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
+		e.POST(url).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
 	})
 
 	t.Run("create medium", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "POST", "/media", bytes.NewBuffer(jsonStr), headers)
 
-		respBody := (resp).(map[string]interface{})
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT slug, organisation_id FROM "bi_medium"`)).
+			WithArgs(fmt.Sprint(data["slug"], "%"), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
 
-		if statusCode != http.StatusCreated {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusCreated)
-		}
+		mock.ExpectBegin()
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, data["name"], data["slug"], data["type"], byteData, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+		mock.ExpectCommit()
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, data["name"], data["slug"], data["type"], byteData))
 
-		if respBody["name"] != "Pie chart" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Pie chart")
-		}
+		e.POST(url).
+			WithHeaders(headers).
+			WithJSON(data).
+			Expect().
+			Status(http.StatusCreated).JSON().Object().ContainsMap(data)
+		mock.ExpectationsWereMet()
 
 	})
 
 	t.Run("create medium with slug is empty", func(t *testing.T) {
 
-		jsonStr = []byte(`
-		{
-			"name": "Bar"
-		}`)
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		slug := slug.Make(fmt.Sprint(mediumWithoutSlug["name"]))
+
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT slug, organisation_id FROM "bi_medium"`)).
+			WithArgs(slug+"%", 1).
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
+
+		mock.ExpectBegin()
+		mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "bi_medium"`)).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, mediumWithoutSlug["name"], slug, mediumWithoutSlug["type"], byteData, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+		mock.ExpectCommit()
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, mediumWithoutSlug["name"], slug, mediumWithoutSlug["type"], byteData))
+		resObj := map[string]interface{}{
+			"name": "Politics",
+			"slug": slug,
 		}
-		resp, statusCode := test.Request(t, ts, "POST", "/media", bytes.NewBuffer(jsonStr), headers)
 
-		respBody := (resp).(map[string]interface{})
+		e.POST(url).
+			WithHeaders(headers).
+			WithJSON(mediumWithoutSlug).
+			Expect().
+			Status(http.StatusCreated).JSON().Object().ContainsMap(resObj)
 
-		if statusCode != http.StatusCreated {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusCreated)
-		}
-
-		if respBody["slug"] != "bar" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["slug"], "bar")
-		}
-
+		mock.ExpectationsWereMet()
 	})
 
 }

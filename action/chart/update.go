@@ -51,7 +51,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	// check record exists or not
 	err = config.DB.Where(&model.Chart{
 		OrganisationID: uint(oID),
-	}).First(&result).Error
+	}).Preload("Tags").Preload("Categories").First(&result).Error
 
 	if err != nil {
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
@@ -78,13 +78,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 		chartSlug = slug.Approve(slug.Make(chart.Title), oID, config.DB.NewScope(&model.Chart{}).TableName())
 	}
 
-	// check themes & medium belong to same organisation or not
-	err = chart.CheckOrganisation(config.DB)
-	if err != nil {
-		errorx.Render(w, errorx.Parser(errorx.DBError()))
-		return
-	}
-
 	// Deleting old associations
 	if len(oldTags) > 0 {
 		config.DB.Model(&result).Association("Tags").Delete(oldTags)
@@ -102,7 +95,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	config.DB.Model(&result).Updates(model.Chart{
 		Title:            chart.Title,
-		Slug:             slug.Approve(chartSlug, oID, config.DB.NewScope(&model.Chart{}).TableName()),
+		Slug:             chartSlug,
 		DataURL:          chart.DataURL,
 		Description:      chart.Description,
 		Status:           chart.Status,
@@ -112,8 +105,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		PublishedDate:    chart.PublishedDate,
 		Tags:             newTags,
 		Categories:       newCategories,
-		OrganisationID:   uint(oID),
-	}).Preload("Medium").Preload("Theme").First(&result).First(&result)
+	}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)
 }

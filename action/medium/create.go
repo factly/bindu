@@ -61,7 +61,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		OrganisationID: uint(oID),
 	}
 
-	err = config.DB.Model(&model.Medium{}).Create(&result).Error
+	err = config.DB.Model(&model.Medium{}).Create(&result).First(&result).Error
 
 	if err != nil {
 		errorx.Render(w, errorx.Parser(errorx.DBError()))

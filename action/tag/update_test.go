@@ -1,145 +1,128 @@
 package tag
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
+func selectAfterUpdate(mock sqlmock.Sqlmock, tag map[string]interface{}) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows(columns).
+			AddRow(1, time.Now(), time.Now(), nil, tag["name"], tag["slug"]))
+}
+
 func TestTagUpdate(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/tags", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
 
-	tag := &model.Tag{
-		Name:           "Test",
-		Slug:           "test",
-		OrganisationID: 1,
-	}
-
-	config.DB.Model(&model.Tag{}).Create(&tag)
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid tag id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/tags/invalid_id", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT(path).
+			WithPath("tag_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "PUT", "/tags/100", nil, headers)
+		recordNotFoundMock(mock)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.PUT(path).
+			WithPath("tag_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("update tag", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		updatedTag := map[string]interface{}{
+			"name": "Elections",
+			"slug": "elections",
 		}
 
-		var jsonStr = []byte(`
-		{
-			"name": "Tag-1",
-			"slug": "test"
-		}`)
+		tagSelectMock(mock)
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/tags/", tag.Base.ID), bytes.NewBuffer(jsonStr), headers)
+		tagUpdateMock(mock, updatedTag)
 
-		respBody := (resp).(map[string]interface{})
+		selectAfterUpdate(mock, updatedTag)
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Tag-1" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Tag-1")
-		}
+		e.PUT(path).
+			WithPath("tag_id", 1).
+			WithHeaders(headers).
+			WithJSON(updatedTag).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedTag)
 
 	})
 
 	t.Run("update tag by id with empty slug", func(t *testing.T) {
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		updatedTag := map[string]interface{}{
+			"name": "Elections",
+			"slug": "elections-1",
 		}
+		tagSelectMock(mock)
 
-		var jsonStr = []byte(`
-		{
-			"name": "Tag-2",
-			"slug": ""
-		}`)
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_tag"`).
+			WithArgs("elections%", 1).
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(1, time.Now(), time.Now(), nil, updatedTag["name"], "elections"))
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/tags/", tag.Base.ID), bytes.NewBuffer(jsonStr), headers)
+		tagUpdateMock(mock, updatedTag)
 
-		respBody := (resp).(map[string]interface{})
+		selectAfterUpdate(mock, updatedTag)
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Tag-2" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Tag-2")
-		}
+		e.PUT(path).
+			WithPath("tag_id", 1).
+			WithHeaders(headers).
+			WithJSON(dataWithoutSlug).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedTag)
 
 	})
 
 	t.Run("update tag with different slug", func(t *testing.T) {
-
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
+		updatedTag := map[string]interface{}{
+			"name": "Elections",
+			"slug": "testing-slug",
 		}
+		tagSelectMock(mock)
 
-		var jsonStr = []byte(`
-		{
-			"name": "Test",
-			"slug": "testing"
-		}`)
+		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_tag"`).
+			WithArgs(fmt.Sprint(updatedTag["slug"], "%"), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
 
-		resp, statusCode := test.Request(t, ts, "PUT", fmt.Sprint("/tags/", tag.Base.ID), bytes.NewBuffer(jsonStr), headers)
+		tagUpdateMock(mock, updatedTag)
 
-		respBody := (resp).(map[string]interface{})
+		selectAfterUpdate(mock, updatedTag)
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["name"] != "Test" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["name"], "Test")
-		}
+		e.PUT(path).
+			WithPath("tag_id", 1).
+			WithHeaders(headers).
+			WithJSON(updatedTag).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedTag)
 
 	})
 

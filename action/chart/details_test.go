@@ -1,89 +1,90 @@
 package chart
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestChartDetails(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/charts", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
 
-	theme := &model.Theme{
-		Name:           "Theme sample",
-		OrganisationID: 1,
-	}
-
-	config.DB.Model(&model.Theme{}).Create(&theme)
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid chart id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "GET", "/charts/invalid_id", nil, headers)
-
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.GET(urlWithPath).
+			WithPath("chart_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("chart record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "GET", "/charts/100", nil, headers)
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(chartColumns))
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.GET(urlWithPath).
+			WithPath("chart_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("get chart by id", func(t *testing.T) {
-		chart := model.Chart{
-			Title:          "Sample chart",
-			ThemeID:        theme.Base.ID,
-			OrganisationID: 1,
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(chartColumns).
+				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
+
+		mock.ExpectQuery(mediumQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
+		mock.ExpectQuery(themeQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
+		mock.ExpectQuery(tagQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
+
+		mock.ExpectQuery(categoryQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+
+		resObj := map[string]interface{}{
+			"title":  "Pie",
+			"slug":   "pie",
+			"status": "available",
 		}
 
-		config.DB.Model(&model.Chart{}).Create(&chart)
-
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-
-		resp, statusCode := test.Request(t, ts, "GET", fmt.Sprint("/charts/", chart.Base.ID), nil, headers)
-
-		respBody := (resp).(map[string]interface{})
-
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
-		if respBody["title"] != "Sample chart" {
-			t.Errorf("handler returned wrong title: got %v want %v", respBody["title"], "Sample chart")
-		}
-
+		e.GET(urlWithPath).
+			WithPath("chart_id", 1).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(resObj)
 	})
 
 }

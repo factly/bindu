@@ -1,72 +1,121 @@
 package theme
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestThemeList(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/themes", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
 
-	t.Run("get themes with pagination", func(t *testing.T) {
-		themeOne := &model.Theme{
-			Name:           "Sample-1",
-			OrganisationID: 1,
-		}
-		themeTwo := &model.Theme{
-			Name:           "Sample-2",
-			OrganisationID: 1,
-		}
-		themes := []model.Theme{}
-		total := 0
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
-		config.DB.Model(&model.Theme{}).Create(&themeOne)
-		config.DB.Model(&model.Theme{}).Create(&themeTwo)
-		config.DB.Model(&model.Theme{}).Where(&model.Theme{
-			OrganisationID: 1,
-		}).Count(&total).Order("id desc").Offset(1).Limit(1).Find(&themes)
+	themelist := []map[string]interface{}{
+		{"name": "Test Theme 1", "config": `{"image": { 
+			"src": "Images/Sun.png",
+			"name": "sun1",
+			"hOffset": 250,
+			"vOffset": 250,
+			"alignment": "center"
+		}}`},
+		{"name": "Test Theme 2", "config": `{"image": { 
+			"src": "Images/Sun.png",
+			"name": "sun2",
+			"hOffset": 250,
+			"vOffset": 250,
+			"alignment": "center"
+		}}`},
+	}
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "GET", "/themes?limit=1&page=2", nil, headers)
+	byteData0, _ := json.Marshal(themelist[0]["config"])
+	byteData1, _ := json.Marshal(themelist[1]["config"])
 
-		respBody := (resp).(map[string]interface{})
+	t.Run("get empty list of themes", func(t *testing.T) {
 
-		nodes := (respBody["nodes"]).([]interface{})
-		theme := (nodes[0]).(map[string]interface{})
-		gotTotal := (respBody["total"]).(float64)
+		themeCountQuery(mock, 0)
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(columns))
 
-		if theme["name"] != themes[0].Name {
-			t.Errorf("handler returned wrong title: got %v want %v", theme["name"], themes[0].Name)
-		}
+		e.GET(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": 0})
 
-		if int(gotTotal) != total {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				int(gotTotal), total)
-		}
-
+		mock.ExpectationsWereMet()
 	})
 
+	t.Run("get non-empty list of themes", func(t *testing.T) {
+		themeCountQuery(mock, len(themelist))
+
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(1, time.Now(), time.Now(), nil, 1, themelist[0]["name"], byteData0).
+				AddRow(2, time.Now(), time.Now(), nil, 1, themelist[1]["name"], byteData1))
+
+		e.GET(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(themelist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(themelist[0])
+
+		mock.ExpectationsWereMet()
+	})
+
+	t.Run("get themes with pagination", func(t *testing.T) {
+		themeCountQuery(mock, len(themelist))
+
+		mock.ExpectQuery(paginationQuery).
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(2, time.Now(), time.Now(), nil, 1, themelist[1]["name"], byteData1))
+
+		e.GET(basePath).
+			WithQueryObject(map[string]interface{}{
+				"limit": "1",
+				"page":  "2",
+			}).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(themelist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(themelist[1])
+
+		mock.ExpectationsWereMet()
+
+	})
 }

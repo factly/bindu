@@ -4,69 +4,103 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestCategoryList(t *testing.T) {
+	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
 
-	t.Run("get categories with pagination", func(t *testing.T) {
-		categoryOne := &model.Category{
-			Name:           "Sample-1",
-			OrganisationID: 1,
-		}
-		categoryTwo := &model.Category{
-			Name:           "Sample-2",
-			OrganisationID: 1,
-		}
-		categories := []model.Category{}
-		total := 0
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
-		config.DB.Model(&model.Category{}).Create(&categoryOne)
-		config.DB.Model(&model.Category{}).Create(&categoryTwo)
-		config.DB.Model(&model.Category{}).Where(&model.Category{
-			OrganisationID: 1,
-		}).Count(&total).Order("id desc").Offset(1).Limit(1).Find(&categories)
+	categorylist := []map[string]interface{}{
+		{"name": "Test Category 1", "slug": "test-category-1"},
+		{"name": "Test Category 2", "slug": "test-category-2"},
+	}
 
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		resp, statusCode := test.Request(t, ts, "GET", "/categories?limit=1&page=2", nil, headers)
+	t.Run("get empty list of categories", func(t *testing.T) {
 
-		respBody := (resp).(map[string]interface{})
+		categoryCountQuery(mock, 0)
 
-		nodes := (respBody["nodes"]).([]interface{})
-		category := (nodes[0]).(map[string]interface{})
-		gotTotal := (respBody["total"]).(float64)
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(columns))
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
+		e.GET(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": 0})
 
-		if category["name"] != categories[0].Name {
-			t.Errorf("handler returned wrong title: got %v want %v", category["name"], categories[0].Name)
-		}
-
-		if int(gotTotal) != total {
-			t.Errorf("handler returned wrong total: got %v want %v",
-				int(gotTotal), total)
-		}
-
+		test.ExpectationsMet(t, mock)
 	})
 
+	t.Run("get non-empty list of categories", func(t *testing.T) {
+
+		categoryCountQuery(mock, len(categorylist))
+
+		mock.ExpectQuery(selectQuery).
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(1, time.Now(), time.Now(), nil, categorylist[0]["name"], categorylist[0]["slug"]).
+				AddRow(2, time.Now(), time.Now(), nil, categorylist[1]["name"], categorylist[1]["slug"]))
+
+		e.GET(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(categorylist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(categorylist[0])
+
+		test.ExpectationsMet(t, mock)
+	})
+
+	t.Run("get categories with pagination", func(t *testing.T) {
+		categoryCountQuery(mock, len(categorylist))
+
+		mock.ExpectQuery(paginationQuery).
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(2, time.Now(), time.Now(), nil, categorylist[1]["name"], categorylist[1]["slug"]))
+
+		e.GET(basePath).
+			WithQueryObject(map[string]interface{}{
+				"limit": "1",
+				"page":  "2",
+			}).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK).
+			JSON().
+			Object().
+			ContainsMap(map[string]interface{}{"total": len(categorylist)}).
+			Value("nodes").
+			Array().
+			Element(0).
+			Object().
+			ContainsMap(categorylist[1])
+
+		test.ExpectationsMet(t, mock)
+
+	})
 }

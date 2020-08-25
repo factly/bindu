@@ -1,109 +1,84 @@
 package medium
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumDelete(t *testing.T) {
+	mock := test.SetupMockDB()
+
 	r := chi.NewRouter()
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/media", Router())
-
-	ts := httptest.NewServer(r)
-	gock.New(ts.URL).EnableNetworking().Persist()
+	testServer := httptest.NewServer(r)
+	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
-	defer ts.Close()
+	defer testServer.Close()
+
+	// create httpexpect instance
+	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid medium id", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/media/invalid_id", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		e.DELETE(urlWithPath).
+			WithPath("medium_id", "invalid_id").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
+
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", "/media/100", nil, headers)
 
-		if statusCode != http.StatusNotFound {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusNotFound)
-		}
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100, 1).
+			WillReturnRows(sqlmock.NewRows(mediumProps))
+
+		e.DELETE(urlWithPath).
+			WithPath("medium_id", "100").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusNotFound)
 	})
 
 	t.Run("check medium associated with other entity", func(t *testing.T) {
 
-		medium := &model.Medium{
-			Name:           "sample",
-			OrganisationID: 1,
-		}
+		mediumSelectMock(mock)
 
-		theme := &model.Theme{
-			Name: "Sample Theme",
-		}
+		mediumChartExpect(mock, 1)
 
-		config.DB.Model(&model.Medium{}).Create(&medium)
-		config.DB.Model(&model.Theme{}).Create(&theme)
-
-		chart := &model.Chart{
-			Title:            "Sample chart",
-			OrganisationID:   1,
-			FeaturedMediumID: medium.Base.ID,
-			ThemeID:          theme.Base.ID,
-		}
-
-		config.DB.Model(&model.Chart{}).Create(&chart)
-
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/media/", medium.Base.ID), nil, headers)
-
-		if statusCode != http.StatusUnprocessableEntity {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusUnprocessableEntity)
-		}
+		e.DELETE(urlWithPath).
+			WithPath("medium_id", 1).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
 	})
 
 	t.Run("medium record deleted", func(t *testing.T) {
-		headers := map[string]string{
-			"X-Organisation": "1",
-			"X-User":         "1",
-		}
-		result := &model.Medium{
-			Name:           "testing",
-			OrganisationID: 1,
-		}
+		mediumSelectMock(mock)
 
-		config.DB.Model(&model.Medium{}).Create(&result)
+		mediumChartExpect(mock, 0)
 
-		_, statusCode := test.Request(t, ts, "DELETE", fmt.Sprint("/media/", result.Base.ID), nil, headers)
+		mock.ExpectBegin()
+		mock.ExpectExec(deleteQuery).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
 
-		if statusCode != http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				statusCode, http.StatusOK)
-		}
-
+		e.DELETE(urlWithPath).
+			WithPath("medium_id", 1).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusOK)
 	})
 
 }
