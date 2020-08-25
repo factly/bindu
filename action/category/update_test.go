@@ -39,7 +39,7 @@ func TestCategoryUpdate(t *testing.T) {
 			Status(http.StatusNotFound)
 	})
 
-	t.Run("cannot decode category decode", func(t *testing.T) {
+	t.Run("cannot decode category", func(t *testing.T) {
 
 		e.PUT(path).
 			WithPath("category_id", 1).
