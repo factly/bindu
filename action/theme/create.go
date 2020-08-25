@@ -2,12 +2,14 @@ package theme
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
+	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 )
@@ -30,17 +32,24 @@ func create(w http.ResponseWriter, r *http.Request) {
 	oID, err := util.GetOrganisation(r.Context())
 
 	if err != nil {
+		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}
 
 	theme := &theme{}
 
-	json.NewDecoder(r.Body).Decode(&theme)
+	err = json.NewDecoder(r.Body).Decode(&theme)
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
+		return
+	}
 
 	validationError := validationx.Check(theme)
 
 	if validationError != nil {
+		loggerx.Error(errors.New("validation error"))
 		errorx.Render(w, validationError)
 		return
 	}
@@ -54,6 +63,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	err = config.DB.Model(&model.Theme{}).Create(&result).Error
 
 	if err != nil {
+		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
