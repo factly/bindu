@@ -20,7 +20,7 @@ func TestChartList(t *testing.T) {
 	mock := test.SetupMockDB()
 	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount("/categories", Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
 
 	testServer := httptest.NewServer(r)
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -109,7 +109,7 @@ func TestChartList(t *testing.T) {
 		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_category" INNER JOIN "bi_chart_category"`)).
 			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)))
 
-		e.GET("/categories").
+		e.GET(url).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -149,7 +149,7 @@ func TestChartList(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
 				AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, 1))
 
-		e.GET("/categories").
+		e.GET(url).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -191,7 +191,7 @@ func TestChartList(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
 				AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, 1))
 
-		e.GET("/categories").
+		e.GET(url).
 			WithQueryObject(map[string]interface{}{
 				"limit": "1",
 				"page":  "2",

@@ -9,7 +9,6 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util/test"
-	"github.com/joho/godotenv"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -69,7 +68,7 @@ func themeCountQuery(mock sqlmock.Sqlmock, count int) {
 
 func TestMain(m *testing.M) {
 
-	godotenv.Load("../../.env")
+	test.SetEnv()
 
 	// Mock kavach server and allowing persisted external traffic
 	defer gock.Disable()
