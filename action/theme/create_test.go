@@ -28,10 +28,20 @@ func TestCategoryCreate(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
+	t.Run("cannot decode theme", func(t *testing.T) {
+
+		e.POST(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
 	t.Run("Unprocessable theme", func(t *testing.T) {
 
 		e.POST(basePath).
 			WithHeaders(headers).
+			WithJSON(invalidData).
 			Expect().
 			Status(http.StatusUnprocessableEntity)
 

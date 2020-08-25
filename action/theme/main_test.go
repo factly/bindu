@@ -28,6 +28,10 @@ var data = map[string]interface{}{
     }}`,
 }
 
+var invalidData = map[string]interface{}{
+	"name": "Li",
+}
+
 var byteData, _ = json.Marshal(data["config"])
 
 var columns = []string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}

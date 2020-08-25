@@ -50,11 +50,33 @@ func TestThemeUpdate(t *testing.T) {
 			Status(http.StatusNotFound)
 	})
 
+	t.Run("cannot decode theme", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("theme_id", 1).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
+	t.Run("Unprocessable theme", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("theme_id", 1).
+			WithHeaders(headers).
+			WithJSON(invalidData).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
 	t.Run("theme record not found", func(t *testing.T) {
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
 			WithPath("theme_id", "100").
+			WithJSON(data).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusNotFound)
