@@ -8,10 +8,8 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -24,11 +22,8 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, category map[string]interface{}) {
 
 func TestCategoryUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -44,11 +39,33 @@ func TestCategoryUpdate(t *testing.T) {
 			Status(http.StatusNotFound)
 	})
 
+	t.Run("cannot decode category decode", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("category_id", 1).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
+	t.Run("Unprocessable category", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("category_id", 1).
+			WithHeaders(headers).
+			WithJSON(invalidData).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
 	t.Run("category record not found", func(t *testing.T) {
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
 			WithPath("category_id", "100").
+			WithJSON(data).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusNotFound)
