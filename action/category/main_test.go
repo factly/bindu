@@ -11,8 +11,8 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
-	"github.com/joho/godotenv"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -96,14 +96,14 @@ func categoryCountQuery(mock sqlmock.Sqlmock, count int) {
 
 func Routes() http.Handler {
 	r := chi.NewRouter()
-
+	r.Use(loggerx.Init())
 	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
 	return r
 }
 
 func TestMain(m *testing.M) {
 
-	godotenv.Load("../../.env")
+	test.SetEnv()
 
 	// Mock kavach server and allowing persisted external traffic
 	defer gock.Disable()
