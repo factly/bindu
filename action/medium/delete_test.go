@@ -39,9 +39,7 @@ func TestMediumDelete(t *testing.T) {
 
 	t.Run("medium record not found", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps))
+		recordNotFoundMock(mock)
 
 		e.DELETE(urlWithPath).
 			WithPath("medium_id", "100").

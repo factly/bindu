@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
@@ -36,9 +35,7 @@ func TestMediumDetails(t *testing.T) {
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps))
+		recordNotFoundMock(mock)
 
 		e.GET(urlWithPath).
 			WithPath("medium_id", "100").

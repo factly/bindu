@@ -57,11 +57,10 @@ func TestMediumList(t *testing.T) {
 
 	t.Run("get empty list of media", func(t *testing.T) {
 
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+		mediumCountQuery(mock, 0)
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(mediumProps))
+			WillReturnRows(sqlmock.NewRows(columns))
 
 		e.GET(url).
 			WithHeaders(headers).
@@ -75,12 +74,10 @@ func TestMediumList(t *testing.T) {
 	})
 
 	t.Run("get non-empty list of media", func(t *testing.T) {
-
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(mediumlist)))
+		mediumCountQuery(mock, len(mediumlist))
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, mediumlist[0]["name"], mediumlist[0]["slug"], mediumlist[0]["type"], byteData0).
 				AddRow(2, time.Now(), time.Now(), nil, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], byteData1))
 
@@ -101,11 +98,10 @@ func TestMediumList(t *testing.T) {
 	})
 
 	t.Run("get media with pagination", func(t *testing.T) {
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(mediumlist)))
+		mediumCountQuery(mock, len(mediumlist))
 
 		mock.ExpectQuery(paginationQuery).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(2, time.Now(), time.Now(), nil, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], byteData1))
 
 		e.GET(url).

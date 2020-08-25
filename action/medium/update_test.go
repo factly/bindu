@@ -41,7 +41,7 @@ func TestMediumUpdate(t *testing.T) {
 	t.Run("medium record not found", func(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps))
+			WillReturnRows(sqlmock.NewRows(columns))
 
 		e.PUT(urlWithPath).
 			WithPath("medium_id", "100").
@@ -68,7 +68,7 @@ func TestMediumUpdate(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, "Elections", "testing", "png", updatedByteData))
 
 		mock.ExpectBegin()
@@ -79,7 +79,7 @@ func TestMediumUpdate(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, updatedMedium["name"], updatedMedium["slug"], updatedMedium["type"], updatedByteData))
 
 		e.PUT(urlWithPath).
@@ -108,12 +108,12 @@ func TestMediumUpdate(t *testing.T) {
 		updatedByteData, _ := json.Marshal(updatedMedium["url"])
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, "Sun", "sun", "png", byteData))
 
 		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_medium"`).
 			WithArgs("sun%", 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, "Sun", "sun", "png", byteData))
 
 		mock.ExpectBegin()
@@ -124,7 +124,7 @@ func TestMediumUpdate(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, updatedMedium["name"], "sun-1", updatedMedium["type"], updatedByteData))
 
 		resObj := map[string]interface{}{
@@ -167,12 +167,12 @@ func TestMediumUpdate(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, "Graph", "testing", "png", updatedByteData))
 
 		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_medium"`).
 			WithArgs(fmt.Sprint(updatedMedium["slug"], "%"), 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps))
+			WillReturnRows(sqlmock.NewRows(columns))
 
 		mock.ExpectBegin()
 		mock.ExpectExec(`UPDATE \"bi_medium\" SET (.+)  WHERE (.+) \"bi_medium\".\"id\" = `).
@@ -182,7 +182,7 @@ func TestMediumUpdate(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, updatedMedium["name"], "testing-slug", updatedMedium["type"], updatedByteData))
 
 		e.PUT(urlWithPath).
