@@ -2,13 +2,16 @@ package category
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"regexp"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -26,6 +29,10 @@ var data = map[string]interface{}{
 var dataWithoutSlug = map[string]interface{}{
 	"name": "Politics",
 	"slug": "",
+}
+
+var invalidData = map[string]interface{}{
+	"name": "ab",
 }
 
 var columns = []string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}
@@ -85,6 +92,13 @@ func categoryUpdateMock(mock sqlmock.Sqlmock, category map[string]interface{}) {
 func categoryCountQuery(mock sqlmock.Sqlmock, count int) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_category"`)).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
+}
+
+func Routes() http.Handler {
+	r := chi.NewRouter()
+
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
+	return r
 }
 
 func TestMain(m *testing.M) {

@@ -11,6 +11,7 @@ import (
 	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
 )
 
@@ -43,7 +44,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	category := &category{}
-	json.NewDecoder(r.Body).Decode(&category)
+	err = json.NewDecoder(r.Body).Decode(&category)
+
+	if err != nil {
+		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
+		return
+	}
+
+	validationError := validationx.Check(category)
+
+	if validationError != nil {
+		errorx.Render(w, validationError)
+		return
+	}
 
 	result := &model.Category{}
 	result.ID = uint(id)
