@@ -22,10 +22,20 @@ func TestMediumCreate(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
+	t.Run("cannot decode medium", func(t *testing.T) {
+
+		e.POST(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
 	t.Run("Unprocessable medium", func(t *testing.T) {
 
 		e.POST(basePath).
 			WithHeaders(headers).
+			WithJSON(invalidData).
 			Expect().
 			Status(http.StatusUnprocessableEntity)
 

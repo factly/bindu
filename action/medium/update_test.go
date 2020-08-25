@@ -32,6 +32,26 @@ func TestMediumUpdate(t *testing.T) {
 			Expect().
 			Status(http.StatusNotFound)
 	})
+	t.Run("cannot decode medium", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("medium_id", 1).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
+	t.Run("Unprocessable medium", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("medium_id", 1).
+			WithHeaders(headers).
+			WithJSON(invalidData).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
 
 	t.Run("medium record not found", func(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
@@ -40,11 +60,11 @@ func TestMediumUpdate(t *testing.T) {
 
 		e.PUT(path).
 			WithPath("medium_id", "100").
+			WithJSON(data).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusNotFound)
 	})
-
 	t.Run("update medium", func(t *testing.T) {
 		updatedMedium := map[string]interface{}{
 			"name": "Elections",

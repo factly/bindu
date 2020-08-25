@@ -22,6 +22,9 @@ var headers = map[string]string{
 	"X-Organisation": "1",
 	"X-User":         "1",
 }
+var invalidData = map[string]interface{}{
+	"name": "po",
+}
 
 var data = map[string]interface{}{
 	"name": "Politics",
