@@ -143,7 +143,7 @@ func TestChartCreate(t *testing.T) {
 			Status(http.StatusCreated).JSON().Object().ContainsMap(res)
 
 		validateAssociations(result)
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 
@@ -196,7 +196,7 @@ func TestChartCreate(t *testing.T) {
 			Status(http.StatusCreated).JSON().Object().ContainsMap(res)
 
 		validateAssociations(result)
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 }

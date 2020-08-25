@@ -59,7 +59,7 @@ func TestThemeList(t *testing.T) {
 			Object().
 			ContainsMap(map[string]interface{}{"total": 0})
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get non-empty list of themes", func(t *testing.T) {
@@ -83,7 +83,7 @@ func TestThemeList(t *testing.T) {
 			Object().
 			ContainsMap(themelist[0])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get themes with pagination", func(t *testing.T) {
@@ -110,7 +110,7 @@ func TestThemeList(t *testing.T) {
 			Object().
 			ContainsMap(themelist[1])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 }

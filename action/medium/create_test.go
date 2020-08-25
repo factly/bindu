@@ -47,7 +47,7 @@ func TestMediumCreate(t *testing.T) {
 			WithJSON(data).
 			Expect().
 			Status(http.StatusCreated).JSON().Object().ContainsMap(data)
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 
@@ -63,7 +63,7 @@ func TestMediumCreate(t *testing.T) {
 			Expect().
 			Status(http.StatusCreated).JSON().Object().ContainsMap(data)
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 }

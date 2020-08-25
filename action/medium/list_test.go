@@ -70,7 +70,7 @@ func TestMediumList(t *testing.T) {
 			Object().
 			ContainsMap(map[string]interface{}{"total": 0})
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get non-empty list of media", func(t *testing.T) {
@@ -94,7 +94,7 @@ func TestMediumList(t *testing.T) {
 			Object().
 			ContainsMap(mediumlist[0])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get media with pagination", func(t *testing.T) {
@@ -121,7 +121,7 @@ func TestMediumList(t *testing.T) {
 			Object().
 			ContainsMap(mediumlist[1])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 }

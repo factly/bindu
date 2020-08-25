@@ -117,7 +117,7 @@ func TestChartList(t *testing.T) {
 			Object().
 			ContainsMap(map[string]interface{}{"total": 0})
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get non-empty list of categories", func(t *testing.T) {
@@ -162,7 +162,7 @@ func TestChartList(t *testing.T) {
 			Object().
 			ContainsMap(chartlist[0])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get categories with pagination", func(t *testing.T) {
@@ -208,7 +208,7 @@ func TestChartList(t *testing.T) {
 			Object().
 			ContainsMap(chartlist[1])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 }
