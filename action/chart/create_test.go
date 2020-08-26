@@ -80,10 +80,20 @@ func TestChartCreate(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
+	t.Run("cannot decode chart", func(t *testing.T) {
+
+		e.POST(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
 	t.Run("Unprocessable chart", func(t *testing.T) {
 
 		e.POST(basePath).
 			WithHeaders(headers).
+			WithJSON(invalidData).
 			Expect().
 			Status(http.StatusUnprocessableEntity)
 
@@ -109,7 +119,7 @@ func TestChartCreate(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows(chartColumns).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 		mock.ExpectQuery(mediumQuery).
@@ -162,7 +172,7 @@ func TestChartCreate(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows(chartColumns).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 		mock.ExpectQuery(mediumQuery).

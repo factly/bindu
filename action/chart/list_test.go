@@ -97,7 +97,7 @@ func TestChartList(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(chartColumns))
+			WillReturnRows(sqlmock.NewRows(columns))
 
 		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
 			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)))
@@ -121,7 +121,7 @@ func TestChartList(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(chartlist)))
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(chartColumns).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, chartlist[0]["title"], chartlist[0]["slug"], byteDescriptionDataOne,
 					chartlist[0]["data_url"], byteConfigDataOne, chartlist[0]["status"], chartlist[0]["featured_medium_id"], chartlist[0]["theme_id"], time.Time{}, 1).
 				AddRow(2, time.Now(), time.Now(), nil, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
@@ -165,7 +165,7 @@ func TestChartList(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(chartlist)))
 
 		mock.ExpectQuery(paginationQuery).
-			WillReturnRows(sqlmock.NewRows(chartColumns).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(2, time.Now(), time.Now(), nil, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
 					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["theme_id"], time.Time{}, 1))
 

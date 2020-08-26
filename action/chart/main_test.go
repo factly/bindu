@@ -23,6 +23,11 @@ var headers = map[string]string{
 	"X-User":         "1",
 }
 
+var invalidData = map[string]interface{}{
+	"title":    "Pi",
+	"theme_id": 0,
+}
+
 var data = map[string]interface{}{
 	"title": "Pie",
 	"slug":  "pie",
@@ -134,7 +139,7 @@ var medium = map[string]interface{}{
 var byteThemeData, _ = json.Marshal(theme["config"])
 var byteMediumData, _ = json.Marshal(medium["url"])
 
-var chartColumns = []string{
+var columns = []string{
 	"id", "created_at", "updated_at", "deleted_at", "title", "slug", "description", "data_url", "config", "status", "featured_medium_id", "theme_id", "published_date", "organisation_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_chart"`)
@@ -159,12 +164,19 @@ func validateAssociations(result *httpexpect.Object) {
 		ContainsMap(theme)
 }
 
+func recordNotFoundMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(100, 1).
+		WillReturnRows(sqlmock.NewRows(columns))
+
+}
+
 func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	description, _ := json.Marshal(chart["description"])
 	config, _ := json.Marshal(chart["config"])
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows(chartColumns).
+		WillReturnRows(sqlmock.NewRows(columns).
 			AddRow(1, time.Now(), time.Now(), nil, chart["title"], chart["slug"], description,
 				chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], time.Time{}, 1))
 
