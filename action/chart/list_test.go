@@ -14,6 +14,19 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
+func chartTagMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
+		WithArgs(sqlmock.AnyArg()).
+		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).
+			AddRow(1, time.Now(), time.Now(), nil, tag["name"], tag["slug"], 1, 1))
+}
+func chartCategoryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_category" INNER JOIN "bi_chart_category"`)).
+		WithArgs(sqlmock.AnyArg()).
+		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
+			AddRow(1, time.Now(), time.Now(), nil, category["name"], category["slug"], 1, 1))
+}
+
 func TestChartList(t *testing.T) {
 	mock := test.SetupMockDB()
 
@@ -127,14 +140,10 @@ func TestChartList(t *testing.T) {
 				AddRow(2, time.Now(), time.Now(), nil, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
 					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["theme_id"], time.Time{}, 1))
 
-		mock.ExpectQuery(mediumQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
-				AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
-		mock.ExpectQuery(themeQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
-				AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
+		mediumQueryMock(mock)
+
+		themeQueryMock(mock)
+
 		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
 			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).
@@ -169,14 +178,10 @@ func TestChartList(t *testing.T) {
 				AddRow(2, time.Now(), time.Now(), nil, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
 					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["theme_id"], time.Time{}, 1))
 
-		mock.ExpectQuery(mediumQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
-				AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
-		mock.ExpectQuery(themeQuery).
-			WithArgs(1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
-				AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
+		mediumQueryMock(mock)
+
+		themeQueryMock(mock)
+
 		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
 			WithArgs(sqlmock.AnyArg()).
 			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).

@@ -170,6 +170,13 @@ func recordNotFoundMock(mock sqlmock.Sqlmock) {
 		WillReturnRows(sqlmock.NewRows(columns))
 
 }
+func chartSelectMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1, 1).
+		WillReturnRows(sqlmock.NewRows(columns).
+			AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+				data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
+}
 
 func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	description, _ := json.Marshal(chart["description"])
@@ -180,24 +187,7 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 			AddRow(1, time.Now(), time.Now(), nil, chart["title"], chart["slug"], description,
 				chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], time.Time{}, 1))
 
-	mock.ExpectQuery(mediumQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
-	mock.ExpectQuery(themeQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
-
-	mock.ExpectQuery(tagQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
-
-	mock.ExpectQuery(categoryQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+	chartPreloadMock(mock)
 }
 
 func chartUpdateMock(mock sqlmock.Sqlmock, chart map[string]interface{}) {
@@ -239,6 +229,34 @@ func chartUpdateMock(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	mock.ExpectCommit()
+}
+
+func tagQueryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(tagQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+			AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
+}
+
+func categoryQueryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(categoryQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+			AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+}
+
+func mediumQueryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(mediumQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
+			AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
+}
+
+func themeQueryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(themeQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
+			AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
 }
 
 func slugCheckMock(mock sqlmock.Sqlmock) {
