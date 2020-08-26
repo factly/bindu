@@ -1,8 +1,8 @@
 package test
 
-import "os"
+import "github.com/factly/bindu-server/config"
 
 //SetEnv - to set .env
 func SetEnv() {
-	os.Setenv("KAVACH_URL", "http://kavach:5000")
+	config.KavachURL = "http://kavach:5000"
 }
