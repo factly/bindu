@@ -3,11 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/config"
-	"github.com/joho/godotenv"
 )
 
 // @title Bindu API
@@ -25,21 +23,15 @@ import (
 // @BasePath /
 func main() {
 
-	err := godotenv.Load()
-
-	if err != nil {
-		log.Fatal("cant load .env")
-	}
-
-	DSN := os.Getenv("DSN")
+	config.SetupVars()
 
 	// db setup
-	config.SetupDB(DSN)
+	config.SetupDB(config.DSN)
 
 	// register routes
 	r := action.RegisterRoutes()
 
-	err = http.ListenAndServe(":8000", r)
+	err := http.ListenAndServe(":8000", r)
 
 	if err != nil {
 		log.Fatal(err)
