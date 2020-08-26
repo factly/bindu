@@ -7,20 +7,15 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestChartDetails(t *testing.T) {
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -29,7 +24,7 @@ func TestChartDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid chart id", func(t *testing.T) {
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -41,7 +36,7 @@ func TestChartDetails(t *testing.T) {
 			WithArgs(100, 1).
 			WillReturnRows(sqlmock.NewRows(chartColumns))
 
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("chart_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -80,7 +75,7 @@ func TestChartDetails(t *testing.T) {
 			"status": "available",
 		}
 
-		e.GET(urlWithPath).
+		e.GET(path).
 			WithPath("chart_id", 1).
 			WithHeaders(headers).
 			Expect().

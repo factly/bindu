@@ -9,10 +9,8 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -73,11 +71,8 @@ func chartInsertMock(mock sqlmock.Sqlmock) {
 func TestChartCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -87,7 +82,7 @@ func TestChartCreate(t *testing.T) {
 
 	t.Run("Unprocessable chart", func(t *testing.T) {
 
-		e.POST(url).
+		e.POST(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusUnprocessableEntity)
@@ -136,7 +131,7 @@ func TestChartCreate(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
 				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
 
-		result := e.POST(url).
+		result := e.POST(basePath).
 			WithHeaders(headers).
 			WithJSON(data).
 			Expect().
@@ -189,7 +184,7 @@ func TestChartCreate(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
 				AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
 
-		result := e.POST(url).
+		result := e.POST(basePath).
 			WithHeaders(headers).
 			WithJSON(dataWithoutSlug).
 			Expect().

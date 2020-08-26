@@ -3,15 +3,18 @@ package chart
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"regexp"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/factly/x/loggerx"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/joho/godotenv"
+	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -143,8 +146,8 @@ var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_chart" SET "deleted_at"=`)
 var countQuery = regexp.QuoteMeta(`SELECT count(*) FROM "bi_chart"`)
 var paginationQuery = `SELECT \* FROM "bi_chart" (.+) LIMIT 1 OFFSET 1`
 
-var url = "/charts"
-var urlWithPath = "/charts/{chart_id}"
+var basePath = "/charts"
+var path = "/charts/{chart_id}"
 
 func validateAssociations(result *httpexpect.Object) {
 	result.Value("medium").
@@ -232,9 +235,16 @@ func slugCheckMock(mock sqlmock.Sqlmock) {
 		WillReturnRows(sqlmock.NewRows([]string{"organisation_id", "slug"}))
 }
 
+func Routes() http.Handler {
+	r := chi.NewRouter()
+	r.Use(loggerx.Init())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
+	return r
+}
+
 func TestMain(m *testing.M) {
 
-	godotenv.Load("../../.env")
+	test.SetEnv()
 
 	// Mock kavach server and allowing persisted external traffic
 	defer gock.Disable()

@@ -8,10 +8,8 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -51,11 +49,8 @@ var updateData = map[string]interface{}{
 
 func TestChartUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -95,7 +90,7 @@ func TestChartUpdate(t *testing.T) {
 	}
 
 	t.Run("invalid chart id", func(t *testing.T) {
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -107,7 +102,7 @@ func TestChartUpdate(t *testing.T) {
 			WithArgs(100, 1).
 			WillReturnRows(sqlmock.NewRows(chartColumns))
 
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("chart_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -147,7 +142,7 @@ func TestChartUpdate(t *testing.T) {
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)
 
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("chart_id", 1).
 			WithHeaders(headers).
 			WithJSON(updateCategory).
@@ -194,7 +189,7 @@ func TestChartUpdate(t *testing.T) {
 
 		updateCategory["slug"] = ""
 
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("chart_id", 1).
 			WithHeaders(headers).
 			WithJSON(updateCategory).
@@ -240,7 +235,7 @@ func TestChartUpdate(t *testing.T) {
 		res["slug"] = "pie-test"
 		selectAfterUpdate(mock, res)
 
-		e.PUT(urlWithPath).
+		e.PUT(path).
 			WithPath("chart_id", 1).
 			WithHeaders(headers).
 			WithJSON(updateCategory).
