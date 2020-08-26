@@ -14,7 +14,6 @@ import (
 	"github.com/factly/bindu-server/util/test"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
-	"github.com/joho/godotenv"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -112,7 +111,7 @@ func Routes() http.Handler {
 
 func TestMain(m *testing.M) {
 
-	godotenv.Load("../../.env")
+	test.SetEnv()
 
 	// Mock kavach server and allowing persisted external traffic
 	defer gock.Disable()

@@ -10,7 +10,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
 
 	"github.com/factly/bindu-server/action/category"
 	"github.com/factly/bindu-server/action/chart"
@@ -24,7 +23,6 @@ import (
 
 //RegisterRoutes - to register routes
 func RegisterRoutes() *chi.Mux {
-	godotenv.Load()
 
 	// db migrations
 	config.DB.AutoMigrate(

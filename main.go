@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -24,7 +25,11 @@ import (
 // @BasePath /
 func main() {
 
-	godotenv.Load()
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal("cant load .env")
+	}
 
 	DSN := os.Getenv("DSN")
 
@@ -34,5 +39,9 @@ func main() {
 	// register routes
 	r := action.RegisterRoutes()
 
-	http.ListenAndServe(":8000", r)
+	err = http.ListenAndServe(":8000", r)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
