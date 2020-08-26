@@ -15,7 +15,7 @@ func Approve(slug string, organisation int, table string) string {
 	var result []comman
 	config.DB.Table(table).Select("slug, organisation_id").Where("slug LIKE ? AND organisation_id = ?", slug+"%", organisation).Scan(&result)
 	count := 0
-	for true {
+	for {
 		flag := true
 		for _, each := range result {
 			temp := slug

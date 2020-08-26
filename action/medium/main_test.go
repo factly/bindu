@@ -14,7 +14,6 @@ import (
 	"github.com/factly/bindu-server/util/test"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
-	"github.com/joho/godotenv"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -103,6 +102,15 @@ func mediumCountQuery(mock sqlmock.Sqlmock, count int) {
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
 }
 
+func mediumUpdateMock(mock sqlmock.Sqlmock, medium map[string]interface{}) {
+	var urlByteData, _ = json.Marshal(medium["url"])
+	mock.ExpectBegin()
+	mock.ExpectExec(`UPDATE \"bi_medium\" SET (.+)  WHERE (.+) \"bi_medium\".\"id\" = `).
+		WithArgs(medium["name"], medium["slug"], medium["type"], test.AnyTime{}, urlByteData, 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+}
+
 func Routes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(loggerx.Init())
@@ -112,7 +120,7 @@ func Routes() http.Handler {
 
 func TestMain(m *testing.M) {
 
-	godotenv.Load("../../.env")
+	test.SetEnv()
 
 	// Mock kavach server and allowing persisted external traffic
 	defer gock.Disable()
