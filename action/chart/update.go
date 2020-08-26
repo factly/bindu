@@ -2,6 +2,7 @@ package chart
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -10,7 +11,9 @@ import (
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
+	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
 )
 
@@ -32,6 +35,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chartID)
 
 	if err != nil {
+		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
@@ -39,11 +43,24 @@ func update(w http.ResponseWriter, r *http.Request) {
 	oID, err := util.GetOrganisation(r.Context())
 
 	if err != nil {
+		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}
 	chart := &chart{}
-	json.NewDecoder(r.Body).Decode(&chart)
+	err = json.NewDecoder(r.Body).Decode(&chart)
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
+		return
+	}
+
+	validationError := validationx.Check(chart)
+	if validationError != nil {
+		loggerx.Error(errors.New("validation error"))
+		errorx.Render(w, validationError)
+		return
+	}
 
 	result := &model.Chart{}
 	result.ID = uint(id)
@@ -54,6 +71,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}).Preload("Tags").Preload("Categories").First(&result).Error
 
 	if err != nil {
+		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
 		return
 	}
