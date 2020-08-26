@@ -102,6 +102,15 @@ func mediumCountQuery(mock sqlmock.Sqlmock, count int) {
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
 }
 
+func mediumUpdateMock(mock sqlmock.Sqlmock, medium map[string]interface{}) {
+	var urlByteData, _ = json.Marshal(medium["url"])
+	mock.ExpectBegin()
+	mock.ExpectExec(`UPDATE \"bi_medium\" SET (.+)  WHERE (.+) \"bi_medium\".\"id\" = `).
+		WithArgs(medium["name"], medium["slug"], medium["type"], test.AnyTime{}, urlByteData, 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+}
+
 func Routes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(loggerx.Init())
