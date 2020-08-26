@@ -7,20 +7,15 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestChartDelete(t *testing.T) {
 	mock := test.SetupMockDB()
 
-	r := chi.NewRouter()
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -30,7 +25,7 @@ func TestChartDelete(t *testing.T) {
 
 	t.Run("invalid chart id", func(t *testing.T) {
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -42,9 +37,9 @@ func TestChartDelete(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(chartColumns))
+			WillReturnRows(sqlmock.NewRows(columns))
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("chart_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -54,7 +49,7 @@ func TestChartDelete(t *testing.T) {
 	t.Run("chart record deleted", func(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows(chartColumns).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 
@@ -64,7 +59,7 @@ func TestChartDelete(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("chart_id", 1).
 			WithHeaders(headers).
 			Expect().
