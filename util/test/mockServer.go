@@ -2,8 +2,9 @@ package test
 
 import (
 	"net/http"
-	"os"
 	"time"
+
+	"github.com/factly/bindu-server/config"
 
 	"gopkg.in/h2non/gock.v1"
 )
@@ -32,7 +33,7 @@ func MockServer() {
 
 	res[0] = data
 
-	gock.New(os.Getenv("KAVACH_URL")).
+	gock.New(config.KavachURL).
 		Get("/organisations").
 		Persist().
 		Reply(http.StatusOK).
