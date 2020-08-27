@@ -3,21 +3,29 @@ package chart
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"regexp"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
+	"github.com/factly/x/loggerx"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/joho/godotenv"
+	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 var headers = map[string]string{
 	"X-Organisation": "1",
 	"X-User":         "1",
+}
+
+var invalidData = map[string]interface{}{
+	"title":    "Pi",
+	"theme_id": 0,
 }
 
 var data = map[string]interface{}{
@@ -131,7 +139,7 @@ var medium = map[string]interface{}{
 var byteThemeData, _ = json.Marshal(theme["config"])
 var byteMediumData, _ = json.Marshal(medium["url"])
 
-var chartColumns = []string{
+var columns = []string{
 	"id", "created_at", "updated_at", "deleted_at", "title", "slug", "description", "data_url", "config", "status", "featured_medium_id", "theme_id", "published_date", "organisation_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_chart"`)
@@ -143,8 +151,8 @@ var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_chart" SET "deleted_at"=`)
 var countQuery = regexp.QuoteMeta(`SELECT count(*) FROM "bi_chart"`)
 var paginationQuery = `SELECT \* FROM "bi_chart" (.+) LIMIT 1 OFFSET 1`
 
-var url = "/charts"
-var urlWithPath = "/charts/{chart_id}"
+var basePath = "/charts"
+var path = "/charts/{chart_id}"
 
 func validateAssociations(result *httpexpect.Object) {
 	result.Value("medium").
@@ -156,33 +164,30 @@ func validateAssociations(result *httpexpect.Object) {
 		ContainsMap(theme)
 }
 
+func recordNotFoundMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(100, 1).
+		WillReturnRows(sqlmock.NewRows(columns))
+
+}
+func chartSelectMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1, 1).
+		WillReturnRows(sqlmock.NewRows(columns).
+			AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+				data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
+}
+
 func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	description, _ := json.Marshal(chart["description"])
 	config, _ := json.Marshal(chart["config"])
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows(chartColumns).
+		WillReturnRows(sqlmock.NewRows(columns).
 			AddRow(1, time.Now(), time.Now(), nil, chart["title"], chart["slug"], description,
 				chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], time.Time{}, 1))
 
-	mock.ExpectQuery(mediumQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
-	mock.ExpectQuery(themeQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
-
-	mock.ExpectQuery(tagQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
-
-	mock.ExpectQuery(categoryQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+	chartPreloadMock(mock)
 }
 
 func chartUpdateMock(mock sqlmock.Sqlmock, chart map[string]interface{}) {
@@ -226,15 +231,50 @@ func chartUpdateMock(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	mock.ExpectCommit()
 }
 
+func tagQueryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(tagQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+			AddRow(1, time.Now(), time.Now(), nil, 1, tag["name"], tag["slug"]))
+}
+
+func categoryQueryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(categoryQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}).
+			AddRow(1, time.Now(), time.Now(), nil, 1, category["name"], category["slug"]))
+}
+
+func mediumQueryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(mediumQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
+			AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
+}
+
+func themeQueryMock(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(themeQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
+			AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
+}
+
 func slugCheckMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT slug, organisation_id FROM "bi_chart"`)).
 		WithArgs(fmt.Sprint(data["slug"], "%"), 1).
 		WillReturnRows(sqlmock.NewRows([]string{"organisation_id", "slug"}))
 }
 
+func Routes() http.Handler {
+	r := chi.NewRouter()
+	r.Use(loggerx.Init())
+	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
+	return r
+}
+
 func TestMain(m *testing.M) {
 
-	godotenv.Load("../../.env")
+	test.SetEnv()
 
 	// Mock kavach server and allowing persisted external traffic
 	defer gock.Disable()

@@ -8,10 +8,8 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -24,11 +22,8 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, tag map[string]interface{}) {
 
 func TestTagUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -44,12 +39,33 @@ func TestTagUpdate(t *testing.T) {
 			Status(http.StatusNotFound)
 	})
 
+	t.Run("cannot decode tag", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("tag_id", 1).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+	t.Run("Unprocessable tag", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("tag_id", 1).
+			WithHeaders(headers).
+			WithJSON(invalidData).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
 	t.Run("tag record not found", func(t *testing.T) {
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
 			WithPath("tag_id", "100").
 			WithHeaders(headers).
+			WithJSON(data).
 			Expect().
 			Status(http.StatusNotFound)
 	})

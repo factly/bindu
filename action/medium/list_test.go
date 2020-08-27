@@ -8,20 +8,15 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumList(t *testing.T) {
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -57,13 +52,12 @@ func TestMediumList(t *testing.T) {
 
 	t.Run("get empty list of media", func(t *testing.T) {
 
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
+		mediumCountQuery(mock, 0)
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(mediumProps))
+			WillReturnRows(sqlmock.NewRows(columns))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -71,20 +65,18 @@ func TestMediumList(t *testing.T) {
 			Object().
 			ContainsMap(map[string]interface{}{"total": 0})
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get non-empty list of media", func(t *testing.T) {
-
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(mediumlist)))
+		mediumCountQuery(mock, len(mediumlist))
 
 		mock.ExpectQuery(selectQuery).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, mediumlist[0]["name"], mediumlist[0]["slug"], mediumlist[0]["type"], byteData0).
 				AddRow(2, time.Now(), time.Now(), nil, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], byteData1))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK).
@@ -97,18 +89,17 @@ func TestMediumList(t *testing.T) {
 			Object().
 			ContainsMap(mediumlist[0])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 	})
 
 	t.Run("get media with pagination", func(t *testing.T) {
-		mock.ExpectQuery(countQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(mediumlist)))
+		mediumCountQuery(mock, len(mediumlist))
 
 		mock.ExpectQuery(paginationQuery).
-			WillReturnRows(sqlmock.NewRows(mediumProps).
+			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(2, time.Now(), time.Now(), nil, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], byteData1))
 
-		e.GET(url).
+		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{
 				"limit": "1",
 				"page":  "2",
@@ -125,7 +116,7 @@ func TestMediumList(t *testing.T) {
 			Object().
 			ContainsMap(mediumlist[1])
 
-		mock.ExpectationsWereMet()
+		test.ExpectationsMet(t, mock)
 
 	})
 }

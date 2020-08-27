@@ -6,20 +6,15 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestMediumDelete(t *testing.T) {
 	mock := test.SetupMockDB()
 
-	r := chi.NewRouter()
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(url, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -29,7 +24,7 @@ func TestMediumDelete(t *testing.T) {
 
 	t.Run("invalid medium id", func(t *testing.T) {
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("medium_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
@@ -39,11 +34,9 @@ func TestMediumDelete(t *testing.T) {
 
 	t.Run("medium record not found", func(t *testing.T) {
 
-		mock.ExpectQuery(selectQuery).
-			WithArgs(100, 1).
-			WillReturnRows(sqlmock.NewRows(mediumProps))
+		recordNotFoundMock(mock)
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("medium_id", "100").
 			WithHeaders(headers).
 			Expect().
@@ -56,7 +49,7 @@ func TestMediumDelete(t *testing.T) {
 
 		mediumChartExpect(mock, 1)
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("medium_id", 1).
 			WithHeaders(headers).
 			Expect().
@@ -74,7 +67,7 @@ func TestMediumDelete(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
-		e.DELETE(urlWithPath).
+		e.DELETE(path).
 			WithPath("medium_id", 1).
 			WithHeaders(headers).
 			Expect().

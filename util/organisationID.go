@@ -6,8 +6,9 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
+
+	"github.com/factly/bindu-server/config"
 
 	"github.com/factly/bindu-server/model"
 )
@@ -47,7 +48,7 @@ func CheckOrganisation(h http.Handler) http.Handler {
 			}
 		}
 
-		if foundOrg == false {
+		if !foundOrg {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -79,7 +80,11 @@ func RequestOrganisation(r *http.Request) ([]model.Organisation, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", os.Getenv("KAVACH_URL")+"/organisations/my", nil)
+	req, err := http.NewRequest("GET", config.KavachURL+"/organisations/my", nil)
+
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Set("X-User", strconv.Itoa(uID))
 	req.Header.Set("Content-Type", "application/json")
 

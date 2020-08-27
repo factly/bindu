@@ -8,20 +8,15 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/go-chi/chi"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestThemeUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-	r := chi.NewRouter()
 
-	r.With(util.CheckUser, util.CheckOrganisation).Mount(basePath, Router())
-
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
 	defer testServer.Close()
@@ -50,11 +45,33 @@ func TestThemeUpdate(t *testing.T) {
 			Status(http.StatusNotFound)
 	})
 
+	t.Run("cannot decode theme", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("theme_id", 1).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
+	t.Run("Unprocessable theme", func(t *testing.T) {
+
+		e.PUT(path).
+			WithPath("theme_id", 1).
+			WithHeaders(headers).
+			WithJSON(invalidData).
+			Expect().
+			Status(http.StatusUnprocessableEntity)
+
+	})
+
 	t.Run("theme record not found", func(t *testing.T) {
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
 			WithPath("theme_id", "100").
+			WithJSON(data).
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusNotFound)
