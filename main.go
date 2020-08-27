@@ -6,6 +6,7 @@ import (
 
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/config"
+	"github.com/factly/bindu-server/model"
 )
 
 // @title Bindu API
@@ -27,6 +28,8 @@ func main() {
 
 	// db setup
 	config.SetupDB(config.DSN)
+
+	model.Migration()
 
 	// register routes
 	r := action.RegisterRoutes()

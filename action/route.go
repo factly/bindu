@@ -3,8 +3,6 @@ package action
 import (
 	"os"
 
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
@@ -23,19 +21,6 @@ import (
 
 //RegisterRoutes - to register routes
 func RegisterRoutes() *chi.Mux {
-
-	// db migrations
-	config.DB.AutoMigrate(
-		&model.Category{},
-		&model.Chart{},
-		&model.Medium{},
-		&model.Tag{},
-		&model.Theme{},
-	)
-
-	// Adding foreignKey
-	config.DB.Model(&model.Chart{}).AddForeignKey("featured_medium_id", "bi_medium(id)", "RESTRICT", "RESTRICT")
-	config.DB.Model(&model.Chart{}).AddForeignKey("theme_id", "bi_theme(id)", "RESTRICT", "RESTRICT")
 
 	r := chi.NewRouter()
 
