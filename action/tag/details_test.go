@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"gopkg.in/h2non/gock.v1"
@@ -30,7 +31,9 @@ func TestTagDetails(t *testing.T) {
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
-		recordNotFoundMock(mock)
+		mock.ExpectQuery(selectQuery).
+			WithArgs(100).
+			WillReturnRows(sqlmock.NewRows(columns))
 
 		e.GET(path).
 			WithPath("tag_id", "100").
@@ -40,7 +43,7 @@ func TestTagDetails(t *testing.T) {
 	})
 
 	t.Run("get tag by id", func(t *testing.T) {
-		tagSelectMock(mock)
+		tagSelectWithOutOrg(mock)
 
 		e.GET(path).
 			WithPath("tag_id", 1).

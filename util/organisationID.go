@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/factly/bindu-server/config"
 
@@ -22,40 +23,45 @@ const OrganisationIDKey ctxKeyOrganisationID = 0
 func CheckOrganisation(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		org := r.Header.Get("X-Organisation")
-		if org == "" {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		oID, err := strconv.Atoi(org)
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		orgs, err := RequestOrganisation(r)
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		foundOrg := false
-		for _, each := range orgs {
-			if each.Base.ID == uint(oID) {
-				foundOrg = true
-				break
+		if strings.Trim(r.URL.Path, "/") != "organisations" {
+			org := r.Header.Get("X-Organisation")
+			if org == "" {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
 			}
-		}
 
-		if !foundOrg {
-			w.WriteHeader(http.StatusUnauthorized)
+			oID, err := strconv.Atoi(org)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			orgs, err := RequestOrganisation(r)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			foundOrg := false
+			for _, each := range orgs {
+				if each.Base.ID == uint(oID) {
+					foundOrg = true
+					break
+				}
+			}
+
+			if !foundOrg {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, OrganisationIDKey, oID)
+			h.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
 
-		ctx := r.Context()
-		ctx = context.WithValue(ctx, OrganisationIDKey, oID)
-		h.ServeHTTP(w, r.WithContext(ctx))
+		h.ServeHTTP(w, r)
 	})
 }
 

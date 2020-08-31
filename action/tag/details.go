@@ -6,7 +6,6 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
@@ -35,21 +34,11 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
 	result := &model.Tag{}
 
 	result.ID = uint(id)
 
-	err = config.DB.Model(&model.Tag{}).Where(&model.Tag{
-		OrganisationID: uint(oID),
-	}).First(&result).Error
+	err = config.DB.Model(&model.Tag{}).First(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)
