@@ -74,6 +74,13 @@ func tagSelectMock(mock sqlmock.Sqlmock) {
 			AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
 }
 
+func tagSelectWithOutOrg(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows(columns).
+			AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
+}
+
 // check tag associated with any chart before deleting
 func tagChartExpect(mock sqlmock.Sqlmock, count int) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_chart" INNER JOIN "bi_chart_tag"`)).

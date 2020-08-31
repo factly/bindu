@@ -21,7 +21,7 @@ type Chart struct {
 	FeaturedMediumID uint           `gorm:"column:featured_medium_id" json:"featured_medium_id" sql:"DEFAULT:NULL"`
 	Medium           *Medium        `gorm:"foreignkey:featured_medium_id;association_foreignkey:id" json:"medium"`
 	ThemeID          uint           `gorm:"column:theme_id" json:"theme_id"`
-	Theme            Theme          `gorm:"foreignkey:theme_id;association_foreignkey:id" json:"theme"`
+	Theme            *Theme         `gorm:"foreignkey:theme_id;association_foreignkey:id" json:"theme" sql:"DEFAULT:NULL"`
 	PublishedDate    time.Time      `json:"published_date"`
 	OrganisationID   uint           `json:"organisation_id"`
 	Tags             []Tag          `gorm:"many2many:chart_tag;" json:"tags"`

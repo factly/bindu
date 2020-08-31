@@ -12,10 +12,10 @@ import (
 var DB *gorm.DB
 
 // SetupDB is database setuo
-func SetupDB(DSN interface{}) {
+func SetupDB(dsn interface{}) {
 
 	var err error
-	DB, err = gorm.Open("postgres", DSN)
+	DB, err = gorm.Open("postgres", dsn)
 
 	if err != nil {
 		log.Fatal(err)

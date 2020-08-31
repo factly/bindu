@@ -16,7 +16,7 @@ type chart struct {
 	Description      postgres.Jsonb `json:"description"`
 	Status           string         `json:"status"`
 	FeaturedMediumID uint           `json:"featured_medium_id"`
-	ThemeID          uint           `json:"theme_id" validate:"required"`
+	ThemeID          uint           `json:"theme_id"`
 	PublishedDate    time.Time      `json:"published_date"`
 	OrganisationID   uint           `json:"organisation_id"`
 	CategoryIDs      []uint         `json:"category_ids"`

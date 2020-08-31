@@ -5,9 +5,6 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/bindu-server/util"
-	"github.com/factly/x/errorx"
-	"github.com/factly/x/loggerx"
 	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
 )
@@ -32,22 +29,12 @@ type paging struct {
 // @Router /tags [get]
 func list(w http.ResponseWriter, r *http.Request) {
 
-	oID, err := util.GetOrganisation(r.Context())
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
 	result := paging{}
 	result.Nodes = make([]model.Tag, 0)
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	config.DB.Model(&model.Tag{}).Where(&model.Tag{
-		OrganisationID: uint(oID),
-	}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
+	config.DB.Model(&model.Tag{}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
 
 	renderx.JSON(w, http.StatusOK, result)
 }
