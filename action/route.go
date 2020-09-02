@@ -3,6 +3,7 @@ package action
 import (
 	"os"
 
+	"github.com/factly/bindu-server/cloudbucket"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
@@ -42,6 +43,8 @@ func RegisterRoutes() *chi.Mux {
 	if envName, _ := os.LookupEnv("ENV"); envName == "development" {
 		r.Get("/swagger/*", httpSwagger.WrapHandler)
 	}
+
+	r.Get("/upload", cloudbucket.UploadToGCS)
 
 	r.With(util.CheckUser, util.CheckOrganisation).Group(func(r chi.Router) {
 		r.Mount("/categories", category.Router())

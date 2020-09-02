@@ -138,3 +138,6 @@ main
 *.log
 
 .DS_Store
+
+#cloud bucket details
+bucket.json
