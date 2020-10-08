@@ -138,3 +138,5 @@ main
 *.log
 
 .DS_Store
+
+bindu-server.yml

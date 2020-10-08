@@ -5,9 +5,8 @@ WORKDIR /app
 COPY . .
 
 RUN go mod download
-ENV DSN $DSN
-ENV KAVACH $KAVACH
+ENV CONFIG_FILE $CONFIG_FILE
 
 RUN go get github.com/githubnemo/CompileDaemon
 
-ENTRYPOINT CompileDaemon -exclude-dir=.git -exclude-dir=docs --build="go build main.go" --command="./main -dsn=${DSN} -kavach=${KAVACH}"
+ENTRYPOINT CompileDaemon -exclude-dir=.git -exclude-dir=docs --build="go build main.go" --command="./main -config=${CONFIG_FILE}"
