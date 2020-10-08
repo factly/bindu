@@ -9,9 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/factly/bindu-server/config"
-
 	"github.com/factly/bindu-server/model"
+	"github.com/spf13/viper"
 )
 
 type ctxKeyOrganisationID int
@@ -85,7 +84,7 @@ func RequestOrganisation(r *http.Request) ([]model.Organisation, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", config.KavachURL+"/organisations/my", nil)
+	req, err := http.NewRequest("GET", viper.GetString("kavach.url")+"/organisations/my", nil)
 
 	if err != nil {
 		return nil, err

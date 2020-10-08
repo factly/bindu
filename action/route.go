@@ -1,13 +1,12 @@
 package action
 
 import (
-	"os"
-
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/spf13/viper"
 
 	"github.com/factly/bindu-server/action/category"
 	"github.com/factly/bindu-server/action/chart"
@@ -39,7 +38,7 @@ func RegisterRoutes() *chi.Mux {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	if envName, _ := os.LookupEnv("ENV"); envName == "development" {
+	if viper.IsSet("mode") && viper.GetString("mode") == "development" {
 		r.Get("/swagger/*", httpSwagger.WrapHandler)
 	}
 

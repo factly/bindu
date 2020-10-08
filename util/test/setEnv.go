@@ -1,8 +1,8 @@
 package test
 
-import "github.com/factly/bindu-server/config"
+import "github.com/spf13/viper"
 
 //SetEnv - to set .env
 func SetEnv() {
-	config.KavachURL = "http://kavach:5000"
+	viper.Set("kavach.url", "http://kavach:5000")
 }

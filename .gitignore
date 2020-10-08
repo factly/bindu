@@ -141,3 +141,5 @@ main
 
 #cloud bucket details
 bucket.json
+
+bindu-server.yml
