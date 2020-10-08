@@ -1,14 +1,15 @@
 package cloudbucket
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 
 	"cloud.google.com/go/storage"
-	"github.com/factly/bindu-server/config"
 	"github.com/google/uuid"
+	"github.com/spf13/viper"
 	"google.golang.org/api/option"
 )
 
@@ -19,13 +20,17 @@ var (
 //FileUpload function returns the filename(to save in database) of the saved file or an error if it occurs
 func FileUpload(r *http.Request, file io.Reader) (string, error) {
 
-	data, jsonByte, err := config.GetBucketConfig()
+	jsonByte, err := json.Marshal(viper.GetStringMapString("bucket.keys"))
 
 	if err != nil {
 		return "", err
 	}
 
-	bucket := data.Details.BucketName
+	if err != nil {
+		return "", err
+	}
+
+	bucket := viper.GetString("bucket.details.bucket_name")
 
 	ctx := r.Context()
 
@@ -34,11 +39,11 @@ func FileUpload(r *http.Request, file io.Reader) (string, error) {
 		return "", err
 	}
 
-	r.ParseMultipartForm(int64(data.Details.Limit))
+	r.ParseMultipartForm(int64(viper.GetInt("bucket.details.limit")))
 
 	fileName := uuid.New()
 
-	sw := storageClient.Bucket(bucket).Object(fmt.Sprint(data.Details.Path, fileName, ".jpg")).NewWriter(ctx)
+	sw := storageClient.Bucket(bucket).Object(fmt.Sprint(viper.GetString("bucket.details.path"), fileName, ".jpg")).NewWriter(ctx)
 
 	if _, err := io.Copy(sw, file); err != nil {
 		return "", err

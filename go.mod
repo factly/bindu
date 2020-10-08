@@ -6,7 +6,6 @@ require (
 	cloud.google.com/go/storage v1.11.0
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/dgryski/trifles v0.0.0-20200830180326-aaf60a07f6a3
 	github.com/factly/x v0.0.5
 	github.com/gavv/httpexpect/v2 v2.1.0
 	github.com/go-chi/chi v4.1.2+incompatible
