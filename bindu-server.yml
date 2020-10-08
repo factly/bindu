@@ -1,5 +1,0 @@
-postgres:
-    dsn: postgres://postgres:postgres@postgres:5432/bindu?sslmode=disable
-kavach:
-    url: http://kavach-server:8000
-mode: development
