@@ -1,10 +1,12 @@
 package chart
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
 
+	"github.com/factly/bindu-server/cloudbucket"
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
@@ -13,6 +15,7 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // create - Create chart
@@ -56,6 +59,46 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	file := bytes.NewReader(chart.FeaturedMedium)
+
+	mediaURL, err := cloudbucket.FileUpload(r, file)
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	mediumJSON := map[string]interface{}{
+		"url": mediaURL,
+	}
+
+	mediumByte, err := json.Marshal(mediumJSON)
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	msg := json.RawMessage(mediumByte)
+
+	var msgJSONB postgres.Jsonb
+
+	msgJSONB.RawMessage = msg
+
+	medium := model.Medium{
+		URL:            msgJSONB,
+		OrganisationID: uint(oID),
+	}
+
+	err = config.DB.Model(&model.Medium{}).Create(&medium).Error
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		return
+	}
+
 	var chartSlug string
 	if chart.Slug != "" && slug.Check(chart.Slug) {
 		chartSlug = chart.Slug
@@ -70,7 +113,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Config:           chart.Config,
 		Description:      chart.Description,
 		Status:           chart.Status,
-		FeaturedMediumID: chart.FeaturedMediumID,
+		FeaturedMediumID: medium.ID,
 		ThemeID:          chart.ThemeID,
 		PublishedDate:    chart.PublishedDate,
 		OrganisationID:   uint(oID),

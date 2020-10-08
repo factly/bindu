@@ -22,7 +22,6 @@ const OrganisationIDKey ctxKeyOrganisationID = 0
 // CheckOrganisation check X-Organisation in header
 func CheckOrganisation(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		if strings.Trim(r.URL.Path, "/") != "organisations" {
 			org := r.Header.Get("X-Organisation")
 			if org == "" {

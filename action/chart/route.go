@@ -15,6 +15,7 @@ type chart struct {
 	Config           postgres.Jsonb `json:"config"`
 	Description      postgres.Jsonb `json:"description"`
 	Status           string         `json:"status"`
+	FeaturedMedium   []byte         `json:"featured_medium"`
 	FeaturedMediumID uint           `json:"featured_medium_id"`
 	ThemeID          uint           `json:"theme_id"`
 	PublishedDate    time.Time      `json:"published_date"`
