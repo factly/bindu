@@ -7,6 +7,7 @@ import (
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
+	"github.com/spf13/viper"
 )
 
 // @title Bindu API
@@ -27,7 +28,7 @@ func main() {
 	config.SetupVars()
 
 	// db setup
-	config.SetupDB(config.DSN)
+	config.SetupDB(viper.GetString("postgres.dsn"))
 
 	model.Migration()
 

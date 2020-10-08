@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/factly/bindu-server/config"
-
+	"github.com/spf13/viper"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -33,7 +32,7 @@ func MockServer() {
 
 	res[0] = data
 
-	gock.New(config.KavachURL).
+	gock.New(viper.GetString("kavach.url")).
 		Get("/organisations").
 		Persist().
 		Reply(http.StatusOK).
