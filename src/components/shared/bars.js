@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col } from 'antd';
+import { InputNumber, Row, Col, Form } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getValueFromNestedPath } from '../../utils/index.js';
 
@@ -16,48 +16,37 @@ function Bars(props) {
 
   return (
     <div className="property-container">
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Bar Opacity</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={opacity}
-            min={0}
-            max={1}
-            step={0.05}
-            placeholder="Opacity"
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_BAR_OPACITY,
-                payload: { value: e.target.value, path: opacityObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Corner radius</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            min={0}
-            value={cornerRadius}
-            placeholder="Corner Radius"
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_BAR_CORNER_RADIUS,
-                payload: { value: e.target.value, path: cornerRadiusObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
+      <Form.Item name={opacityObj.path} label="Bar Opacity">
+        <InputNumber
+          min={0}
+          max={1}
+          step={0.05}
+          placeholder="Opacity"
+          onChange={(value) =>
+            dispatch({
+              type: SET_BAR_OPACITY,
+              payload: { value, path: opacityObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+
+      <Form.Item name={cornerRadiusObj.path} label="Corner Radius">
+        <InputNumber
+          min={0}
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          placeholder="Corner Radius"
+          onChange={(value) =>
+            dispatch({
+              type: SET_BAR_CORNER_RADIUS,
+              payload: { value, path: cornerRadiusObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Select, Row, Col } from 'antd';
+import { Input, Select, Form } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getValueFromNestedPath } from '../../utils/index.js';
 
@@ -29,83 +29,63 @@ function XAxis(props) {
 
   return (
     <div className="property-container">
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Title</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={title}
-            placeholder="Title"
-            type="text"
-            onChange={(e) =>
-              dispatch({
-                type: SET_XAXIS_TITLE,
-                payload: { value: e.target.value, path: titleObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Position</label>
-        </Col>
-        <Col span={12}>
-          <Select
-            value={orient}
-            onChange={(value) =>
-              dispatch({
-                type: SET_XAXIS_POSITION,
-                payload: { value: value, path: orientObj.path },
-                chart: 'shared',
-              })
-            }
-          >
-            <Option value="top">Top</Option>
-            <Option value="bottom">bottom</Option>
-          </Select>
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Label Format</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={format}
-            placeholder="Label Format"
-            type="text"
-            onChange={(e) =>
-              dispatch({
-                type: SET_XAXIS_LABEL_FORMAT,
-                payload: { value: e.target.value, path: formatObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Label Color</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={labelColor}
-            placeholder="Label Color"
-            type="color"
-            onChange={(e) =>
-              dispatch({
-                type: SET_XAXIS_LABEL_COLOR,
-                payload: { value: e.target.value, path: labelColorObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
+      <Form.Item name={titleObj.path} lable="Title">
+        <Input
+          placeholder="Title"
+          type="text"
+          onChange={(e) =>
+            dispatch({
+              type: SET_XAXIS_TITLE,
+              payload: { value: e.target.value, path: titleObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+
+      <Form.Item name={orientObj.path} label="Position">
+        <Select
+          onChange={(value) =>
+            dispatch({
+              type: SET_XAXIS_POSITION,
+              payload: { value: value, path: orientObj.path },
+              chart: 'shared',
+            })
+          }
+        >
+          <Option value="top">Top</Option>
+          <Option value="bottom">bottom</Option>
+        </Select>
+      </Form.Item>
+
+      <Form.Item name={formatObj.path} label="Label Format">
+        <Input
+          placeholder="Label Format"
+          type="text"
+          onChange={(e) =>
+            dispatch({
+              type: SET_XAXIS_LABEL_FORMAT,
+              payload: { value: e.target.value, path: formatObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+
+      <Form.Item name={labelColorObj.path} label="Label Color">
+        <Input
+          value={labelColor}
+          placeholder="Label Color"
+          type="color"
+          onChange={(e) =>
+            dispatch({
+              type: SET_XAXIS_LABEL_COLOR,
+              payload: { value: e.target.value, path: labelColorObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
     </div>
   );
 }

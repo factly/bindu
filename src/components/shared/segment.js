@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col } from 'antd';
+import { Input, Form, InputNumber } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getValueFromNestedPath } from '../../utils/index.js';
 
@@ -29,88 +29,70 @@ function Segment(props) {
 
   return (
     <div className="property-container">
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Outer Radius</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            min={0}
-            value={outerRadius}
-            placeholder="title"
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_PIE_OUTER_RADIUS,
-                payload: { value: e.target.value, path: outerRadiusObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Doughnut hole</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            min={0}
-            value={innerRadius}
-            placeholder="title"
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_PIE_INNER_RADIUS,
-                payload: { value: e.target.value, path: innerRadiusObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Corner Curve</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            min={0}
-            value={cornerRadius}
-            placeholder="width"
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_PIE_CORNER_RADIUS,
-                payload: { value: e.target.value, path: cornerRadiusObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Padding Angle</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            min={0}
-            max={0.5}
-            step="0.025"
-            value={padAngle}
-            placeholder="height"
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_PIE_PADDING_ANGLE,
-                payload: { value: e.target.value, path: padAngleObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
+      <Form.Item name={outerRadiusObj.path} label="Outer Radius">
+        <InputNumber
+          min={0}
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          placeholder="title"
+          onChange={(value) =>
+            dispatch({
+              type: SET_PIE_OUTER_RADIUS,
+              payload: { value, path: outerRadiusObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+
+      <Form.Item name={innerRadiusObj.path} label="Doughnut hole">
+        <InputNumber
+          min={0}
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          placeholder="title"
+          onChange={(value) =>
+            dispatch({
+              type: SET_PIE_INNER_RADIUS,
+              payload: { value, path: innerRadiusObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+
+      <Form.Item name={cornerRadiusObj.path} label="Corner Curve">
+        <InputNumber
+          min={0}
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          placeholder="width"
+          onChange={(value) =>
+            dispatch({
+              type: SET_PIE_CORNER_RADIUS,
+              payload: { value, path: cornerRadiusObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+
+      <Form.Item name={padAngleObj.path} label="Padding Angle">
+        <InputNumber
+          min={0}
+          max={0.5}
+          step="0.025"
+          placeholder="height"
+          type="number"
+          onChange={(value) =>
+            dispatch({
+              type: SET_PIE_PADDING_ANGLE,
+              payload: { value: value, path: padAngleObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col, Select } from 'antd';
+import { Input, Select, Form } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getValueFromNestedPath } from '../../utils/index.js';
 
@@ -34,89 +34,66 @@ function Facet(props) {
 
   return (
     <div className="property-container">
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Columns</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={columns}
-            placeholder="columns"
-            min={0}
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_FACET_COLUMNS,
-                payload: { value: e.target.value, path: columnsObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Spacing</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={spacing}
-            placeholder="columns"
-            min={0}
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_FACET_SPACING,
-                payload: { value: e.target.value, path: spacingObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
+      <Form.Item name={columnsObj.path} label="Columns">
+        <Input
+          placeholder="columns"
+          min={0}
+          type="number"
+          onChange={(e) =>
+            dispatch({
+              type: SET_FACET_COLUMNS,
+              payload: { value: e.target.value, path: columnsObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+
+      <Form.Item name={spacingObj.path} label="Spacing">
+        <Input
+          placeholder="columns"
+          min={0}
+          type="number"
+          onChange={(e) =>
+            dispatch({
+              type: SET_FACET_SPACING,
+              payload: { value: e.target.value, path: spacingObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
       {xaxisObj ? (
-        <Row gutter={[0, 12]}>
-          <Col span={12}>
-            <label htmlFor="">X Axis</label>
-          </Col>
-          <Col span={12}>
-            <Select
-              value={xaxis}
-              onChange={(value) =>
-                dispatch({
-                  type: SET_FACET_XAXIS,
-                  payload: { value: value, path: xaxisObj.path },
-                  chart: 'shared',
-                })
-              }
-            >
-              <Option value="shared">Shared</Option>
-              <Option value="independent">Independent</Option>
-            </Select>
-          </Col>
-        </Row>
+        <Form.Item name={xaxisObj.path} label="X Axis">
+          <Select
+            onChange={(value) =>
+              dispatch({
+                type: SET_FACET_XAXIS,
+                payload: { value: value, path: xaxisObj.path },
+                chart: 'shared',
+              })
+            }
+          >
+            <Option value="shared">Shared</Option>
+            <Option value="independent">Independent</Option>
+          </Select>
+        </Form.Item>
       ) : null}
       {yaxisObj ? (
-        <Row gutter={[0, 12]}>
-          <Col span={12}>
-            <label htmlFor="">Y Axis</label>
-          </Col>
-          <Col span={12}>
-            <Select
-              value={yaxis}
-              onChange={(value) =>
-                dispatch({
-                  type: SET_FACET_YAXIS,
-                  payload: { value: value, path: yaxisObj.path },
-                  chart: 'shared',
-                })
-              }
-            >
-              <Option value="shared">Shared</Option>
-              <Option value="independent">Independent</Option>
-            </Select>
-          </Col>
-        </Row>
+        <Form.Item name={yaxisObj.path} label="Y Axis">
+          <Select
+            onChange={(value) =>
+              dispatch({
+                type: SET_FACET_YAXIS,
+                payload: { value: value, path: yaxisObj.path },
+                chart: 'shared',
+              })
+            }
+          >
+            <Option value="shared">Shared</Option>
+            <Option value="independent">Independent</Option>
+          </Select>
+        </Form.Item>
       ) : null}
     </div>
   );

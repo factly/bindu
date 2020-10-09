@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col } from 'antd';
+import { Input, Form, InputNumber } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getValueFromNestedPath } from '../../utils/index.js';
 
@@ -27,84 +27,59 @@ function Dimensions(props) {
 
   return (
     <div className="property-container">
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Title</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={title}
-            placeholder="title"
-            type="text"
-            onChange={(e) =>
-              dispatch({
-                type: SET_TITLE,
-                payload: { value: e.target.value, path: titleObj.path },
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Width</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={width}
-            placeholder="width"
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_WIDTH,
-                payload: { value: e.target.value, path: widthObj.path },
-                value: e.target.value,
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Height</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={height}
-            placeholder="height"
-            type="number"
-            onChange={(e) =>
-              dispatch({
-                type: SET_HEIGHT,
-                payload: { value: e.target.value, path: heightObj.path },
-                value: e.target.value,
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Background</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            value={background}
-            type="color"
-            onChange={(e) =>
-              dispatch({
-                type: SET_BACKGROUND,
-                payload: { value: e.target.value, path: backgroundObj.path },
-                value: e.target.value,
-                chart: 'shared',
-              })
-            }
-          />
-        </Col>
-      </Row>
+      <Form.Item name={titleObj.path} label="Title">
+        <Input
+          placeholder="title"
+          type="text"
+          onChange={(e) =>
+            dispatch({
+              type: SET_TITLE,
+              payload: { value: e.target.value, path: titleObj.path },
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+
+      <Form.Item name={widthObj.path} label="Width">
+        <InputNumber
+          placeholder="width"
+          onChange={(value) => {
+            dispatch({
+              type: SET_WIDTH,
+              payload: { value, path: widthObj.path },
+              value: value,
+              chart: 'shared',
+            });
+          }}
+        />
+      </Form.Item>
+      <Form.Item name={heightObj.path} label="Height">
+        <InputNumber
+          placeholder="height"
+          onChange={(value) =>
+            dispatch({
+              type: SET_HEIGHT,
+              payload: { value: value, path: heightObj.path },
+              value: value,
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
+      <Form.Item name={backgroundObj.path} label="Background">
+        <Input
+          type="color"
+          onChange={(e) =>
+            dispatch({
+              type: SET_BACKGROUND,
+              payload: { value: e.target.value, path: backgroundObj.path },
+              value: e.target.value,
+              chart: 'shared',
+            })
+          }
+        />
+      </Form.Item>
     </div>
   );
 }
