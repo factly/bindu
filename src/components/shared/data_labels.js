@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col } from 'antd';
+import { Input, InputNumber, Form, Checkbox } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getValueFromNestedPath } from '../../utils/index.js';
 
@@ -9,8 +9,11 @@ import {
   SET_DATA_LABELS_SIZE,
   SET_DATA_LABELS_FORMAT,
 } from '../../constants/data_labels.js';
+import { SET_LEGEND_LABEL_BASELINE } from '../../constants/legend_label.js';
 
 function DataLabels(props) {
+  const [enable, setEnable] = React.useState(false);
+
   const spec = useSelector((state) => state.chart.spec);
   const layersLength = spec.layer.length;
 
@@ -33,78 +36,76 @@ function DataLabels(props) {
     format = getValueFromNestedPath(spec, formatObj.path);
   }
 
+  const handleEnable = (checked) => {
+    if (checked) {
+      props.addLayer(({ encoding }) => ({
+        mark: { type: 'text', dx: 0, dy: 10, fontSize: 12 },
+        encoding: {
+          x: encoding.x,
+          y: { ...encoding.y, stack: 'zero' },
+          color: { value: '#ffffff' },
+          text: { ...encoding.y, format: '.1f' },
+        },
+      }));
+    } else {
+      props.removeLayer();
+    }
+    setEnable(checked);
+  };
+
   return (
     <div className="property-container">
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Enable</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            type="checkbox"
-            onChange={(e) =>
-              dispatch({ type: SET_DATA_LABELS, value: e.target.checked, chart: 'shared' })
-            }
-          />
-        </Col>
-      </Row>
-      {layersLength > 1 ? (
+      <Checkbox
+        onChange={(e) => {
+          const checked = e.target.checked;
+          handleEnable(checked);
+          dispatch({ type: SET_DATA_LABELS, value: e.target.checked, chart: 'shared' });
+        }}
+      >
+        Enable
+      </Checkbox>
+      {enable ? (
         <React.Fragment>
-          <Row gutter={[0, 12]}>
-            <Col span={12}>
-              <label htmlFor="">Color</label>
-            </Col>
-            <Col span={12}>
-              <Input
-                type="color"
-                value={color}
-                onChange={(e) =>
-                  dispatch({
-                    type: SET_DATA_LABELS_COLOR,
-                    payload: { value: e.target.value, path: colorObj.path },
-                    chart: 'shared',
-                  })
-                }
-              />
-            </Col>
-          </Row>
-          <Row gutter={[0, 12]}>
-            <Col span={12}>
-              <label htmlFor="">Size</label>
-            </Col>
-            <Col span={12}>
-              <Input
-                type="number"
-                value={fontSize}
-                onChange={(e) =>
-                  dispatch({
-                    type: SET_DATA_LABELS_SIZE,
-                    payload: { value: e.target.value, path: fontSizeObj.path },
-                    chart: 'shared',
-                  })
-                }
-              />
-            </Col>
-          </Row>
-          <Row gutter={[0, 12]}>
-            <Col span={12}>
-              <label htmlFor="">Format</label>
-            </Col>
-            <Col span={12}>
-              <Input
-                type="text"
-                value={format}
-                onChange={(e) =>
-                  dispatch({
-                    type: SET_DATA_LABELS_FORMAT,
-                    payload: { value: e.target.value, path: formatObj.path },
-                    chart: 'shared',
-                  })
-                }
-              />
-            </Col>
-          </Row>
-          <div className="item-container"></div>
+          <Form.Item name={colorObj.path} label="Color">
+            <Input
+              type="color"
+              value={color}
+              onChange={(e) =>
+                dispatch({
+                  type: SET_DATA_LABELS_COLOR,
+                  payload: { value: e.target.value, path: colorObj.path },
+                  chart: 'shared',
+                })
+              }
+            />
+          </Form.Item>
+
+          <Form.Item name={fontSizeObj.path} label="Size">
+            <InputNumber
+              value={fontSize}
+              onChange={(value) =>
+                dispatch({
+                  type: SET_DATA_LABELS_SIZE,
+                  payload: { value: value, path: fontSizeObj.path },
+                  chart: 'shared',
+                })
+              }
+            />
+          </Form.Item>
+
+          <Form.Item name={formatObj.path} label="Format">
+            <Input
+              type="text"
+              value={format}
+              onChange={(e) =>
+                dispatch({
+                  type: SET_DATA_LABELS_FORMAT,
+                  payload: { value: e.target.value, path: formatObj.path },
+                  chart: 'shared',
+                })
+              }
+            />
+          </Form.Item>
         </React.Fragment>
       ) : null}
     </div>

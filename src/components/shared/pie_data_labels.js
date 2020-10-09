@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col } from 'antd';
+import { Form, Checkbox, InputNumber } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   SET_PIE_DATA_LABELS,
@@ -7,65 +7,67 @@ import {
   SET_PIE_DATA_LABELS_POSITION,
 } from '../../constants/pie_data_labels.js';
 
-function DataLabels() {
+function DataLabels(props) {
+  const [enable, setEnable] = React.useState(false);
+
   const spec = useSelector((state) => state.chart.spec);
   const layersLength = spec.layer.length;
 
   const dispatch = useDispatch();
 
+  const handleEnable = (checked) => {
+    if (checked) {
+      console.log('checked');
+      props.addLayer(({ encoding, mark }) => ({
+        mark: { type: 'text', fontSize: 12, radius: mark.outerRadius + 10 },
+        encoding: {
+          theta: { ...encoding.theta, stack: true },
+          text: { field: encoding.color.field, type: encoding.color.type },
+          color: { ...encoding.color, legend: null },
+        },
+      }));
+    } else {
+      props.removeLayer();
+    }
+    setEnable(checked);
+  };
+
   return (
     <div className="property-container">
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Enable</label>
-        </Col>
-        <Col span={12}>
-          <Input
-            type="checkbox"
-            onChange={(e) =>
-              dispatch({ type: SET_PIE_DATA_LABELS, value: e.target.checked, chart: 'shared' })
-            }
-          />
-        </Col>
-      </Row>
-      {layersLength > 1 ? (
+      <Checkbox
+        onChange={(e) => {
+          const checked = e.target.checked;
+          handleEnable(checked);
+          dispatch({ type: SET_PIE_DATA_LABELS, value: e.target.checked, chart: 'shared' });
+        }}
+      >
+        Enable
+      </Checkbox>
+      {enable ? (
         <React.Fragment>
-          <Row gutter={[0, 12]}>
-            <Col span={12}>
-              <label htmlFor="">Size</label>
-            </Col>
-            <Col span={12}>
-              <Input
-                type="number"
-                value={spec.layer[1].mark.fontSize}
-                onChange={(e) =>
-                  dispatch({
-                    type: SET_PIE_DATA_LABELS_SIZE,
-                    value: e.target.value,
-                    chart: 'shared',
-                  })
-                }
-              />
-            </Col>
-          </Row>
-          <Row gutter={[0, 12]}>
-            <Col span={12}>
-              <label htmlFor="">Position( from center)</label>
-            </Col>
-            <Col span={12}>
-              <Input
-                type="number"
-                value={spec.layer[1].mark.radius}
-                onChange={(e) =>
-                  dispatch({
-                    type: SET_PIE_DATA_LABELS_POSITION,
-                    value: e.target.value,
-                    chart: 'shared',
-                  })
-                }
-              />
-            </Col>
-          </Row>
+          <Form.Item name={['layer', 1, 'mark', 'fontSize']} label="Size">
+            <InputNumber
+              onChange={(value) =>
+                dispatch({
+                  type: SET_PIE_DATA_LABELS_SIZE,
+                  value: value,
+                  chart: 'shared',
+                })
+              }
+            />
+          </Form.Item>
+
+          <Form.Item name={['layer', 1, 'mark', 'radius']} label="Position( from center)">
+            <InputNumber
+              onChange={(value) =>
+                dispatch({
+                  type: SET_PIE_DATA_LABELS_POSITION,
+                  value: value,
+                  chart: 'shared',
+                })
+              }
+            />
+          </Form.Item>
         </React.Fragment>
       ) : null}
     </div>
