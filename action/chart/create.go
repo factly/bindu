@@ -1,12 +1,12 @@
 package chart
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
 
-	"github.com/factly/bindu-server/cloudbucket"
+	"github.com/factly/bindu-server/util/minio"
+
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
@@ -59,9 +59,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file := bytes.NewReader(chart.FeaturedMedium)
-
-	mediaURL, err := cloudbucket.FileUpload(r, file)
+	mediaURL, err := minio.Upload(r, chart.FeaturedMedium)
 
 	if err != nil {
 		loggerx.Error(err)
