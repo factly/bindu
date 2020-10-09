@@ -1,12 +1,14 @@
 package chart
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/factly/bindu-server/util/minio"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
 	"gopkg.in/h2non/gock.v1"
@@ -44,7 +46,6 @@ var res = map[string]interface{}{
 }
 
 func chartInsertMock(mock sqlmock.Sqlmock) {
-	mock.ExpectBegin()
 	mock.ExpectQuery(mediumQuery).
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
@@ -63,7 +64,6 @@ func chartInsertMock(mock sqlmock.Sqlmock) {
 	mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
 		WithArgs(1, 1, 1, 1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	mock.ExpectCommit()
 }
 
 func chartPreloadMock(mock sqlmock.Sqlmock) {
@@ -79,6 +79,8 @@ func chartPreloadMock(mock sqlmock.Sqlmock) {
 func TestChartCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
+
+	test.MockServer()
 
 	testServer := httptest.NewServer(Routes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -108,6 +110,11 @@ func TestChartCreate(t *testing.T) {
 	})
 
 	t.Run("create chart", func(t *testing.T) {
+		mock.ExpectBegin()
+
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "", "", "", sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 		slugCheckMock(mock)
 
@@ -124,6 +131,8 @@ func TestChartCreate(t *testing.T) {
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 
 		chartPreloadMock(mock)
+
+		mock.ExpectCommit()
 
 		result := e.POST(basePath).
 			WithHeaders(headers).
@@ -137,6 +146,11 @@ func TestChartCreate(t *testing.T) {
 	})
 
 	t.Run("create chart with slug is empty", func(t *testing.T) {
+		mock.ExpectBegin()
+
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "", "", "", sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 		slugCheckMock(mock)
 
@@ -153,6 +167,7 @@ func TestChartCreate(t *testing.T) {
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 
 		chartPreloadMock(mock)
+		mock.ExpectCommit()
 
 		result := e.POST(basePath).
 			WithHeaders(headers).
@@ -161,6 +176,20 @@ func TestChartCreate(t *testing.T) {
 			Status(http.StatusCreated).JSON().Object().ContainsMap(res)
 
 		validateAssociations(result)
+		test.ExpectationsMet(t, mock)
+	})
+
+	t.Run("when uploading returns error", func(t *testing.T) {
+		minio.Upload = func(r *http.Request, image string) (string, error) {
+			return "", errors.New("some error")
+		}
+
+		e.POST(basePath).
+			WithHeaders(headers).
+			WithJSON(data).
+			Expect().
+			Status(http.StatusInternalServerError)
+
 		test.ExpectationsMet(t, mock)
 	})
 

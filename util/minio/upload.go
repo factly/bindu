@@ -4,8 +4,11 @@ import (
 	"bytes"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/google/uuid"
 
 	"github.com/minio/minio-go/v7"
 
@@ -13,7 +16,7 @@ import (
 )
 
 // Upload uploads the image to minio
-func Upload(r *http.Request, image string) (string, error) {
+var Upload = func(r *http.Request, image string) (string, error) {
 
 	idx := strings.Index(image, ";base64,")
 	if idx < 0 {
@@ -27,7 +30,9 @@ func Upload(r *http.Request, image string) (string, error) {
 	}
 	file := bytes.NewReader(unbased)
 
-	info, err := Client.PutObject(r.Context(), viper.GetString("minio.bucket"), "test2."+imageType, file, -1, minio.PutObjectOptions{
+	fileName := fmt.Sprint(uuid.New(), ".", imageType)
+
+	info, err := Client.PutObject(r.Context(), viper.GetString("minio.bucket"), fileName, file, -1, minio.PutObjectOptions{
 		ContentType: "image/" + imageType,
 	})
 	return info.Location, err

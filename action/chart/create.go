@@ -89,9 +89,12 @@ func create(w http.ResponseWriter, r *http.Request) {
 		OrganisationID: uint(oID),
 	}
 
-	err = config.DB.Model(&model.Medium{}).Create(&medium).Error
+	tx := config.DB.Begin()
+
+	err = tx.Model(&model.Medium{}).Create(&medium).Error
 
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
@@ -117,18 +120,21 @@ func create(w http.ResponseWriter, r *http.Request) {
 		OrganisationID:   uint(oID),
 	}
 
-	config.DB.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
-	config.DB.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
+	tx.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
+	tx.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
 
-	err = config.DB.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result).Error
+	err = tx.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result).Error
 
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 
-	config.DB.Model(&model.Chart{}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result)
+	tx.Model(&model.Chart{}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result)
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusCreated, result)
 }
