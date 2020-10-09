@@ -21,53 +21,76 @@ import GroupedBarProportional from './grouped_bar_proportional/index.js';
 import HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
 import { useParams } from 'react-router-dom';
 
-function OptionComponent() {
+function OptionComponent(props) {
   let { id } = useParams();
   id = parseInt(id);
+  let Component;
   switch (id) {
     case 0:
-      return <Area />;
+      Component = Area;
+      break;
     case 1:
-      return <StackedArea />;
+      Component = StackedArea;
+      break;
     case 2:
-      return <StackedAreaProportional />;
+      Component = StackedAreaProportional;
+      break;
     case 3:
-      return <Bar />;
+      Component = Bar;
+      break;
     case 4:
-      return <HorizontalBar />;
+      Component = HorizontalBar;
+      break;
     case 5:
-      return <HorizontalStackBar />;
+      Component = HorizontalStackBar;
+      break;
     case 6:
-      return <StackedBar />;
+      Component = StackedBar;
+      break;
     case 7:
-      return <GroupedLine />;
+      Component = GroupedLine;
+      break;
     case 8:
-      return <Line />;
+      Component = Line;
+      break;
     case 9:
-      return <LineProjected />;
+      Component = LineProjected;
+      break;
     case 10:
-      return <Pie />;
+      Component = Pie;
+      break;
     case 11:
-      return <Donut />;
+      Component = Donut;
+      break;
     case 12:
-      return <LineBar />;
+      Component = LineBar;
+      break;
     case 13:
-      return <DivergingBar />;
+      Component = DivergingBar;
+      break;
     case 14:
-      return <GroupedBarProportional />;
+      Component = GroupedBarProportional;
+      break;
     case 15:
-      return <HorizontalGroupedBarProportional />;
+      Component = HorizontalGroupedBarProportional;
+      break;
     case 16:
-      return <GridPie />;
+      Component = GridPie;
+      break;
     case 17:
-      return <GridBar />;
+      Component = GridBar;
+      break;
     case 18:
-      return <GridLine />;
+      Component = GridLine;
+      break;
     case 19:
-      return <GroupedBar />;
+      Component = GroupedBar;
+      break;
     default:
       return null;
   }
+
+  return <Component {...props} />;
 }
 
 export default OptionComponent;

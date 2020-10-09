@@ -2,9 +2,12 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import * as vega from 'vega';
 import { compile } from 'vega-lite';
+import _ from 'lodash';
 
-function Chart() {
-  const spec = useSelector((state) => state.chart.spec);
+function Chart({ spec }) {
+  const reduxspec = useSelector((state) => state.chart.spec);
+  !_.isEqual(spec, reduxspec) && console.table([spec, reduxspec]);
+  console.log(_.isEqual(spec, reduxspec));
 
   const refContainer = React.useRef(null);
 
