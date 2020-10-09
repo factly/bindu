@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/factly/bindu-server/util/minio"
+
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
@@ -13,6 +15,7 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // create - Create chart
@@ -56,6 +59,47 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	mediaURL, err := minio.Upload(r, chart.FeaturedMedium)
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	mediumJSON := map[string]interface{}{
+		"url": mediaURL,
+	}
+
+	mediumByte, err := json.Marshal(mediumJSON)
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	msg := json.RawMessage(mediumByte)
+
+	var msgJSONB postgres.Jsonb
+
+	msgJSONB.RawMessage = msg
+
+	medium := model.Medium{
+		URL:            msgJSONB,
+		OrganisationID: uint(oID),
+	}
+
+	tx := config.DB.Begin()
+
+	err = tx.Model(&model.Medium{}).Create(&medium).Error
+
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		return
+	}
+
 	var chartSlug string
 	if chart.Slug != "" && slug.Check(chart.Slug) {
 		chartSlug = chart.Slug
@@ -70,24 +114,27 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Config:           chart.Config,
 		Description:      chart.Description,
 		Status:           chart.Status,
-		FeaturedMediumID: chart.FeaturedMediumID,
+		FeaturedMediumID: medium.ID,
 		ThemeID:          chart.ThemeID,
 		PublishedDate:    chart.PublishedDate,
 		OrganisationID:   uint(oID),
 	}
 
-	config.DB.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
-	config.DB.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
+	tx.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
+	tx.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
 
-	err = config.DB.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result).Error
+	err = tx.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result).Error
 
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 
-	config.DB.Model(&model.Chart{}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result)
+	tx.Model(&model.Chart{}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result)
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusCreated, result)
 }

@@ -28,4 +28,20 @@ func SetupVars() {
 	if !viper.IsSet("kavach.url") {
 		log.Fatal("please provide kavach.url in config file")
 	}
+
+	if !viper.IsSet("minio.url") {
+		log.Fatal("please provide minio.url in config file")
+	}
+
+	if !viper.IsSet("minio.key") {
+		log.Fatal("please provide minio.key in config file")
+	}
+
+	if !viper.IsSet("minio.secret") {
+		log.Fatal("please provide minio.secret in config file")
+	}
+
+	if !viper.IsSet("minio.bucket") {
+		log.Fatal("please provide minio.bucket in config file")
+	}
 }

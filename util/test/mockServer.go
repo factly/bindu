@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/factly/bindu-server/util/minio"
+
 	"github.com/spf13/viper"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -37,4 +39,8 @@ func MockServer() {
 		Persist().
 		Reply(http.StatusOK).
 		JSON(res)
+
+	minio.Upload = func(r *http.Request, image string) (string, error) {
+		return "http://" + viper.GetString("minio.url") + "/dega/test.jpg", nil
+	}
 }

@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/factly/bindu-server/util/minio"
+
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -24,13 +26,14 @@ import (
 // @host localhost:7000
 // @BasePath /
 func main() {
-
 	config.SetupVars()
 
 	// db setup
 	config.SetupDB(viper.GetString("postgres.dsn"))
 
 	model.Migration()
+
+	minio.SetupClient()
 
 	// register routes
 	r := action.RegisterRoutes()
