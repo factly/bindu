@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col } from 'antd';
+import { Input, Form } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { getValueFromNestedPath } from '../../utils/index.js';
@@ -16,6 +16,14 @@ function Colors(props) {
     colors = [colors];
   }
 
+  const getName = (index) => {
+    if (colorObj.type === 'string') {
+      return colorObj.path;
+    }
+
+    return [...colorObj.path, index];
+  };
+
   const dispatch = useDispatch();
   const payload = {
     path: colorObj.path,
@@ -24,28 +32,22 @@ function Colors(props) {
 
   return (
     <div className="property-container">
-      <Row gutter={[0, 12]}>
-        <Col span={12}>
-          <label htmlFor="">Colors</label>
-        </Col>
-        <Col span={12}>
-          {colors &&
-            colors.map((d, i) => (
-              <Input
-                type="color"
-                value={d}
-                key={i}
-                onChange={(e) =>
-                  dispatch({
-                    type: SET_COLOR,
-                    payload: { index: i, value: e.target.value, ...payload },
-                    chart: 'shared',
-                  })
-                }
-              ></Input>
-            ))}
-        </Col>
-      </Row>
+      {colors &&
+        colors.map((d, i) => (
+          <Form.Item name={getName(i)} label="Colors">
+            <Input
+              type="color"
+              key={i}
+              onChange={(e) =>
+                dispatch({
+                  type: SET_COLOR,
+                  payload: { index: i, value: e.target.value, ...payload },
+                  chart: 'shared',
+                })
+              }
+            ></Input>
+          </Form.Item>
+        ))}
     </div>
   );
 }
