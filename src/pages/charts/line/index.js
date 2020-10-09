@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { Collapse } from 'antd';
+import { Collapse, Form } from 'antd';
 import ChartProperties from '../../../components/shared/chart_properties.js';
 import Colors from '../../../components/shared/colors.js';
 import Legend from '../../../components/shared/legend.js';
@@ -17,67 +17,71 @@ import { useDispatch } from 'react-redux';
 import Spec from './default.json';
 const { Panel } = Collapse;
 
-function GroupedBarChart() {
+function GroupedBarChart(props) {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch({ type: 'set-config', value: Spec });
+    props.onSpecChange(Spec);
   }, [dispatch]);
 
   const properties = [
     {
       name: 'Chart Properties',
-      component: <ChartProperties />,
+      component: ChartProperties,
     },
     {
       name: 'Colors',
-      component: <Colors />,
+      component: Colors,
     },
     {
       name: 'Lines',
-      component: <Lines />,
+      component: Lines,
     },
     {
       name: 'Dots',
-      component: <Dots />,
+      component: Dots,
     },
     {
       name: 'Data Labels',
-      component: <DataLabels />,
+      component: DataLabels,
     },
     {
       name: 'X Axis',
-      component: <XAxis />,
+      component: XAxis,
     },
     {
       name: 'Y Axis',
-      component: <YAxis />,
+      component: YAxis,
     },
     {
       name: 'Legend',
-      component: <Legend />,
+      component: Legend,
     },
     {
       name: 'Legend Label',
-      component: <LegendLabel />,
+      component: LegendLabel,
     },
     {
       name: 'Data Labels',
-      component: <DataLabels />,
+      component: DataLabels,
     },
   ];
 
   return (
-    <div className="options-container">
+    <Form
+      initialValues={Spec}
+      onValuesChange={(changedValues, allValues) => props.onSpecChange(allValues)}
+    >
       <Collapse className="option-item-collapse">
         {properties.map((d, i) => {
           return (
             <Panel className="option-item-panel" header={d.name} key={i}>
-              {d.component}
+              <d.Component {...props} />
             </Panel>
           );
         })}
       </Collapse>
-    </div>
+    </Form>
   );
 }
 

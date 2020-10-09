@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { Collapse } from 'antd';
+import { Collapse, Form } from 'antd';
 import ChartProperties from '../../../components/shared/chart_properties.js';
 import Colors from '../../../components/shared/colors.js';
 import XAxis from '../../../components/shared/x_axis.js';
@@ -14,13 +14,14 @@ import { useDispatch } from 'react-redux';
 import Spec from './default.json';
 const { Panel } = Collapse;
 
-function GroupedBarChart() {
+function GroupedBarChart(props) {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch({ type: 'set-config', value: Spec });
+    props.onSpecChange(Spec);
   }, [dispatch]);
 
-  const props = [
+  const properties = [
     {
       name: 'Chart Properties',
       properties: [
@@ -139,15 +140,20 @@ function GroupedBarChart() {
   ];
 
   return (
-    <Collapse className="option-item-collapse">
-      {props.map((d, i) => {
-        return (
-          <Panel className="option-item-panel" header={d.name} key={i}>
-            <d.Component properties={d.properties} />
-          </Panel>
-        );
-      })}
-    </Collapse>
+    <Form
+      initialValues={Spec}
+      onValuesChange={(changedValues, allValues) => props.onSpecChange(allValues)}
+    >
+      <Collapse className="option-item-collapse">
+        {properties.map((d, i) => {
+          return (
+            <Panel className="option-item-panel" header={d.name} key={i}>
+              <d.Component properties={d.properties} {...props} />
+            </Panel>
+          );
+        })}
+      </Collapse>
+    </Form>
   );
 }
 

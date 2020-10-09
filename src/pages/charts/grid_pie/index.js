@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { Collapse } from 'antd';
+import { Collapse, Form } from 'antd';
 import ChartProperties from '../../../components/shared/chart_properties.js';
 import Colors from '../../../components/shared/colors.js';
 import Legend from '../../../components/shared/legend.js';
@@ -14,10 +14,11 @@ import { useDispatch } from 'react-redux';
 import Spec from './default.json';
 const { Panel } = Collapse;
 
-function PieChart() {
+function PieChart(props) {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch({ type: 'set-config', value: Spec });
+    props.onSpecChange(Spec);
   }, [dispatch]);
 
   const properties = [
@@ -137,17 +138,20 @@ function PieChart() {
   ];
 
   return (
-    <div className="options-container">
+    <Form
+      initialValues={Spec}
+      onValuesChange={(changedValues, allValues) => props.onSpecChange(allValues)}
+    >
       <Collapse className="option-item-collapse">
         {properties.map((d, i) => {
           return (
             <Panel className="option-item-panel" header={d.name} key={i}>
-              <d.Component properties={d.properties} />
+              <d.Component properties={d.properties} {...props} />
             </Panel>
           );
         })}
       </Collapse>
-    </div>
+    </Form>
   );
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { Collapse } from 'antd';
+import { Collapse, Form } from 'antd';
 import ChartProperties from '../../../components/shared/chart_properties.js';
 import Colors from '../../../components/shared/colors.js';
 import Bars from '../../../components/shared/bars.js';
@@ -14,10 +14,11 @@ import { useDispatch } from 'react-redux';
 import Spec from './default.json';
 const { Panel } = Collapse;
 
-function GroupedBarChart() {
+function GroupedBarChart({ onSpecChange }) {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch({ type: 'set-config', value: Spec });
+    onSpecChange(Spec);
   }, [dispatch]);
 
   const properties = [
@@ -56,7 +57,10 @@ function GroupedBarChart() {
   ];
 
   return (
-    <div className="options-container">
+    <Form
+      initialValues={Spec}
+      onValuesChange={(changedValues, allValues) => onSpecChange(allValues)}
+    >
       <Collapse className="option-item-collapse">
         {properties.map((d, i) => {
           return (
@@ -66,7 +70,7 @@ function GroupedBarChart() {
           );
         })}
       </Collapse>
-    </div>
+    </Form>
   );
 }
 
