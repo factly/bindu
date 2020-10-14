@@ -1,13 +1,17 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Select, Avatar } from 'antd';
-import { setSelectedOrganisation } from '../actions/organisation.js';
+import { setSelectedOrganisation, getOrganisations } from '../actions/organisation.js';
 
 const { Option } = Select;
 
 function OrganisationSelector() {
   const { details, selected } = useSelector((state) => state.organisation);
   const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(getOrganisations());
+  }, [dispatch]);
 
   const handleOrganisationChange = (organisation) => {
     dispatch(setSelectedOrganisation(organisation));
