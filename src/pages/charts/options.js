@@ -1,96 +1,136 @@
-import React from 'react';
-import Area from './area/index.js';
-import StackedArea from './stacked_area/index.js';
-import StackedAreaProportional from './stacked_area_proportional/index.js';
-import Bar from './bar/index.js';
-import GridBar from './grid_bar/index.js';
-import HorizontalBar from './horizontal_bar/index.js';
-import HorizontalStackBar from './horizontal_stacked_bar/index.js';
-import StackedBar from './stacked_bar/index.js';
-import GroupedBar from './grouped_bar/index.js';
-import Line from './line/index.js';
-import GridLine from './grid_line/index.js';
-import LineProjected from './line_projected/index.js';
-import Pie from './pie/index.js';
-import GridPie from './grid_pie/index.js';
-import GroupedLine from './grouped_line/index.js';
-import LineBar from './line_bar/index.js';
-import DivergingBar from './diverging_bar/index.js';
-import Donut from './donut/index.js';
-import GroupedBarProportional from './grouped_bar_proportional/index.js';
-import HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
+import React, { useEffect } from 'react';
+
+import { Collapse, Form } from 'antd';
+import * as Area from './area/index.js';
+import * as StackedArea from './stacked_area/index.js';
+import * as StackedAreaProportional from './stacked_area_proportional/index.js';
+import * as Bar from './bar/index.js';
+import * as GridBar from './grid_bar/index.js';
+import * as HorizontalBar from './horizontal_bar/index.js';
+import * as HorizontalStackBar from './horizontal_stacked_bar/index.js';
+import * as StackedBar from './stacked_bar/index.js';
+import * as GroupedBar from './grouped_bar/index.js';
+import * as Line from './line/index.js';
+import * as GridLine from './grid_line/index.js';
+import * as LineProjected from './line_projected/index.js';
+import * as Pie from './pie/index.js';
+import * as GridPie from './grid_pie/index.js';
+import * as GroupedLine from './grouped_line/index.js';
+import * as LineBar from './line_bar/index.js';
+import * as DivergingBar from './diverging_bar/index.js';
+import * as Donut from './donut/index.js';
+import * as GroupedBarProportional from './grouped_bar_proportional/index.js';
+import * as HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
 import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { cleanup } from '@testing-library/react';
+
+const { Panel } = Collapse;
 
 function OptionComponent(props) {
   let { id } = useParams();
   id = parseInt(id);
-  let Component;
+  let component;
+
+  const [form] = Form.useForm();
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    console.log(component.spec);
+    const interval = setInterval(() => {
+      console.log('getFieldsValue', form.getFieldsValue());
+    }, 2000);
+    dispatch({ type: 'set-config', value: component.spec });
+    props.onSpecChange(component.spec);
+    return function cleanup() {
+      clearInterval(interval);
+    };
+  }, [id, component]);
+
   switch (id) {
     case 0:
-      Component = Area;
+      component = Area;
       break;
     case 1:
-      Component = StackedArea;
+      component = StackedArea;
       break;
     case 2:
-      Component = StackedAreaProportional;
+      component = StackedAreaProportional;
       break;
     case 3:
-      Component = Bar;
+      component = Bar;
       break;
     case 4:
-      Component = HorizontalBar;
+      component = HorizontalBar;
       break;
     case 5:
-      Component = HorizontalStackBar;
+      component = HorizontalStackBar;
       break;
     case 6:
-      Component = StackedBar;
+      component = StackedBar;
       break;
     case 7:
-      Component = GroupedLine;
+      component = GroupedLine;
       break;
     case 8:
-      Component = Line;
+      component = Line;
       break;
     case 9:
-      Component = LineProjected;
+      component = LineProjected;
       break;
     case 10:
-      Component = Pie;
+      component = Pie;
       break;
     case 11:
-      Component = Donut;
+      component = Donut;
       break;
     case 12:
-      Component = LineBar;
+      component = LineBar;
       break;
     case 13:
-      Component = DivergingBar;
+      component = DivergingBar;
       break;
     case 14:
-      Component = GroupedBarProportional;
+      component = GroupedBarProportional;
       break;
     case 15:
-      Component = HorizontalGroupedBarProportional;
+      component = HorizontalGroupedBarProportional;
       break;
     case 16:
-      Component = GridPie;
+      component = GridPie;
       break;
     case 17:
-      Component = GridBar;
+      component = GridBar;
       break;
     case 18:
-      Component = GridLine;
+      component = GridLine;
       break;
     case 19:
-      Component = GroupedBar;
+      component = GroupedBar;
       break;
     default:
       return null;
   }
 
-  return <Component {...props} />;
+  return (
+    <Form
+      form={form}
+      initialValues={component.spec}
+      onValuesChange={(changedValues, allValues) => {
+        props.onSpecChange(allValues);
+      }}
+    >
+      <Collapse className="option-item-collapse">
+        {component.properties.map((d, i) => {
+          return (
+            <Panel className="option-item-panel" header={d.name} key={i}>
+              <d.Component properties={d.properties} {...props} form={form} />
+            </Panel>
+          );
+        })}
+      </Collapse>
+    </Form>
+  );
 }
 
 export default OptionComponent;
