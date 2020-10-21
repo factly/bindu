@@ -3,6 +3,8 @@ import { Input, InputNumber, Select, Checkbox, Form } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getValueFromNestedPath } from '../../utils/index.js';
 
+import _ from 'lodash';
+
 import {
   SET_AREA_LINES,
   SET_AREA_LINE_WIDTH,
@@ -13,26 +15,20 @@ import {
 const { Option } = Select;
 
 function Lines(props) {
+  const { form } = props;
   const [enable, setEnable] = React.useState(false);
 
-  const spec = useSelector((state) => state.chart.spec);
   const markObj = props.properties.find((d) => d.prop === 'mark');
-  const mark = getValueFromNestedPath(spec, markObj.path);
 
   const dispatch = useDispatch();
 
   const handleEnable = (checked) => {
-    if (checked) {
-      props.addField(markObj.path, 'line', {
-        interpolate: 'linear',
-        strokeWidth: 4,
-        opacity: 1,
-        strokeDash: 0,
-      });
-    } else {
-      props.removeField(markObj.path, 'line');
-    }
     setEnable(checked);
+    if (!checked) {
+      let values = form.getFieldValue();
+      _.unset(values, [...markObj.path, 'line']);
+      form.setFieldsValue(values);
+    }
   };
 
   return (
@@ -52,7 +48,7 @@ function Lines(props) {
       </Checkbox>
       {enable ? (
         <React.Fragment>
-          <Form.Item name={[...markObj.path, 'line', 'strokeWidth']} label="Width">
+          <Form.Item name={[...markObj.path, 'line', 'strokeWidth']} initialValue={4} label="Width">
             <InputNumber
               onChange={(value) =>
                 dispatch({
@@ -64,7 +60,7 @@ function Lines(props) {
             />
           </Form.Item>
 
-          <Form.Item name={[...markObj.path, 'line', 'opacity']} label="Opacity">
+          <Form.Item name={[...markObj.path, 'line', 'opacity']} initialValue={1} label="Opacity">
             <InputNumber
               min={0}
               max={1}
@@ -79,7 +75,11 @@ function Lines(props) {
             />
           </Form.Item>
 
-          <Form.Item name={[...markObj.path, 'line', 'interpolate']} label="Line Curve">
+          <Form.Item
+            name={[...markObj.path, 'line', 'interpolate']}
+            initialValue="linear"
+            label="Line Curve"
+          >
             <Select
               onChange={(value) =>
                 dispatch({
@@ -97,7 +97,11 @@ function Lines(props) {
             </Select>
           </Form.Item>
 
-          <Form.Item name={[...markObj.path, 'line', 'strokeDash']} label="Dash Width">
+          <Form.Item
+            name={[...markObj.path, 'line', 'strokeDash']}
+            initialValue={0}
+            label="Dash Width"
+          >
             <InputNumber
               onChange={(value) =>
                 dispatch({

@@ -12,10 +12,8 @@ import {
 import { SET_LEGEND_LABEL_BASELINE } from '../../constants/legend_label.js';
 
 function DataLabels(props) {
+  const { form } = props;
   const [enable, setEnable] = React.useState(false);
-
-  const spec = useSelector((state) => state.chart.spec);
-  const layersLength = spec.layer.length;
 
   const dispatch = useDispatch();
 
@@ -23,22 +21,11 @@ function DataLabels(props) {
   const fontSizeObj = props.properties.find((d) => d.prop === 'font_size');
   const formatObj = props.properties.find((d) => d.prop === 'format');
 
-  let color;
-  let fontSize;
-  let format;
-  if (layersLength > 1 && colorObj.path) {
-    color = getValueFromNestedPath(spec, colorObj.path);
-  }
-  if (layersLength > 1 && fontSizeObj.path) {
-    fontSize = getValueFromNestedPath(spec, fontSizeObj.path);
-  }
-  if (layersLength > 1 && formatObj.path) {
-    format = getValueFromNestedPath(spec, formatObj.path);
-  }
-
   const handleEnable = (checked) => {
+    let values = form.getFieldValue([]);
     if (checked) {
-      props.addLayer(({ encoding }) => ({
+      const { encoding } = values.layer[0];
+      values.layer.push({
         mark: { type: 'text', dx: 0, dy: 10, fontSize: 12 },
         encoding: {
           x: encoding.x,
@@ -46,11 +33,12 @@ function DataLabels(props) {
           color: { value: '#ffffff' },
           text: { ...encoding.y, format: '.1f' },
         },
-      }));
+      });
     } else {
-      props.removeLayer();
+      values.layer.splice(1, 1);
     }
     setEnable(checked);
+    form.setFieldsValue(values);
   };
 
   return (
@@ -69,7 +57,6 @@ function DataLabels(props) {
           <Form.Item name={colorObj.path} label="Color">
             <Input
               type="color"
-              value={color}
               onChange={(e) =>
                 dispatch({
                   type: SET_DATA_LABELS_COLOR,
@@ -82,7 +69,6 @@ function DataLabels(props) {
 
           <Form.Item name={fontSizeObj.path} label="Size">
             <InputNumber
-              value={fontSize}
               onChange={(value) =>
                 dispatch({
                   type: SET_DATA_LABELS_SIZE,
@@ -96,7 +82,6 @@ function DataLabels(props) {
           <Form.Item name={formatObj.path} label="Format">
             <Input
               type="text"
-              value={format}
               onChange={(e) =>
                 dispatch({
                   type: SET_DATA_LABELS_FORMAT,

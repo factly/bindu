@@ -8,27 +8,26 @@ import {
   SET_LINE_DOT_SIZE,
   SET_LINE_DOTS_HOLLOW,
 } from '../../constants/dots.js';
+import _ from 'lodash';
+import CheckboxGroup from 'antd/lib/checkbox/Group';
 
 const { Option } = Select;
 
 function Dots(props) {
+  const { form } = props;
   const [enable, setEnable] = React.useState(false);
 
-  const spec = useSelector((state) => state.chart.spec);
   const markObj = props.properties.find((d) => d.prop === 'mark');
-  const mark = getValueFromNestedPath(spec, markObj.path);
 
   const dispatch = useDispatch();
+  let values = form.getFieldValue([]);
+  console.log({ point: _.get(values, [...markObj.path]) });
 
   const handleEnable = (checked) => {
-    if (checked) {
-      props.addField(markObj.path, 'point', {
-        shape: 'circle',
-        size: 40,
-        filled: true,
-      });
-    } else {
-      props.removeField(markObj.path, 'point');
+    if (!checked) {
+      let values = form.getFieldValue();
+      _.unset(values, [...markObj.path, 'point']);
+      form.setFieldsValue(values);
     }
     setEnable(checked);
   };
@@ -51,7 +50,11 @@ function Dots(props) {
 
       {enable ? (
         <React.Fragment>
-          <Form.Item name={[...markObj.path, 'point', 'shape']} label="Symbol">
+          <Form.Item
+            name={[...markObj.path, 'point', 'shape']}
+            initialValue={'circle'}
+            label="Symbol"
+          >
             <Select
               onChange={(value) =>
                 dispatch({
@@ -72,7 +75,11 @@ function Dots(props) {
             </Select>
           </Form.Item>
 
-          <Form.Item name={[...markObj.path, 'point', 'size']} label="Symbol Size">
+          <Form.Item
+            name={[...markObj.path, 'point', 'size']}
+            initialValue={40}
+            label="Symbol Size"
+          >
             <InputNumber
               placeholder="Symbol Size"
               onChange={(value) =>
@@ -85,16 +92,13 @@ function Dots(props) {
             />
           </Form.Item>
 
-          <Form.Item name={[...markObj.path, 'point', 'filled']} label="Hollow">
-            <Checkbox
-              onChange={(e) =>
-                dispatch({
-                  type: SET_LINE_DOTS_HOLLOW,
-                  payload: { value: e.target.checked, path: markObj.path },
-                  chart: 'shared',
-                })
-              }
-            />
+          <Form.Item
+            name={[...markObj.path, 'point', 'filled']}
+            initialValue={true}
+            valuePropName="checked"
+            label="Filled"
+          >
+            <Checkbox />
           </Form.Item>
         </React.Fragment>
       ) : null}

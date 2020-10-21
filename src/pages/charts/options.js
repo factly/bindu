@@ -23,28 +23,21 @@ import * as GroupedBarProportional from './grouped_bar_proportional/index.js';
 import * as HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { cleanup } from '@testing-library/react';
 
 const { Panel } = Collapse;
 
 function OptionComponent(props) {
+  const { form } = props;
+
   let { id } = useParams();
   id = parseInt(id);
   let component;
 
-  const [form] = Form.useForm();
-
   const dispatch = useDispatch();
   useEffect(() => {
-    console.log(component.spec);
-    const interval = setInterval(() => {
-      console.log('getFieldsValue', form.getFieldsValue());
-    }, 2000);
     dispatch({ type: 'set-config', value: component.spec });
-    props.onSpecChange(component.spec);
-    return function cleanup() {
-      clearInterval(interval);
-    };
+    console.log(component.spec);
+    form.setFieldsValue(component.spec);
   }, [id, component]);
 
   switch (id) {
@@ -113,23 +106,15 @@ function OptionComponent(props) {
   }
 
   return (
-    <Form
-      form={form}
-      initialValues={component.spec}
-      onValuesChange={(changedValues, allValues) => {
-        props.onSpecChange(allValues);
-      }}
-    >
-      <Collapse className="option-item-collapse">
-        {component.properties.map((d, i) => {
-          return (
-            <Panel className="option-item-panel" header={d.name} key={i}>
-              <d.Component properties={d.properties} {...props} form={form} />
-            </Panel>
-          );
-        })}
-      </Collapse>
-    </Form>
+    <Collapse className="option-item-collapse">
+      {component.properties.map((d, i) => {
+        return (
+          <Panel className="option-item-panel" header={d.name} key={i}>
+            <d.Component properties={d.properties} form={form} />
+          </Panel>
+        );
+      })}
+    </Collapse>
   );
 }
 

@@ -6,11 +6,12 @@ import _ from 'lodash';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Card, Tooltip, Button, Input } from 'antd';
+import { Card, Tooltip, Button, Input, Form } from 'antd';
 import { SaveOutlined, SettingOutlined, EditOutlined } from '@ant-design/icons';
 
 function Chart() {
-  const [spec, setSpec] = useState({});
+  const [form] = Form.useForm();
+
   const showOptions = useSelector((state) => state.chart.showOptions);
   const chartName = useSelector((state) => state.chart.chartName);
   const isChartNameEditable = useSelector((state) => state.chart.isChartNameEditable);
@@ -20,11 +21,12 @@ function Chart() {
     {
       name: 'Customize',
       Icon: SettingOutlined,
-      onClick: () => dispatch({ type: 'set-options' }),
+      props: { onClick: () => dispatch({ type: 'set-options' }) },
     },
     {
       name: 'Save',
       Icon: SaveOutlined,
+      props: {},
     },
   ];
 
@@ -34,8 +36,10 @@ function Chart() {
     <div className="extra-actions-container">
       <ul>
         {actions.map((item) => (
-          <li key={item.name} onClick={item.onClick}>
-            <Tooltip title={item.name}>{<item.Icon style={{ fontSize: IconSize }} />}</Tooltip>
+          <li key={item.name}>
+            <Tooltip title={item.name}>
+              {<item.Icon {...item.props} style={{ fontSize: IconSize }} />}
+            </Tooltip>
           </li>
         ))}
       </ul>
@@ -72,59 +76,29 @@ function Chart() {
     );
   }
 
-  const changeSpec = (values) => {
-    setSpec(values);
-  };
-
-  const addLayer = (func) => {
-    console.log('addlayer');
-    const layer = spec.layer[0];
-    const { encoding, mark } = layer;
-    const newLayer = func({ encoding, mark });
-    console.log({ newLayer });
-    const newSpec = { ...spec };
-    newSpec.layer.push(newLayer);
-    setSpec(newSpec);
-  };
-
-  const removeLayer = () => {
-    const newSpec = { ...spec };
-    newSpec.layer.splice(1, 1);
-    setSpec(newSpec);
-  };
-
-  const addField = (path, field, value) => {
-    const newSpec = { ...spec };
-    _.set(newSpec, [...path, field], value);
-    console.log(newSpec, path, field, value);
-    setSpec(newSpec);
-  };
-
-  const removeField = (path, field) => {
-    const newSpec = { ...spec };
-    _.unset(newSpec, [...path, field]);
-    setSpec(newSpec);
-  };
-
   return (
-    <Card
-      title={titleComponent}
-      extra={actionsList}
-      bodyStyle={{ overflow: 'hidden', display: 'flex', padding: '0px' }}
-    >
-      <div className="display-container" style={{ width: '100%' }}>
-        <Display spec={spec} />
-      </div>
-      <div className="option-container" style={{ right: showOptions ? '0' : '-250px' }}>
-        <ChartOption
-          onSpecChange={changeSpec}
-          addLayer={addLayer}
-          removeLayer={removeLayer}
-          addField={addField}
-          removeField={removeField}
-        />
-      </div>
-    </Card>
+    <Form form={form}>
+      <Card
+        title={titleComponent}
+        extra={actionsList}
+        bodyStyle={{ overflow: 'hidden', display: 'flex', padding: '0px' }}
+      >
+        <div className="display-container" style={{ width: '100%' }}>
+          <Form.Item shouldUpdate={true}>
+            {({ getFieldValue }) => {
+              return (
+                <Form.Item>
+                  <Display spec={getFieldValue()} />
+                </Form.Item>
+              );
+            }}
+          </Form.Item>
+        </div>
+        <div className="option-container" style={{ right: showOptions ? '0' : '-250px' }}>
+          <ChartOption form={form} />
+        </div>
+      </Card>
+    </Form>
   );
 }
 

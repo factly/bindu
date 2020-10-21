@@ -8,6 +8,7 @@ import {
 } from '../../constants/pie_data_labels.js';
 
 function DataLabels(props) {
+  const { form } = props;
   const [enable, setEnable] = React.useState(false);
 
   const spec = useSelector((state) => state.chart.spec);
@@ -16,20 +17,22 @@ function DataLabels(props) {
   const dispatch = useDispatch();
 
   const handleEnable = (checked) => {
+    let values = form.getFieldValue([]);
     if (checked) {
-      console.log('checked');
-      props.addLayer(({ encoding, mark }) => ({
+      const { encoding, mark } = values.layer[0];
+      values.layer.push({
         mark: { type: 'text', fontSize: 12, radius: mark.outerRadius + 10 },
         encoding: {
           theta: { ...encoding.theta, stack: true },
           text: { field: encoding.color.field, type: encoding.color.type },
           color: { ...encoding.color, legend: null },
         },
-      }));
+      });
     } else {
-      props.removeLayer();
+      values.layer.splice(1, 1);
     }
     setEnable(checked);
+    form.setFieldsValue(values);
   };
 
   return (
