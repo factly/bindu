@@ -16,6 +16,24 @@ export const spec = Spec;
 export const properties = [
   {
     name: 'Chart Properties',
+    properties: [
+      {
+        prop: 'title',
+        path: ['title'],
+      },
+      {
+        prop: 'width',
+        path: ['width'],
+      },
+      {
+        prop: 'height',
+        path: ['height'],
+      },
+      {
+        prop: 'background',
+        path: ['background'],
+      },
+    ],
     Component: ChartProperties,
   },
   {

@@ -7,7 +7,8 @@ import { getValueFromNestedPath } from '../../utils/index.js';
 import { SET_COLOR } from '../../constants/colors.js';
 
 function Colors(props) {
-  const spec = useSelector((state) => state.chart.spec);
+  const spec = props.form.getFieldValue();
+  // const spec = useSelector((state) => state.chart.spec);
   const colorObj = props.properties.find((d) => d.prop === 'color');
 
   let colors = getValueFromNestedPath(spec, colorObj.path);

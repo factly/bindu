@@ -72,7 +72,7 @@ function YAxis(props) {
         />
       </Form.Item>
 
-      <Form.Item name={formatObj.path} label="Label Color">
+      <Form.Item name={labelColorObj.path} label="Label Color">
         <Input
           placeholder="Label Color"
           type="color"

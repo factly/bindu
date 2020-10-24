@@ -39,8 +39,8 @@ export const properties = [
     properties: [
       {
         prop: 'color',
-        type: 'string',
-        path: ['layer', 0, 'encoding', 'color', 'value'],
+        type: 'array',
+        path: ['layer', 0, 'encoding', 'color', 'scale', 'range'],
       },
     ],
     Component: Colors,

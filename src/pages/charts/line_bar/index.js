@@ -196,6 +196,20 @@ export const properties = [
   },
   {
     name: 'Data Labels',
+    properties: [
+      {
+        prop: 'color',
+        path: ['layer', 1, 'encoding', 'color', 'value'],
+      },
+      {
+        prop: 'font_size',
+        path: ['layer', 1, 'mark', 'fontSize'],
+      },
+      {
+        prop: 'format',
+        path: ['layer', 1, 'encoding', 'text', 'format'],
+      },
+    ],
     component: DataLabels,
   },
 ];

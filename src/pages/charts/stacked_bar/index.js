@@ -47,26 +47,122 @@ export const properties = [
   },
   {
     name: 'Bars',
+    properties: [
+      {
+        prop: 'opacity',
+        path: ['layer', 0, 'encoding', 'opacity', 'value'],
+      },
+      {
+        prop: 'corner_radius',
+        path: ['layer', 0, 'mark', 'cornerRadius'],
+      },
+    ],
     Component: Bars,
   },
   {
     name: 'X Axis',
+    properties: [
+      {
+        prop: 'title',
+        path: ['layer', 0, 'encoding', 'x', 'axis', 'title'],
+      },
+      {
+        prop: 'orient',
+        path: ['layer', 0, 'encoding', 'x', 'axis', 'orient'],
+      },
+      {
+        prop: 'format',
+        path: ['layer', 0, 'encoding', 'x', 'axis', 'format'],
+      },
+      {
+        prop: 'label_color',
+        path: ['layer', 0, 'encoding', 'x', 'axis', 'labelColor'],
+      },
+    ],
     Component: XAxis,
   },
   {
     name: 'Y Axis',
+    properties: [
+      {
+        prop: 'title',
+        path: ['layer', 0, 'encoding', 'y', 'axis', 'title'],
+      },
+      {
+        prop: 'orient',
+        path: ['layer', 0, 'encoding', 'y', 'axis', 'orient'],
+      },
+      {
+        prop: 'format',
+        path: ['layer', 0, 'encoding', 'y', 'axis', 'format'],
+      },
+      {
+        prop: 'label_color',
+        path: ['layer', 0, 'encoding', 'y', 'axis', 'labelColor'],
+      },
+    ],
     Component: YAxis,
   },
   {
     name: 'Legend',
+    properties: [
+      {
+        prop: 'title',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'title'],
+      },
+      {
+        prop: 'fill_color',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'fillColor'],
+      },
+      {
+        prop: 'symbol_type',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'symbolType'],
+      },
+      {
+        prop: 'symbol_size',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'symbolSize'],
+      },
+      {
+        prop: 'orient',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'orient'],
+      },
+    ],
     Component: Legend,
   },
   {
     name: 'Legend Label',
+    properties: [
+      {
+        prop: 'label_align',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'labelAlign'],
+      },
+      {
+        prop: 'label_baseline',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'labelBaseline'],
+      },
+      {
+        prop: 'label_color',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'labelColor'],
+      },
+    ],
     Component: LegendLabel,
   },
   {
     name: 'Data Labels',
+    properties: [
+      {
+        prop: 'color',
+        path: ['layer', 1, 'encoding', 'color', 'value'],
+      },
+      {
+        prop: 'font_size',
+        path: ['layer', 1, 'mark', 'fontSize'],
+      },
+      {
+        prop: 'format',
+        path: ['layer', 1, 'encoding', 'text', 'format'],
+      },
+    ],
     Component: DataLabels,
   },
 ];
