@@ -18,7 +18,7 @@ export const properties = [
       },
       {
         prop: 'width',
-        path: ['width'],
+        path: ['width', 'step'],
       },
       {
         prop: 'height',
