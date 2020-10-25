@@ -32,7 +32,7 @@ function OrganisationSelector() {
             size="small"
             src={organisation.logo ? organisation.logo.url?.raw : DEFAULT_IMAGE}
           />{' '}
-          {organisation.name}
+          {organisation.title}
         </Option>
       ))}
     </Select>
