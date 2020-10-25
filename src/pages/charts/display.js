@@ -2,7 +2,7 @@ import React from 'react';
 import * as vega from 'vega';
 import { compile } from 'vega-lite';
 
-function Chart({ spec }) {
+function Chart({ spec, setView }) {
   const refContainer = React.useRef(null);
 
   const getSpec = () => {
@@ -19,6 +19,7 @@ function Chart({ spec }) {
       }).hover();
 
       view.logLevel(vega.Warn).renderer('svg').initialize(refContainer.current).runAsync();
+      setView(view);
     }
   };
 

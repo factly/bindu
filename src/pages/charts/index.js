@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import Display from './display.js';
 import ChartOption from './options.js';
+import { saveAs } from 'file-saver';
 import './index.css';
 
-import { Card, Tooltip, Button, Input, Form, Modal } from 'antd';
-import { SaveOutlined, SettingOutlined, EditOutlined, UploadOutlined } from '@ant-design/icons';
+import { Card, Tooltip, Button, Input, Form, Modal, Dropdown, Menu } from 'antd';
+import {
+  SaveOutlined,
+  SettingOutlined,
+  EditOutlined,
+  UploadOutlined,
+  MenuOutlined,
+} from '@ant-design/icons';
 import UppyUploader from '../../components/uppy';
+import { b64toBlob } from '../../utils/file';
 
 function Chart() {
   const [form] = Form.useForm();
@@ -14,6 +22,29 @@ function Chart() {
   const [showOptions, setShowOptions] = useState(true);
   const [chartName, setChartName] = useState('Untitled');
   const [isChartNameEditable, setChartNameEditable] = useState(false);
+  const [view, setView] = useState(null);
+
+  const onDataUpload = (dataDetails) => {
+    form.setFieldsValue({ data: { url: dataDetails.url.raw } });
+  };
+
+  const downloadSampleData = () => {
+    const url = form.getFieldValue(['data', 'url']);
+    const values = form.getFieldValue(['data', 'values']);
+    if (url) {
+      saveAs(url, url.split('/').pop());
+    } else if (values) {
+      const blob = new Blob([JSON.stringify(values)], { type: 'application/json;charset=utf-8' });
+      saveAs(blob, 'sample.json');
+    }
+  };
+
+  const downloadImage = async (e) => {
+    const ext = e.key;
+    const data = await view?.toImageURL(ext, 1);
+    const blob = b64toBlob(data.split(',')[1], 'image/' + ext);
+    saveAs(blob, `${chartName}.${ext}`);
+  };
 
   const IconSize = 20;
   const actions = [
@@ -36,11 +67,34 @@ function Chart() {
         <UploadOutlined style={{ fontSize: IconSize }} onClick={() => setShowModal(true)} />
       ),
     },
+    {
+      name: 'Options',
+      Component: (
+        <Dropdown
+          overlay={
+            <div style={{ boxShadow: '0px 0px 6px 1px #999' }}>
+              <Menu onClick={downloadImage}>
+                <Menu.Item key="svg">Download Image (SVG)</Menu.Item>
+                <Menu.Item key="png">Download Image (PNG)</Menu.Item>
+              </Menu>
+              <Menu.Divider />
+              <Menu onClick={downloadSampleData}>
+                <Menu.Item>Download Sample</Menu.Item>
+              </Menu>
+            </div>
+          }
+        >
+          <Button style={{ marginBottom: 5 }}>
+            <MenuOutlined />
+          </Button>
+        </Dropdown>
+      ),
+    },
   ];
 
   const actionsList = (
     <div className="extra-actions-container">
-      <ul>
+      <ul style={{ display: 'flex', alignItems: 'center' }}>
         {actions.map((item) => (
           <li key={item.name}>
             <Tooltip title={item.name}>{item.Component}</Tooltip>
@@ -90,7 +144,7 @@ function Chart() {
               {({ getFieldValue }) => {
                 return (
                   <Form.Item>
-                    <Display spec={getFieldValue()} />
+                    <Display spec={getFieldValue()} setView={setView} />
                   </Form.Item>
                 );
               }}
@@ -105,9 +159,9 @@ function Chart() {
         title="Upload Dataset"
         visible={showModal}
         onOk={() => setShowModal(false)}
-        onCancel={() => setShowModal(false)}
+        okText="Done"
       >
-        <UppyUploader onUpload={console.log} />
+        <UppyUploader onUpload={onDataUpload} />
       </Modal>
     </>
   );

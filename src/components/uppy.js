@@ -29,12 +29,9 @@ function UppyUploader({ onUpload }) {
           ...files[fileID],
           meta: {
             ...files[fileID].meta,
-            name: `bindu
-            /${organisation_slug}
-            /${new Date().getFullYear()}
-            /${new Date().getMonth()}
-            /${Date.now().toString()}
-            _${files[fileID].meta.name}`,
+            name: `bindu/${organisation_slug}/${new Date().getFullYear()}/${new Date().getMonth()}/${Date.now().toString()}_${
+              files[fileID].meta.name
+            }`,
           },
         };
       });
