@@ -1,7 +1,6 @@
 import React from 'react';
 import * as vega from 'vega';
 import { compile } from 'vega-lite';
-import _ from 'lodash';
 
 function Chart({ spec }) {
   const refContainer = React.useRef(null);
@@ -25,6 +24,7 @@ function Chart({ spec }) {
 
   React.useEffect(() => {
     renderVega();
+    // eslint-disable-next-line
   }, [spec]);
 
   return <div className="chart-container" ref={refContainer}></div>;

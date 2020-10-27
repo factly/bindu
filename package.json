@@ -1,23 +1,31 @@
 {
   "name": "bindu-web",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
+  "cacheDirectories": [
+    "node_modules"
+  ],
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "antd": "^4.3.1",
+    "axios": "^0.20.0",
     "immer": "^7.0.1",
     "lodash": "^4.17.20",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^3.4.3",
+    "react-scripts": "3.4.0",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
+    "redux-thunk": "^2.3.0",
     "vega": "^5.13.0",
     "vega-lite": "^4.13.0"
+  },
+  "engines": {
+    "node": ">=8.9.0"
   },
   "husky": {
     "hooks": {

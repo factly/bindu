@@ -28,7 +28,7 @@ const routes = [
 function App() {
   return (
     <Provider store={store}>
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <BasicLayout>
           <Switch>
             {routes.map((route) => (

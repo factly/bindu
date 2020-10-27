@@ -1,11 +1,5 @@
 import React from 'react';
 import { Form, Checkbox, InputNumber } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  SET_PIE_DATA_LABELS,
-  SET_PIE_DATA_LABELS_SIZE,
-  SET_PIE_DATA_LABELS_POSITION,
-} from '../../constants/pie_data_labels.js';
 
 function DataLabels(props) {
   const { form } = props;

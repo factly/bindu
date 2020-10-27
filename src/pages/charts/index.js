@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Display from './display.js';
 import ChartOption from './options.js';
 import './index.css';
-import _ from 'lodash';
 
 import { Card, Tooltip, Button, Input, Form } from 'antd';
 import { SaveOutlined, SettingOutlined, EditOutlined } from '@ant-design/icons';
