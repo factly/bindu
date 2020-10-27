@@ -11,11 +11,6 @@ function DataLabels(props) {
   const { form } = props;
   const [enable, setEnable] = React.useState(false);
 
-  const spec = useSelector((state) => state.chart.spec);
-  const layersLength = spec.layer.length;
-
-  const dispatch = useDispatch();
-
   const handleEnable = (checked) => {
     let values = form.getFieldValue([]);
     if (checked) {
@@ -41,7 +36,6 @@ function DataLabels(props) {
         onChange={(e) => {
           const checked = e.target.checked;
           handleEnable(checked);
-          dispatch({ type: SET_PIE_DATA_LABELS, value: e.target.checked, chart: 'shared' });
         }}
       >
         Enable
@@ -49,27 +43,11 @@ function DataLabels(props) {
       {enable ? (
         <React.Fragment>
           <Form.Item name={['layer', 1, 'mark', 'fontSize']} label="Size">
-            <InputNumber
-              onChange={(value) =>
-                dispatch({
-                  type: SET_PIE_DATA_LABELS_SIZE,
-                  value: value,
-                  chart: 'shared',
-                })
-              }
-            />
+            <InputNumber />
           </Form.Item>
 
           <Form.Item name={['layer', 1, 'mark', 'radius']} label="Position( from center)">
-            <InputNumber
-              onChange={(value) =>
-                dispatch({
-                  type: SET_PIE_DATA_LABELS_POSITION,
-                  value: value,
-                  chart: 'shared',
-                })
-              }
-            />
+            <InputNumber />
           </Form.Item>
         </React.Fragment>
       ) : null}

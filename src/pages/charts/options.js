@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
+import { Collapse } from 'antd';
 
-import { Collapse, Form } from 'antd';
 import * as Area from './area/index.js';
 import * as StackedArea from './stacked_area/index.js';
 import * as StackedAreaProportional from './stacked_area_proportional/index.js';
@@ -22,7 +22,6 @@ import * as Donut from './donut/index.js';
 import * as GroupedBarProportional from './grouped_bar_proportional/index.js';
 import * as HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
 const { Panel } = Collapse;
 
@@ -33,10 +32,7 @@ function OptionComponent(props) {
   id = parseInt(id);
   let component;
 
-  const dispatch = useDispatch();
   useEffect(() => {
-    dispatch({ type: 'set-config', value: component.spec });
-    console.log(component.spec);
     form.setFieldsValue(component.spec);
   }, [id, component]);
 

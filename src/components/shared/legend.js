@@ -1,50 +1,20 @@
 import React from 'react';
 import { Input, Select, Form, InputNumber } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { getValueFromNestedPath } from '../../utils/index.js';
-
-import {
-  SET_LEGEND_POSITION,
-  SET_LEGEND_TITLE,
-  SET_LEGEND_BACKGROUND,
-  SET_LEGEND_SYMBOL,
-  SET_LEGEND_SYMBOL_SIZE,
-} from '../../constants/legend.js';
 
 const { Option } = Select;
 
 function Legend(props) {
-  const spec = useSelector((state) => state.chart.spec);
   // const {title, fillColor, symbolType, symbolSize, orient} = layer.encoding.color.legend;
   const titleObj = props.properties.find((d) => d.prop === 'title');
-  const title = getValueFromNestedPath(spec, titleObj.path);
-
   const fillColorObj = props.properties.find((d) => d.prop === 'fill_color');
-  const fillColor = getValueFromNestedPath(spec, fillColorObj.path);
-
   const symbolTypeObj = props.properties.find((d) => d.prop === 'symbol_type');
-  const symbolType = getValueFromNestedPath(spec, symbolTypeObj.path);
-
   const symbolSizeObj = props.properties.find((d) => d.prop === 'symbol_size');
-  const symbolSize = getValueFromNestedPath(spec, symbolSizeObj.path);
-
   const orientObj = props.properties.find((d) => d.prop === 'orient');
-  const orient = getValueFromNestedPath(spec, orientObj.path);
-
-  const dispatch = useDispatch();
 
   return (
     <div className="property-container">
       <Form.Item name={orientObj.path} label="Position">
-        <Select
-          onChange={(value) =>
-            dispatch({
-              type: SET_LEGEND_POSITION,
-              payload: { value: value, path: orientObj.path },
-              chart: 'shared',
-            })
-          }
-        >
+        <Select>
           <Option value="left">Left</Option>
           <Option value="right">Right</Option>
           <Option value="top">Top</Option>
@@ -57,42 +27,15 @@ function Legend(props) {
       </Form.Item>
 
       <Form.Item name={titleObj.path} label="Title">
-        <Input
-          placeholder="Title"
-          type="text"
-          onChange={(e) =>
-            dispatch({
-              type: SET_LEGEND_TITLE,
-              payload: { value: e.target.value, path: titleObj.path },
-              chart: 'shared',
-            })
-          }
-        />
+        <Input placeholder="Title" type="text" />
       </Form.Item>
 
       <Form.Item name={fillColorObj.path} label="Background Color">
-        <Input
-          type="color"
-          onChange={(e) =>
-            dispatch({
-              type: SET_LEGEND_BACKGROUND,
-              payload: { value: e.target.value, path: fillColorObj.path },
-              chart: 'shared',
-            })
-          }
-        />
+        <Input type="color" />
       </Form.Item>
 
       <Form.Item name={symbolTypeObj.path} labe="Symbol">
-        <Select
-          onChange={(value) =>
-            dispatch({
-              type: SET_LEGEND_SYMBOL,
-              payload: { value: value, path: symbolTypeObj.path },
-              chart: 'shared',
-            })
-          }
-        >
+        <Select>
           <Option value="circle">Circle</Option>
           <Option value="square">Square</Option>
           <Option value="cross">Cross</Option>
@@ -105,16 +48,7 @@ function Legend(props) {
       </Form.Item>
 
       <Form.Item name={symbolSizeObj.path} label="Symbol Size">
-        <InputNumber
-          placeholder="Symbol Size"
-          onChange={(value) =>
-            dispatch({
-              type: SET_LEGEND_SYMBOL_SIZE,
-              payload: { value, path: symbolSizeObj.path },
-              chart: 'shared',
-            })
-          }
-        />
+        <InputNumber placeholder="Symbol Size" />
       </Form.Item>
     </div>
   );

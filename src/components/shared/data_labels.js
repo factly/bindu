@@ -1,21 +1,9 @@
 import React from 'react';
 import { Input, InputNumber, Form, Checkbox } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { getValueFromNestedPath } from '../../utils/index.js';
-
-import {
-  SET_DATA_LABELS,
-  SET_DATA_LABELS_COLOR,
-  SET_DATA_LABELS_SIZE,
-  SET_DATA_LABELS_FORMAT,
-} from '../../constants/data_labels.js';
-import { SET_LEGEND_LABEL_BASELINE } from '../../constants/legend_label.js';
 
 function DataLabels(props) {
   const { form } = props;
   const [enable, setEnable] = React.useState(false);
-
-  const dispatch = useDispatch();
 
   const colorObj = props.properties.find((d) => d.prop === 'color');
   const fontSizeObj = props.properties.find((d) => d.prop === 'font_size');
@@ -47,7 +35,6 @@ function DataLabels(props) {
         onChange={(e) => {
           const checked = e.target.checked;
           handleEnable(checked);
-          dispatch({ type: SET_DATA_LABELS, value: e.target.checked, chart: 'shared' });
         }}
       >
         Enable
@@ -55,41 +42,15 @@ function DataLabels(props) {
       {enable ? (
         <React.Fragment>
           <Form.Item name={colorObj.path} label="Color">
-            <Input
-              type="color"
-              onChange={(e) =>
-                dispatch({
-                  type: SET_DATA_LABELS_COLOR,
-                  payload: { value: e.target.value, path: colorObj.path },
-                  chart: 'shared',
-                })
-              }
-            />
+            <Input type="color" />
           </Form.Item>
 
           <Form.Item name={fontSizeObj.path} label="Size">
-            <InputNumber
-              onChange={(value) =>
-                dispatch({
-                  type: SET_DATA_LABELS_SIZE,
-                  payload: { value: value, path: fontSizeObj.path },
-                  chart: 'shared',
-                })
-              }
-            />
+            <InputNumber />
           </Form.Item>
 
           <Form.Item name={formatObj.path} label="Format">
-            <Input
-              type="text"
-              onChange={(e) =>
-                dispatch({
-                  type: SET_DATA_LABELS_FORMAT,
-                  payload: { value: e.target.value, path: formatObj.path },
-                  chart: 'shared',
-                })
-              }
-            />
+            <Input type="text" />
           </Form.Item>
         </React.Fragment>
       ) : null}

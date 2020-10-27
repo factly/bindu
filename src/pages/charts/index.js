@@ -4,24 +4,21 @@ import ChartOption from './options.js';
 import './index.css';
 import _ from 'lodash';
 
-import { useDispatch, useSelector } from 'react-redux';
-
 import { Card, Tooltip, Button, Input, Form } from 'antd';
 import { SaveOutlined, SettingOutlined, EditOutlined } from '@ant-design/icons';
 
 function Chart() {
   const [form] = Form.useForm();
 
-  const showOptions = useSelector((state) => state.chart.showOptions);
-  const chartName = useSelector((state) => state.chart.chartName);
-  const isChartNameEditable = useSelector((state) => state.chart.isChartNameEditable);
-  // const openCopyModal = useSelector(state => state.chart.openCopyModal);
-  const dispatch = useDispatch();
+  const [showOptions, setShowOptions] = useState(true);
+  const [chartName, setChartName] = useState('Untitled');
+  const [isChartNameEditable, setChartNameEditable] = useState(false);
+
   const actions = [
     {
       name: 'Customize',
       Icon: SettingOutlined,
-      props: { onClick: () => dispatch({ type: 'set-options' }) },
+      props: { onClick: () => setShowOptions(!showOptions) },
     },
     {
       name: 'Save',
@@ -50,14 +47,14 @@ function Chart() {
     titleComponent = (
       <div className="chart-name-editable-container">
         <Input
-          onPressEnter={() => dispatch({ type: 'edit-chart-name', value: false })}
+          onPressEnter={() => setChartNameEditable(false)}
           value={chartName}
-          onChange={(e) => dispatch({ type: 'set-chart-name', value: e.target.value })}
+          onChange={(e) => setChartName(e.target.value)}
         />{' '}
         <Button
           style={{ padding: '4px 0px' }}
           size="medium"
-          onClick={() => dispatch({ type: 'edit-chart-name', value: false })}
+          onClick={() => setChartNameEditable(false)}
           type="primary"
         >
           Save
@@ -68,10 +65,7 @@ function Chart() {
     titleComponent = (
       <div className="chart-name-container">
         <label className="chart-name">{chartName}</label>
-        <EditOutlined
-          style={{ fontSize: IconSize }}
-          onClick={() => dispatch({ type: 'edit-chart-name', value: true })}
-        />
+        <EditOutlined style={{ fontSize: IconSize }} onClick={() => setChartNameEditable(true)} />
       </div>
     );
   }

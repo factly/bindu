@@ -1,72 +1,27 @@
 import React from 'react';
 import { Input, Select, Form } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { getValueFromNestedPath } from '../../utils/index.js';
 
-import {
-  SET_LINE_WIDTH,
-  SET_LINE_OPACITY,
-  SET_LINE_CURVE,
-  SET_LINE_DASHED,
-} from '../../constants/lines.js';
 const { Option } = Select;
 
 function Lines(props) {
-  const spec = useSelector((state) => state.chart.spec);
   // const { strokeWidth, opacity, interpolate, strokeDash} = spec.layer[0].mark;
   const strokeWidthObj = props.properties.find((d) => d.prop === 'strokeWidth');
   const opacityObj = props.properties.find((d) => d.prop === 'opacity');
   const interpolateObj = props.properties.find((d) => d.prop === 'interpolate');
   const strokeDashObj = props.properties.find((d) => d.prop === 'strokeDash');
 
-  const strokeWidth = getValueFromNestedPath(spec, strokeWidthObj.path);
-  const opacity = getValueFromNestedPath(spec, opacityObj.path);
-  const interpolate = getValueFromNestedPath(spec, interpolateObj.path);
-  const strokeDash = getValueFromNestedPath(spec, strokeDashObj.path);
-
-  const dispatch = useDispatch();
-
   return (
     <div className="property-container">
       <Form.Item name={strokeWidthObj.path} label="Width">
-        <Input
-          type="number"
-          onChange={(e) =>
-            dispatch({
-              type: SET_LINE_WIDTH,
-              payload: { value: e.target.value, path: strokeWidthObj.path },
-              chart: 'shared',
-            })
-          }
-        />
+        <Input type="number" />
       </Form.Item>
 
       <Form.Item name={opacityObj.path} label="Opacity">
-        <Input
-          min={0}
-          max={1}
-          step={0.05}
-          type="number"
-          onChange={(e) =>
-            dispatch({
-              type: SET_LINE_OPACITY,
-              payload: { value: e.target.value, path: opacityObj.path },
-              chart: 'shared',
-            })
-          }
-        />
+        <Input min={0} max={1} step={0.05} type="number" />
       </Form.Item>
 
       <Form.Item name={interpolateObj.path} label="Line Curve">
-        <Select
-          onChange={(value) =>
-            dispatch({
-              type: SET_LINE_CURVE,
-              payload: { value: value, path: interpolateObj.path },
-              chart: 'shared',
-            })
-          }
-        >
+        <Select>
           <Option value="linear">Linear</Option>
           <Option value="linear-closed">Linear Closed</Option>
           <Option value="step">Step</Option>
@@ -76,16 +31,7 @@ function Lines(props) {
       </Form.Item>
 
       <Form.Item name={strokeDashObj.path} label="Dash Width">
-        <Input
-          type="number"
-          onChange={(e) =>
-            dispatch({
-              type: SET_LINE_DASHED,
-              payload: { value: e.target.value, path: strokeDashObj.path },
-              chart: 'shared',
-            })
-          }
-        />
+        <Input type="number" />
       </Form.Item>
     </div>
   );

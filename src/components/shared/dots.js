@@ -1,15 +1,5 @@
 import React from 'react';
-import { Input, Select, Form, Checkbox, InputNumber } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { getValueFromNestedPath } from '../../utils/index.js';
-import {
-  SET_LINE_DOTS,
-  SET_LINE_DOT_SHAPE,
-  SET_LINE_DOT_SIZE,
-  SET_LINE_DOTS_HOLLOW,
-} from '../../constants/dots.js';
-import _ from 'lodash';
-import CheckboxGroup from 'antd/lib/checkbox/Group';
+import { Select, Form, Checkbox, InputNumber } from 'antd';
 
 const { Option } = Select;
 
@@ -18,10 +8,6 @@ function Dots(props) {
   const [enable, setEnable] = React.useState(false);
 
   const markObj = props.properties.find((d) => d.prop === 'mark');
-
-  const dispatch = useDispatch();
-  let values = form.getFieldValue([]);
-  console.log({ point: _.get(values, [...markObj.path]) });
 
   const handleEnable = (checked) => {
     if (!checked) {
@@ -38,11 +24,6 @@ function Dots(props) {
         onChange={(e) => {
           const checked = e.target.checked;
           handleEnable(checked);
-          dispatch({
-            type: SET_LINE_DOTS,
-            payload: { value: e.target.checked, path: markObj.path },
-            chart: 'shared',
-          });
         }}
       >
         Enable
@@ -55,15 +36,7 @@ function Dots(props) {
             initialValue={'circle'}
             label="Symbol"
           >
-            <Select
-              onChange={(value) =>
-                dispatch({
-                  type: SET_LINE_DOT_SHAPE,
-                  payload: { value: value, path: markObj.path },
-                  chart: 'shared',
-                })
-              }
-            >
+            <Select>
               <Option value="circle">Circle</Option>
               <Option value="square">Square</Option>
               <Option value="cross">Cross</Option>
@@ -80,16 +53,7 @@ function Dots(props) {
             initialValue={40}
             label="Symbol Size"
           >
-            <InputNumber
-              placeholder="Symbol Size"
-              onChange={(value) =>
-                dispatch({
-                  type: SET_LINE_DOT_SIZE,
-                  payload: { value, path: markObj.path },
-                  chart: 'shared',
-                })
-              }
-            />
+            <InputNumber placeholder="Symbol Size" />
           </Form.Item>
 
           <Form.Item
