@@ -1,73 +1,117 @@
-import React from 'react';
-import Area from './area/index.js';
-import StackedArea from './stacked_area/index.js';
-import StackedAreaProportional from './stacked_area_proportional/index.js';
-import Bar from './bar/index.js';
-import GridBar from './grid_bar/index.js';
-import HorizontalBar from './horizontal_bar/index.js';
-import HorizontalStackBar from './horizontal_stacked_bar/index.js';
-import StackedBar from './stacked_bar/index.js';
-import GroupedBar from './grouped_bar/index.js';
-import Line from './line/index.js';
-import GridLine from './grid_line/index.js';
-import LineProjected from './line_projected/index.js';
-import Pie from './pie/index.js';
-import GridPie from './grid_pie/index.js';
-import GroupedLine from './grouped_line/index.js';
-import LineBar from './line_bar/index.js';
-import DivergingBar from './diverging_bar/index.js';
-import Donut from './donut/index.js';
-import GroupedBarProportional from './grouped_bar_proportional/index.js';
-import HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
+import React, { useEffect } from 'react';
+import { Collapse } from 'antd';
+
+import * as Area from './area/index.js';
+import * as StackedArea from './stacked_area/index.js';
+import * as StackedAreaProportional from './stacked_area_proportional/index.js';
+import * as Bar from './bar/index.js';
+import * as GridBar from './grid_bar/index.js';
+import * as HorizontalBar from './horizontal_bar/index.js';
+import * as HorizontalStackBar from './horizontal_stacked_bar/index.js';
+import * as StackedBar from './stacked_bar/index.js';
+import * as GroupedBar from './grouped_bar/index.js';
+import * as Line from './line/index.js';
+import * as GridLine from './grid_line/index.js';
+import * as LineProjected from './line_projected/index.js';
+import * as Pie from './pie/index.js';
+import * as GridPie from './grid_pie/index.js';
+import * as GroupedLine from './grouped_line/index.js';
+import * as LineBar from './line_bar/index.js';
+import * as DivergingBar from './diverging_bar/index.js';
+import * as Donut from './donut/index.js';
+import * as GroupedBarProportional from './grouped_bar_proportional/index.js';
+import * as HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
 import { useParams } from 'react-router-dom';
 
-function OptionComponent() {
+const { Panel } = Collapse;
+
+function OptionComponent(props) {
+  const { form } = props;
+
   let { id } = useParams();
   id = parseInt(id);
+  let component;
+
+  useEffect(() => {
+    form.setFieldsValue(component.spec);
+  }, [id, component]);
+
   switch (id) {
     case 0:
-      return <Area />;
+      component = Area;
+      break;
     case 1:
-      return <StackedArea />;
+      component = StackedArea;
+      break;
     case 2:
-      return <StackedAreaProportional />;
+      component = StackedAreaProportional;
+      break;
     case 3:
-      return <Bar />;
+      component = Bar;
+      break;
     case 4:
-      return <HorizontalBar />;
+      component = HorizontalBar;
+      break;
     case 5:
-      return <HorizontalStackBar />;
+      component = HorizontalStackBar;
+      break;
     case 6:
-      return <StackedBar />;
+      component = StackedBar;
+      break;
     case 7:
-      return <GroupedLine />;
+      component = GroupedLine;
+      break;
     case 8:
-      return <Line />;
+      component = Line;
+      break;
     case 9:
-      return <LineProjected />;
+      component = LineProjected;
+      break;
     case 10:
-      return <Pie />;
+      component = Pie;
+      break;
     case 11:
-      return <Donut />;
+      component = Donut;
+      break;
     case 12:
-      return <LineBar />;
+      component = LineBar;
+      break;
     case 13:
-      return <DivergingBar />;
+      component = DivergingBar;
+      break;
     case 14:
-      return <GroupedBarProportional />;
+      component = GroupedBarProportional;
+      break;
     case 15:
-      return <HorizontalGroupedBarProportional />;
+      component = HorizontalGroupedBarProportional;
+      break;
     case 16:
-      return <GridPie />;
+      component = GridPie;
+      break;
     case 17:
-      return <GridBar />;
+      component = GridBar;
+      break;
     case 18:
-      return <GridLine />;
+      component = GridLine;
+      break;
     case 19:
-      return <GroupedBar />;
+      component = GroupedBar;
+      break;
     default:
       return null;
   }
+
+  return (
+    <Collapse className="option-item-collapse">
+      {component.properties.map((d, i) => {
+        return (
+          <Panel className="option-item-panel" header={d.name} key={i}>
+            <d.Component properties={d.properties} form={form} />
+          </Panel>
+        );
+      })}
+    </Collapse>
+  );
 }
 
 export default OptionComponent;

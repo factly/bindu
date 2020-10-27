@@ -1,28 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Display from './display.js';
 import ChartOption from './options.js';
 import './index.css';
+import _ from 'lodash';
 
-import { useDispatch, useSelector } from 'react-redux';
-
-import { Card, Tooltip, Button, Input } from 'antd';
+import { Card, Tooltip, Button, Input, Form } from 'antd';
 import { SaveOutlined, SettingOutlined, EditOutlined } from '@ant-design/icons';
 
 function Chart() {
-  const showOptions = useSelector((state) => state.chart.showOptions);
-  const chartName = useSelector((state) => state.chart.chartName);
-  const isChartNameEditable = useSelector((state) => state.chart.isChartNameEditable);
-  // const openCopyModal = useSelector(state => state.chart.openCopyModal);
-  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+
+  const [showOptions, setShowOptions] = useState(true);
+  const [chartName, setChartName] = useState('Untitled');
+  const [isChartNameEditable, setChartNameEditable] = useState(false);
+
   const actions = [
     {
       name: 'Customize',
       Icon: SettingOutlined,
-      onClick: () => dispatch({ type: 'set-options' }),
+      props: { onClick: () => setShowOptions(!showOptions) },
     },
     {
       name: 'Save',
       Icon: SaveOutlined,
+      props: {},
     },
   ];
 
@@ -32,8 +33,10 @@ function Chart() {
     <div className="extra-actions-container">
       <ul>
         {actions.map((item) => (
-          <li key={item.name} onClick={item.onClick}>
-            <Tooltip title={item.name}>{<item.Icon style={{ fontSize: IconSize }} />}</Tooltip>
+          <li key={item.name}>
+            <Tooltip title={item.name}>
+              {<item.Icon {...item.props} style={{ fontSize: IconSize }} />}
+            </Tooltip>
           </li>
         ))}
       </ul>
@@ -44,14 +47,14 @@ function Chart() {
     titleComponent = (
       <div className="chart-name-editable-container">
         <Input
-          onPressEnter={() => dispatch({ type: 'edit-chart-name', value: false })}
+          onPressEnter={() => setChartNameEditable(false)}
           value={chartName}
-          onChange={(e) => dispatch({ type: 'set-chart-name', value: e.target.value })}
+          onChange={(e) => setChartName(e.target.value)}
         />{' '}
         <Button
           style={{ padding: '4px 0px' }}
           size="medium"
-          onClick={() => dispatch({ type: 'edit-chart-name', value: false })}
+          onClick={() => setChartNameEditable(false)}
           type="primary"
         >
           Save
@@ -62,26 +65,34 @@ function Chart() {
     titleComponent = (
       <div className="chart-name-container">
         <label className="chart-name">{chartName}</label>
-        <EditOutlined
-          style={{ fontSize: IconSize }}
-          onClick={() => dispatch({ type: 'edit-chart-name', value: true })}
-        />
+        <EditOutlined style={{ fontSize: IconSize }} onClick={() => setChartNameEditable(true)} />
       </div>
     );
   }
+
   return (
-    <Card
-      title={titleComponent}
-      extra={actionsList}
-      bodyStyle={{ overflow: 'hidden', display: 'flex', padding: '0px' }}
-    >
-      <div className="display-container" style={{ width: '100%' }}>
-        <Display />
-      </div>
-      <div className="option-container" style={{ right: showOptions ? '0' : '-250px' }}>
-        <ChartOption />
-      </div>
-    </Card>
+    <Form form={form}>
+      <Card
+        title={titleComponent}
+        extra={actionsList}
+        bodyStyle={{ overflow: 'hidden', display: 'flex', padding: '0px' }}
+      >
+        <div className="display-container" style={{ width: '100%' }}>
+          <Form.Item shouldUpdate={true}>
+            {({ getFieldValue }) => {
+              return (
+                <Form.Item>
+                  <Display spec={getFieldValue()} />
+                </Form.Item>
+              );
+            }}
+          </Form.Item>
+        </div>
+        <div className="option-container" style={{ right: showOptions ? '0' : '-250px' }}>
+          <ChartOption form={form} />
+        </div>
+      </Card>
+    </Form>
   );
 }
 
