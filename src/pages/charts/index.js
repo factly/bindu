@@ -3,6 +3,7 @@ import Display from './display.js';
 import ChartOption from './options.js';
 import { saveAs } from 'file-saver';
 import './index.css';
+import _ from 'lodash';
 
 import { Card, Tooltip, Button, Input, Form, Modal, Dropdown, Menu } from 'antd';
 import {
@@ -25,7 +26,10 @@ function Chart() {
   const [view, setView] = useState(null);
 
   const onDataUpload = (dataDetails) => {
-    form.setFieldsValue({ data: { url: dataDetails.url.raw } });
+    let values = form.getFieldValue();
+    _.unset(values, ['data', 'values']);
+    _.set(values, ['data', 'url'], dataDetails.url.raw);
+    form.setFieldsValue(values);
   };
 
   const downloadSampleData = () => {
