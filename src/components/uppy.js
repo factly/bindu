@@ -10,10 +10,9 @@ import '@uppy/dashboard/dist/style.css';
 import '@uppy/url/dist/style.css';
 
 function UppyUploader({ onUpload }) {
-  // const organisation_slug = useSelector(
-  //   (state) => state.organisation.details[state.organisation.selected].slug,
-  // );
-  const organisation_slug = 'org';
+  const organisationTitle = useSelector(
+    ({ organisation }) => organisation.details[organisation.selected].title,
+  );
 
   const uppy = Uppy({
     id: 'uppy-media',
@@ -29,7 +28,7 @@ function UppyUploader({ onUpload }) {
           ...files[fileID],
           meta: {
             ...files[fileID].meta,
-            name: `bindu/${organisation_slug}/${new Date().getFullYear()}/${new Date().getMonth()}/${Date.now().toString()}_${
+            name: `bindu/${organisationTitle}/${new Date().getFullYear()}/${new Date().getMonth()}/${Date.now().toString()}_${
               files[fileID].meta.name
             }`,
           },
