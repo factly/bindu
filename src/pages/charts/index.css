@@ -17,7 +17,7 @@
 .option-container {
   position: relative;
   transition: right 0.5s;
-  width: 250px;
+  width: 400px;
 }
 
 .chart-name {

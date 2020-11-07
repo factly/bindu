@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { Collapse } from 'antd';
+import { useParams } from 'react-router-dom';
 
+import Categories from '../../components/categories';
+import Tags from '../../components/tags';
 import * as Area from './area/index.js';
 import * as StackedArea from './stacked_area/index.js';
 import * as StackedAreaProportional from './stacked_area_proportional/index.js';
@@ -21,7 +24,6 @@ import * as DivergingBar from './diverging_bar/index.js';
 import * as Donut from './donut/index.js';
 import * as GroupedBarProportional from './grouped_bar_proportional/index.js';
 import * as HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
-import { useParams } from 'react-router-dom';
 
 const { Panel } = Collapse;
 
@@ -34,7 +36,7 @@ function OptionComponent(props) {
 
   useEffect(() => {
     form.setFieldsValue(component.spec);
-  }, [id, form, component]);
+  }, [id, component]);
 
   switch (id) {
     case 0:
@@ -103,6 +105,12 @@ function OptionComponent(props) {
 
   return (
     <Collapse className="option-item-collapse">
+      <Panel className="option-item-panel" header={'Tags'} key={'tags'}>
+        <Tags form={form} />
+      </Panel>
+      <Panel className="option-item-panel" header={'Categories'} key={'categories'}>
+        <Categories form={form} />
+      </Panel>
       {component.properties.map((d, i) => {
         return (
           <Panel className="option-item-panel" header={d.name} key={i}>
