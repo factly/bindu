@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, Select } from 'antd';
+import { Button, Form, Select, Empty } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { getCategories, addCategory } from '../actions/categories';
@@ -14,6 +14,7 @@ function Categories(props) {
   }, []);
 
   const onCreate = () => {
+    if (!searchText.trim()) return;
     dispatch(addCategory({ name: searchText }))
       .then(() => {
         setSearchText('');
@@ -35,18 +36,25 @@ function Categories(props) {
           onSelect={() => setSearchText('')}
           onSearch={setSearchText}
           notFoundContent={
-            <Button
-              block
-              type="dashed"
-              style={{
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-              onClick={onCreate}
-            >
-              Create {searchText}
-            </Button>
+            searchText.trim() ? (
+              <Button
+                block
+                type="dashed"
+                style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                onClick={onCreate}
+              >
+                Create {searchText}
+              </Button>
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={'No categories available. Type something to create new category'}
+              />
+            )
           }
         >
           {categories.map((category) => (

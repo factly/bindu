@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, Select } from 'antd';
+import { Button, Form, Select, Empty } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { getTags, addTag } from '../actions/tags';
@@ -16,6 +16,7 @@ function Tags(props) {
   }, []);
 
   const onCreate = () => {
+    if (!searchText.trim()) return;
     dispatch(addTag({ name: searchText }))
       .then(() => {
         setSearchText('');
@@ -37,18 +38,25 @@ function Tags(props) {
           onSelect={() => setSearchText('')}
           onSearch={setSearchText}
           notFoundContent={
-            <Button
-              block
-              type="dashed"
-              style={{
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-              onClick={onCreate}
-            >
-              Create {searchText}
-            </Button>
+            searchText.trim() ? (
+              <Button
+                block
+                type="dashed"
+                style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                onClick={onCreate}
+              >
+                Create {searchText}
+              </Button>
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={'No tags available. Type something to create new tag'}
+              />
+            )
           }
         >
           {tags.map((tag) => (
