@@ -18,7 +18,9 @@ function BasicLayout(props) {
               <Menu.Item key="1">
                 <Link to={'/templates'}>Templates</Link>
               </Menu.Item>
-              <Menu.Item key="2">Saved Charts</Menu.Item>
+              <Menu.Item key="2">
+                <Link to={'/charts/saved'}>Saved Charts</Link>
+              </Menu.Item>
               <Menu.Item key="3">
                 <Link to={'/tags'}>Tags</Link>
               </Menu.Item>

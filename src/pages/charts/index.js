@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import Display from './display.js';
 import ChartOption from './options.js';
 import { saveAs } from 'file-saver';
@@ -13,10 +14,13 @@ import {
   UploadOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
+
 import UppyUploader from '../../components/uppy';
 import { b64toBlob } from '../../utils/file';
+import { addChart } from '../../actions/charts';
 
 function Chart() {
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
 
   const [showModal, setShowModal] = useState(false);
@@ -50,6 +54,21 @@ function Chart() {
     saveAs(blob, `${chartName}.${ext}`);
   };
 
+  const saveChart = async () => {
+    const { tags, categories, ...values } = form.getFieldValue();
+    const imageBlob = await view?.toImageURL('png', 1);
+    dispatch(
+      addChart({
+        title: chartName,
+        data_url: values.data.url,
+        config: values,
+        featured_medium: imageBlob,
+        category_ids: categories,
+        tag_ids: tags,
+      }),
+    );
+  };
+
   const IconSize = 20;
   const actions = [
     {
@@ -63,7 +82,7 @@ function Chart() {
     },
     {
       name: 'Save',
-      Component: <SaveOutlined style={{ fontSize: IconSize }} />,
+      Component: <SaveOutlined style={{ fontSize: IconSize }} onClick={saveChart} />,
     },
     {
       name: 'Upload',

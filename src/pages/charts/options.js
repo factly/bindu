@@ -104,21 +104,26 @@ function OptionComponent(props) {
   }
 
   return (
-    <Collapse className="option-item-collapse">
-      <Panel className="option-item-panel" header={'Tags'} key={'tags'}>
-        <Tags form={form} />
-      </Panel>
-      <Panel className="option-item-panel" header={'Categories'} key={'categories'}>
-        <Categories form={form} />
-      </Panel>
-      {component.properties.map((d, i) => {
-        return (
-          <Panel className="option-item-panel" header={d.name} key={i}>
-            <d.Component properties={d.properties} form={form} />
-          </Panel>
-        );
-      })}
-    </Collapse>
+    <>
+      <Collapse className="option-item-collapse">
+        {component.properties.map((d, i) => {
+          return (
+            <Panel className="option-item-panel" header={d.name} key={i}>
+              <d.Component properties={d.properties} form={form} />
+            </Panel>
+          );
+        })}
+      </Collapse>
+      <br />
+      <Collapse defaultActiveKey={['tags', 'categories']} className="option-item-collapse">
+        <Panel className="option-item-panel" header={'Tags'} key={'tags'}>
+          <Tags form={form} />
+        </Panel>
+        <Panel className="option-item-panel" header={'Categories'} key={'categories'}>
+          <Categories form={form} />
+        </Panel>
+      </Collapse>
+    </>
   );
 }
 
