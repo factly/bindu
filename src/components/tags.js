@@ -29,7 +29,7 @@ function Tags(props) {
 
   return (
     <div className="property-container">
-      <Form.Item name={'tags'} label="Tags">
+      <Form.Item name={'tags'}>
         <Select
           showSearch
           mode="multiple"
@@ -37,6 +37,9 @@ function Tags(props) {
           type="text"
           onSelect={() => setSearchText('')}
           onSearch={setSearchText}
+          filterOption={(input, option) =>
+            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
           notFoundContent={
             searchText.trim() ? (
               <Button
@@ -49,7 +52,7 @@ function Tags(props) {
                 }}
                 onClick={onCreate}
               >
-                Create {searchText}
+                Create a tag '{searchText}'
               </Button>
             ) : (
               <Empty
@@ -60,7 +63,7 @@ function Tags(props) {
           }
         >
           {tags.map((tag) => (
-            <Select.Option key={tag.id} value={tag.name}>
+            <Select.Option key={tag.id} value={tag.id}>
               {tag.name}
             </Select.Option>
           ))}

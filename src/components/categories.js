@@ -27,7 +27,7 @@ function Categories(props) {
 
   return (
     <div className="property-container">
-      <Form.Item name={'categories'} label="Categories">
+      <Form.Item name={'categories'}>
         <Select
           showSearch
           mode="multiple"
@@ -35,6 +35,9 @@ function Categories(props) {
           type="text"
           onSelect={() => setSearchText('')}
           onSearch={setSearchText}
+          filterOption={(input, option) =>
+            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
           notFoundContent={
             searchText.trim() ? (
               <Button
@@ -58,7 +61,7 @@ function Categories(props) {
           }
         >
           {categories.map((category) => (
-            <Select.Option key={category.id} value={category.name}>
+            <Select.Option key={category.id} value={category.id}>
               {category.name}
             </Select.Option>
           ))}
