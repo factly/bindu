@@ -126,10 +126,14 @@ func create(w http.ResponseWriter, r *http.Request) {
 		OrganisationID:   uint(oID),
 	}
 
-	tx.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
-	tx.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
+	if len(chart.TagIDs) > 0 {
+		tx.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
+	}
+	if len(chart.CategoryIDs) > 0 {
+		tx.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
+	}
 
-	err = tx.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result).Error
+	err = tx.Model(&model.Chart{}).Create(&result).Error
 
 	if err != nil {
 		tx.Rollback()
