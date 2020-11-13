@@ -15,6 +15,7 @@ import (
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"gorm.io/gorm"
 )
 
 // update - Update chart by id
@@ -86,14 +87,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 	newCategories := make([]model.Category, 0)
 	config.DB.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&newCategories)
 
+	// Get table name
+	stmt := &gorm.Statement{DB: config.DB}
+	_ = stmt.Parse(&model.Chart{})
+	tableName := stmt.Schema.Table
+
 	var chartSlug string
 
 	if result.Slug == chart.Slug {
 		chartSlug = result.Slug
 	} else if chart.Slug != "" && slug.Check(chart.Slug) {
-		chartSlug = slug.Approve(chart.Slug, oID, config.DB.NewScope(&model.Chart{}).TableName())
+		chartSlug = slug.Approve(chart.Slug, oID, tableName)
 	} else {
-		chartSlug = slug.Approve(slug.Make(chart.Title), oID, config.DB.NewScope(&model.Chart{}).TableName())
+		chartSlug = slug.Approve(slug.Make(chart.Title), oID, tableName)
 	}
 
 	// Deleting old associations

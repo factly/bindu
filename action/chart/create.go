@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/factly/bindu-server/util/minio"
+	"gorm.io/gorm"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -100,6 +101,11 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get table name
+	stmt := &gorm.Statement{DB: config.DB}
+	_ = stmt.Parse(&model.Chart{})
+	tableName := stmt.Schema.Table
+
 	var chartSlug string
 	if chart.Slug != "" && slug.Check(chart.Slug) {
 		chartSlug = chart.Slug
@@ -109,7 +115,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	result := &model.Chart{
 		Title:            chart.Title,
-		Slug:             slug.Approve(chartSlug, oID, config.DB.NewScope(&model.Chart{}).TableName()),
+		Slug:             slug.Approve(chartSlug, oID, tableName),
 		DataURL:          chart.DataURL,
 		Config:           chart.Config,
 		Description:      chart.Description,

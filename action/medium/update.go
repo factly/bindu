@@ -15,6 +15,7 @@ import (
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"gorm.io/gorm"
 )
 
 // update - Update medium by id
@@ -77,14 +78,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get table name
+	stmt := &gorm.Statement{DB: config.DB}
+	_ = stmt.Parse(&model.Medium{})
+	tableName := stmt.Schema.Table
+
 	var mediumSlug string
 
 	if result.Slug == medium.Slug {
 		mediumSlug = result.Slug
 	} else if medium.Slug != "" && slug.Check(medium.Slug) {
-		mediumSlug = slug.Approve(medium.Slug, oID, config.DB.NewScope(&model.Medium{}).TableName())
+		mediumSlug = slug.Approve(medium.Slug, oID, tableName)
 	} else {
-		mediumSlug = slug.Approve(slug.Make(medium.Name), oID, config.DB.NewScope(&model.Medium{}).TableName())
+		mediumSlug = slug.Approve(slug.Make(medium.Name), oID, tableName)
 	}
 
 	config.DB.Model(&result).Updates(model.Medium{
