@@ -1,6 +1,8 @@
 package action
 
 import (
+	"fmt"
+
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
@@ -40,6 +42,7 @@ func RegisterRoutes() *chi.Mux {
 
 	if viper.IsSet("mode") && viper.GetString("mode") == "development" {
 		r.Get("/swagger/*", httpSwagger.WrapHandler)
+		fmt.Println("Swagger @ http://localhost:7000/swagger/index.html")
 	}
 
 	r.With(util.CheckUser, util.CheckOrganisation).Group(func(r chi.Router) {
