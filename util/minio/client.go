@@ -14,8 +14,8 @@ var Client *minio.Client
 // SetupClient setups a minio client
 func SetupClient() {
 	var err error
-	Client, err = minio.New(viper.GetString("minio.url"), &minio.Options{
-		Creds:  credentials.NewStaticV4(viper.GetString("minio.key"), viper.GetString("minio.secret"), ""),
+	Client, err = minio.New(viper.GetString("minio_url"), &minio.Options{
+		Creds:  credentials.NewStaticV4(viper.GetString("minio_key"), viper.GetString("minio_secret"), ""),
 		Secure: false,
 	})
 

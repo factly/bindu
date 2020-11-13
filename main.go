@@ -29,7 +29,7 @@ func main() {
 	config.SetupVars()
 
 	// db setup
-	config.SetupDB(viper.GetString("postgres.dsn"))
+	config.SetupDB(viper.GetString("dsn"))
 
 	model.Migration()
 

@@ -139,4 +139,4 @@ main
 
 .DS_Store
 
-bindu-server.yml
+config.*

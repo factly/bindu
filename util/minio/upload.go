@@ -32,7 +32,7 @@ var Upload = func(r *http.Request, image string) (string, error) {
 
 	fileName := fmt.Sprint(uuid.New(), ".", imageType)
 
-	info, err := Client.PutObject(r.Context(), viper.GetString("minio.bucket"), fileName, file, -1, minio.PutObjectOptions{
+	info, err := Client.PutObject(r.Context(), viper.GetString("minio_bucket"), fileName, file, -1, minio.PutObjectOptions{
 		ContentType: "image/" + imageType,
 	})
 	return info.Location, err

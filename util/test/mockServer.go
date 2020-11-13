@@ -34,13 +34,13 @@ func MockServer() {
 
 	res[0] = data
 
-	gock.New(viper.GetString("kavach.url")).
+	gock.New(viper.GetString("kavach_url")).
 		Get("/organisations").
 		Persist().
 		Reply(http.StatusOK).
 		JSON(res)
 
 	minio.Upload = func(r *http.Request, image string) (string, error) {
-		return "http://" + viper.GetString("minio.url") + "/dega/test.jpg", nil
+		return "http://" + viper.GetString("minio_url") + "/dega/test.jpg", nil
 	}
 }
