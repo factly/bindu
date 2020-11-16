@@ -120,15 +120,41 @@ func update(w http.ResponseWriter, r *http.Request) {
 		_ = config.DB.Model(&result).Association("Categories").Clear()
 	}
 
+	featuredMediumID := &chart.FeaturedMediumID
+	result.FeaturedMediumID = &chart.FeaturedMediumID
+	if chart.FeaturedMediumID == 0 {
+		err = tx.Model(&result).Omit("Tags", "Categories").Updates(map[string]interface{}{"featured_medium_id": nil}).Error
+		featuredMediumID = nil
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
+
+	themeID := &chart.ThemeID
+	result.ThemeID = &chart.ThemeID
+	if chart.ThemeID == 0 {
+		err = tx.Model(&result).Omit("Tags", "Categories").Updates(map[string]interface{}{"theme_id": nil}).Error
+		themeID = nil
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
+
 	err = tx.Model(&result).Updates(model.Chart{
 		Title:            chart.Title,
 		Slug:             chartSlug,
 		DataURL:          chart.DataURL,
 		Description:      chart.Description,
 		Status:           chart.Status,
-		FeaturedMediumID: chart.FeaturedMediumID,
+		FeaturedMediumID: featuredMediumID,
 		Config:           chart.Config,
-		ThemeID:          chart.ThemeID,
+		ThemeID:          themeID,
 		PublishedDate:    chart.PublishedDate,
 	}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result).Error
 

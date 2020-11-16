@@ -61,9 +61,10 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if theme is associated with charts
+	uintID := uint(id)
 	var totAssociated int64
 	config.DB.Model(&model.Chart{}).Where(&model.Chart{
-		ThemeID: uint(id),
+		ThemeID: &uintID,
 	}).Count(&totAssociated)
 
 	if totAssociated != 0 {

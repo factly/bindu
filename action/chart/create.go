@@ -113,6 +113,11 @@ func create(w http.ResponseWriter, r *http.Request) {
 		chartSlug = slug.Make(chart.Title)
 	}
 
+	themeID := &chart.ThemeID
+	if chart.ThemeID == 0 {
+		themeID = nil
+	}
+
 	result := &model.Chart{
 		Title:            chart.Title,
 		Slug:             slug.Approve(chartSlug, oID, tableName),
@@ -120,8 +125,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Config:           chart.Config,
 		Description:      chart.Description,
 		Status:           chart.Status,
-		FeaturedMediumID: medium.ID,
-		ThemeID:          chart.ThemeID,
+		FeaturedMediumID: &medium.ID,
+		ThemeID:          themeID,
 		PublishedDate:    chart.PublishedDate,
 		OrganisationID:   uint(oID),
 	}
