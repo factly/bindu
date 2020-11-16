@@ -1,7 +1,6 @@
 package medium
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -25,14 +24,6 @@ var updateData = map[string]interface{}{
 		"vOffset": 250,
 		"alignment": "center"
 	}}`,
-}
-
-func selectAfterUpdate(mock sqlmock.Sqlmock, medium map[string]interface{}) {
-	urlByteData, _ := json.Marshal(medium["url"])
-	mock.ExpectQuery(selectQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], urlByteData))
 }
 
 func TestMediumUpdate(t *testing.T) {

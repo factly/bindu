@@ -14,13 +14,6 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-func selectAfterUpdate(mock sqlmock.Sqlmock, category map[string]interface{}) {
-	mock.ExpectQuery(selectQuery).
-		WithArgs(1).
-		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, category["name"], category["slug"]))
-}
-
 func TestCategoryUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
 
