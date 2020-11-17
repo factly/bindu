@@ -96,7 +96,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	newTags := make([]model.Tag, 0)
 	if len(chart.TagIDs) > 0 {
-		config.DB.Model(&model.Tag{}).Where(chart.TagIDs).Find(&newTags)
+		tx.Model(&model.Tag{}).Where(chart.TagIDs).Find(&newTags)
 		if err = tx.Model(&result).Association("Tags").Replace(&newTags); err != nil {
 			tx.Rollback()
 			loggerx.Error(err)
@@ -104,12 +104,12 @@ func update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		_ = config.DB.Model(&result).Association("Tags").Clear()
+		_ = tx.Model(&result).Association("Tags").Clear()
 	}
 
 	newCategories := make([]model.Category, 0)
 	if len(chart.CategoryIDs) > 0 {
-		config.DB.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&newCategories)
+		tx.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&newCategories)
 		if err = tx.Model(&result).Association("Categories").Replace(&newCategories); err != nil {
 			tx.Rollback()
 			loggerx.Error(err)
@@ -117,7 +117,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		_ = config.DB.Model(&result).Association("Categories").Clear()
+		_ = tx.Model(&result).Association("Categories").Clear()
 	}
 
 	featuredMediumID := &chart.FeaturedMediumID
@@ -146,7 +146,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = tx.Model(&result).Updates(model.Chart{
+	err = tx.Model(&result).Omit("Tags", "Categories").Updates(model.Chart{
 		Title:            chart.Title,
 		Slug:             chartSlug,
 		DataURL:          chart.DataURL,

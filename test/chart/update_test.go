@@ -1,11 +1,9 @@
 package chart
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"regexp"
 	"testing"
 	"time"
 
@@ -48,28 +46,6 @@ var updateData = map[string]interface{}{
 	"published_date":     time.Time{},
 	"category_ids":       []int{1},
 	"tag_ids":            []int{1},
-}
-
-func deleteAssociationsMock(mock sqlmock.Sqlmock) {
-	mock.ExpectBegin()
-	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_tag"`)).
-		WillReturnResult(sqlmock.NewResult(0, 1))
-	mock.ExpectCommit()
-
-	mock.ExpectBegin()
-	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_category"`)).
-		WillReturnResult(sqlmock.NewResult(0, 1))
-	mock.ExpectCommit()
-}
-
-func chartTagUpdate(mock sqlmock.Sqlmock) {
-	chartSelectMock(mock)
-
-	chartTagMock(mock)
-	chartCategoryMock(mock)
-
-	tagQueryMock(mock)
-	categoryQueryMock(mock)
 }
 
 func TestChartUpdate(t *testing.T) {
@@ -157,13 +133,20 @@ func TestChartUpdate(t *testing.T) {
 		updateChart := updateData
 		updateChart["slug"] = "pie"
 
+		chartSelectMock(mock)
+
+		mock.ExpectBegin()
 		chartTagUpdate(mock)
+		chartCategoryUpdate(mock)
 
-		deleteAssociationsMock(mock)
-
+		mediumQueryMock(mock)
+		themeQueryMock(mock)
 		chartUpdateMock(mock, updateChart)
+
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)
+
+		mock.ExpectCommit()
 
 		e.PUT(path).
 			WithPath("chart_id", 1).
@@ -177,17 +160,23 @@ func TestChartUpdate(t *testing.T) {
 		updateChart := updateData
 		updateChart["slug"] = "pie-test"
 
-		chartTagUpdate(mock)
+		chartSelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_chart"`).
 			WithArgs(fmt.Sprint(updateChart["slug"], "%"), 1).
 			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
 
-		deleteAssociationsMock(mock)
+		mock.ExpectBegin()
+		chartTagUpdate(mock)
+		chartCategoryUpdate(mock)
 
+		mediumQueryMock(mock)
+		themeQueryMock(mock)
 		chartUpdateMock(mock, updateChart)
+
 		res["slug"] = "pie-test"
 		selectAfterUpdate(mock, res)
+		mock.ExpectCommit()
 
 		e.PUT(path).
 			WithPath("chart_id", 1).
@@ -202,48 +191,21 @@ func TestChartUpdate(t *testing.T) {
 
 		updateChart := updateData
 		updateChart["slug"] = "pie"
-		updateChart["category_ids"] = []uint{}
-		updateChart["tag_ids"] = []uint{}
-
 		chartSelectMock(mock)
-
-		chartTagMock(mock)
-		chartCategoryMock(mock)
-
-		mock.ExpectQuery(tagQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}))
-		mock.ExpectQuery(categoryQuery).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}))
 
 		slugCheckMock(mock)
 
-		deleteAssociationsMock(mock)
-
-		description, _ := json.Marshal(updateChart["description"])
-		config, _ := json.Marshal(updateChart["config"])
-
 		mock.ExpectBegin()
+		chartTagUpdate(mock)
+		chartCategoryUpdate(mock)
 
-		mock.ExpectQuery(mediumQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
-				AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
-
-		mock.ExpectQuery(themeQuery).
-			WithArgs(1, 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
-				AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
-
-		mock.ExpectExec(`UPDATE \"bi_chart\" SET (.+)  WHERE (.+) \"bi_chart\".\"id\" = `).
-			WithArgs(config, updateChart["data_url"],
-				description, updateChart["featured_medium_id"], updateChart["slug"],
-				updateChart["status"], updateChart["theme_id"], updateChart["title"], test.AnyTime{}, 1).
-			WillReturnResult(sqlmock.NewResult(1, 1))
-
-		mock.ExpectCommit()
+		mediumQueryMock(mock)
+		themeQueryMock(mock)
+		chartUpdateMock(mock, updateChart)
 
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)
+		mock.ExpectCommit()
 
 		updateChart["slug"] = ""
 
@@ -253,6 +215,7 @@ func TestChartUpdate(t *testing.T) {
 			WithJSON(updateChart).
 			Expect().
 			Status(http.StatusOK).JSON().Object().ContainsMap(res)
+		updateChart["slug"] = "pie"
 		test.ExpectationsMet(t, mock)
 	})
 

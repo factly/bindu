@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"regexp"
 	"testing"
 	"time"
 
@@ -15,18 +14,18 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-func chartTagMock(mock sqlmock.Sqlmock) {
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
-		WithArgs(sqlmock.AnyArg()).
-		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).
-			AddRow(1, time.Now(), time.Now(), nil, tag["name"], tag["slug"], 1, 1))
-}
-func chartCategoryMock(mock sqlmock.Sqlmock) {
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_category" INNER JOIN "bi_chart_category"`)).
-		WithArgs(sqlmock.AnyArg()).
-		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
-			AddRow(1, time.Now(), time.Now(), nil, category["name"], category["slug"], 1, 1))
-}
+// func chartTagMock(mock sqlmock.Sqlmock) {
+// 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
+// 		WithArgs(sqlmock.AnyArg()).
+// 		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).
+// 			AddRow(1, time.Now(), time.Now(), nil, tag["name"], tag["slug"], 1, 1))
+// }
+// func chartCategoryMock(mock sqlmock.Sqlmock) {
+// 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_category" INNER JOIN "bi_chart_category"`)).
+// 		WithArgs(sqlmock.AnyArg()).
+// 		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
+// 			AddRow(1, time.Now(), time.Now(), nil, category["name"], category["slug"], 1, 1))
+// }
 
 func TestChartList(t *testing.T) {
 	mock := test.SetupMockDB()
@@ -105,18 +104,13 @@ func TestChartList(t *testing.T) {
 	byteDescriptionDataOne, _ := json.Marshal(chartlist[0]["description"])
 	byteDescriptionDataTwo, _ := json.Marshal(chartlist[1]["description"])
 
-	t.Run("get empty list of categories", func(t *testing.T) {
+	t.Run("get empty list of chart", func(t *testing.T) {
 
 		mock.ExpectQuery(countQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns))
-
-		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
-			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)))
-		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_category" INNER JOIN "bi_chart_category"`)).
-			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -129,7 +123,7 @@ func TestChartList(t *testing.T) {
 		test.ExpectationsMet(t, mock)
 	})
 
-	t.Run("get non-empty list of categories", func(t *testing.T) {
+	t.Run("get non-empty list of chart", func(t *testing.T) {
 
 		mock.ExpectQuery(countQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(chartlist)))
@@ -141,18 +135,7 @@ func TestChartList(t *testing.T) {
 				AddRow(2, time.Now(), time.Now(), nil, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
 					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["theme_id"], time.Time{}, 1))
 
-		mediumQueryMock(mock)
-
-		themeQueryMock(mock)
-
-		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
-			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
-			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).
-				AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, 1))
-		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_category" INNER JOIN "bi_chart_category"`)).
-			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
-			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
-				AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, 1))
+		chartPreloadMock(mock)
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -170,7 +153,7 @@ func TestChartList(t *testing.T) {
 		test.ExpectationsMet(t, mock)
 	})
 
-	t.Run("get categories with pagination", func(t *testing.T) {
+	t.Run("get chart with pagination", func(t *testing.T) {
 		mock.ExpectQuery(countQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(chartlist)))
 
@@ -179,18 +162,7 @@ func TestChartList(t *testing.T) {
 				AddRow(2, time.Now(), time.Now(), nil, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
 					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["theme_id"], time.Time{}, 1))
 
-		mediumQueryMock(mock)
-
-		themeQueryMock(mock)
-
-		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
-			WithArgs(sqlmock.AnyArg()).
-			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).
-				AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, 1))
-		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_category" INNER JOIN "bi_chart_category"`)).
-			WithArgs(sqlmock.AnyArg()).
-			WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
-				AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, 1))
+		chartPreloadMock(mock)
 
 		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{
