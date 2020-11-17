@@ -59,7 +59,7 @@ func categoryInsertMock(mock sqlmock.Sqlmock) {
 //check category exits or not
 func recordNotFoundMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
-		WithArgs(100, 1).
+		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows(columns))
 }
 
@@ -72,21 +72,28 @@ func categorySelectMock(mock sqlmock.Sqlmock) {
 
 // check category associated with any chart before deleting
 func categoryChartExpect(mock sqlmock.Sqlmock, count int) {
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_chart" INNER JOIN "bi_chart_category"`)).
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(1) FROM "bi_chart" JOIN "bi_chart_category"`)).
 		WithArgs(1).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
 }
 
 func categoryUpdateMock(mock sqlmock.Sqlmock, category map[string]interface{}) {
 	mock.ExpectBegin()
-	mock.ExpectExec(`UPDATE \"bi_category\" SET (.+)  WHERE (.+) \"bi_category\".\"id\" = `).
-		WithArgs(category["name"], category["slug"], test.AnyTime{}, 1).
+	mock.ExpectExec(`UPDATE \"bi_category\"`).
+		WithArgs(test.AnyTime{}, category["name"], category["slug"], 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 }
 
+func selectAfterUpdate(mock sqlmock.Sqlmock, category map[string]interface{}) {
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1, 1).
+		WillReturnRows(sqlmock.NewRows(columns).
+			AddRow(1, time.Now(), time.Now(), nil, category["name"], category["slug"]))
+}
+
 func categoryCountQuery(mock sqlmock.Sqlmock, count int) {
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_category"`)).
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(1) FROM "bi_category"`)).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
 }
 

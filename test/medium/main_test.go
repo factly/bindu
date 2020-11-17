@@ -52,7 +52,7 @@ var byteData, _ = json.Marshal(data["url"])
 var columns = []string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_medium"`)
-var chartQuery = regexp.QuoteMeta(`SELECT count(*) FROM "bi_chart"`)
+var chartQuery = regexp.QuoteMeta(`SELECT count(1) FROM "bi_chart"`)
 var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_medium" SET "deleted_at"=`)
 var paginationQuery = `SELECT \* FROM "bi_medium" (.+) LIMIT 1 OFFSET 1`
 
@@ -75,7 +75,7 @@ func mediumChartExpect(mock sqlmock.Sqlmock, count int) {
 //check medium exits or not
 func recordNotFoundMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
-		WithArgs(100, 1).
+		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows(columns))
 }
 
@@ -94,17 +94,25 @@ func mediumInsertMock(mock sqlmock.Sqlmock) {
 }
 
 func mediumCountQuery(mock sqlmock.Sqlmock, count int) {
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_medium"`)).
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(1) FROM "bi_medium"`)).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
 }
 
 func mediumUpdateMock(mock sqlmock.Sqlmock, medium map[string]interface{}) {
 	var urlByteData, _ = json.Marshal(medium["url"])
 	mock.ExpectBegin()
-	mock.ExpectExec(`UPDATE \"bi_medium\" SET (.+)  WHERE (.+) \"bi_medium\".\"id\" = `).
-		WithArgs(medium["name"], medium["slug"], medium["type"], test.AnyTime{}, urlByteData, 1).
+	mock.ExpectExec(`UPDATE \"bi_medium\"`).
+		WithArgs(test.AnyTime{}, medium["name"], medium["slug"], medium["type"], urlByteData, 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
+}
+
+func selectAfterUpdate(mock sqlmock.Sqlmock, medium map[string]interface{}) {
+	urlByteData, _ := json.Marshal(medium["url"])
+	mock.ExpectQuery(selectQuery).
+		WithArgs(1, 1).
+		WillReturnRows(sqlmock.NewRows(columns).
+			AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], urlByteData))
 }
 
 func TestMain(m *testing.M) {

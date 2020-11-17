@@ -46,7 +46,7 @@ var path = "/themes/{theme_id}"
 //check theme exits or not
 func recordNotFoundMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
-		WithArgs(100, 1).
+		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows(columns))
 }
 
@@ -60,13 +60,13 @@ func themeSelectMock(mock sqlmock.Sqlmock) {
 
 // check theme associated with any chart before deleting
 func themeChartExpect(mock sqlmock.Sqlmock, count int) {
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_chart"`)).
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(1) FROM "bi_chart"`)).
 		WithArgs(1).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
 }
 
 func themeCountQuery(mock sqlmock.Sqlmock, count int) {
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "bi_theme"`)).
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(1) FROM "bi_theme"`)).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(count))
 }
 

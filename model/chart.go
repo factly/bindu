@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/factly/bindu-server/config"
-	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/gorm"
 )
 
 // Chart model
@@ -18,10 +18,10 @@ type Chart struct {
 	DataURL          string         `json:"data_url"`
 	Config           postgres.Jsonb `json:"config"`
 	Status           string         `json:"status"`
-	FeaturedMediumID uint           `gorm:"column:featured_medium_id" json:"featured_medium_id" sql:"DEFAULT:NULL"`
-	Medium           *Medium        `gorm:"foreignkey:featured_medium_id;association_foreignkey:id" json:"medium"`
-	ThemeID          uint           `gorm:"column:theme_id" json:"theme_id"`
-	Theme            *Theme         `gorm:"foreignkey:theme_id;association_foreignkey:id" json:"theme" sql:"DEFAULT:NULL"`
+	FeaturedMediumID *uint          `gorm:"column:featured_medium_id;default:NULL" json:"featured_medium_id"`
+	Medium           *Medium        `gorm:"foreignKey:featured_medium_id" json:"medium"`
+	ThemeID          *uint          `gorm:"column:theme_id" json:"theme_id"`
+	Theme            *Theme         `gorm:"foreignKey:theme_id;default:NULL" json:"theme"`
 	PublishedDate    time.Time      `json:"published_date"`
 	OrganisationID   uint           `json:"organisation_id"`
 	Tags             []Tag          `gorm:"many2many:chart_tag;" json:"tags"`
@@ -31,9 +31,9 @@ type Chart struct {
 // BeforeSave - to check organisation for medium & theme
 func (c *Chart) BeforeSave(tx *gorm.DB) (e error) {
 
-	if c.FeaturedMediumID > 0 {
+	if c.FeaturedMediumID != nil && *c.FeaturedMediumID > 0 {
 		medium := Medium{}
-		medium.ID = c.FeaturedMediumID
+		medium.ID = *c.FeaturedMediumID
 
 		err := tx.Model(&Medium{}).Where(Medium{
 			OrganisationID: c.OrganisationID,
@@ -44,9 +44,9 @@ func (c *Chart) BeforeSave(tx *gorm.DB) (e error) {
 		}
 	}
 
-	if c.ThemeID > 0 {
+	if c.ThemeID != nil && *c.ThemeID > 0 {
 		theme := Theme{}
-		theme.ID = c.ThemeID
+		theme.ID = *c.ThemeID
 
 		err := tx.Model(&Theme{}).Where(Theme{
 			OrganisationID: c.OrganisationID,

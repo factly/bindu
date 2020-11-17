@@ -61,9 +61,10 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if medium is associated with charts
-	var totAssociated int
+	uintID := uint(id)
+	var totAssociated int64
 	config.DB.Model(&model.Chart{}).Where(&model.Chart{
-		FeaturedMediumID: uint(id),
+		FeaturedMediumID: &uintID,
 	}).Count(&totAssociated)
 
 	if totAssociated != 0 {

@@ -11,7 +11,7 @@ import (
 
 // list response
 type paging struct {
-	Total int                  `json:"total"`
+	Total int64                `json:"total"`
 	Nodes []model.Organisation `json:"nodes"`
 }
 
@@ -41,7 +41,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 	result.Nodes = orgs
 
-	result.Total = len(orgs)
+	result.Total = int64(len(orgs))
 
 	renderx.JSON(w, http.StatusOK, result)
 }

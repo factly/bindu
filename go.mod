@@ -18,4 +18,6 @@ require (
 	github.com/swaggo/swag v1.6.7
 	google.golang.org/api v0.30.0
 	gopkg.in/h2non/gock.v1 v1.0.15
+	gorm.io/driver/postgres v1.0.5
+	gorm.io/gorm v1.20.6
 )

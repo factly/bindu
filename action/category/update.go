@@ -15,6 +15,7 @@ import (
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"gorm.io/gorm"
 )
 
 // update - Update category by id
@@ -78,14 +79,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get table name
+	stmt := &gorm.Statement{DB: config.DB}
+	_ = stmt.Parse(&model.Category{})
+	tableName := stmt.Schema.Table
+
 	var categorySlug string
 
 	if result.Slug == category.Slug {
 		categorySlug = result.Slug
 	} else if category.Slug != "" && slug.Check(category.Slug) {
-		categorySlug = slug.Approve(category.Slug, oID, config.DB.NewScope(&model.Category{}).TableName())
+		categorySlug = slug.Approve(category.Slug, oID, tableName)
 	} else {
-		categorySlug = slug.Approve(slug.Make(category.Name), oID, config.DB.NewScope(&model.Category{}).TableName())
+		categorySlug = slug.Approve(slug.Make(category.Name), oID, tableName)
 	}
 
 	config.DB.Model(&result).Updates(model.Category{

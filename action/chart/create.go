@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/factly/bindu-server/util/minio"
+	"gorm.io/gorm"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -100,6 +101,11 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get table name
+	stmt := &gorm.Statement{DB: config.DB}
+	_ = stmt.Parse(&model.Chart{})
+	tableName := stmt.Schema.Table
+
 	var chartSlug string
 	if chart.Slug != "" && slug.Check(chart.Slug) {
 		chartSlug = chart.Slug
@@ -107,23 +113,32 @@ func create(w http.ResponseWriter, r *http.Request) {
 		chartSlug = slug.Make(chart.Title)
 	}
 
+	themeID := &chart.ThemeID
+	if chart.ThemeID == 0 {
+		themeID = nil
+	}
+
 	result := &model.Chart{
 		Title:            chart.Title,
-		Slug:             slug.Approve(chartSlug, oID, config.DB.NewScope(&model.Chart{}).TableName()),
+		Slug:             slug.Approve(chartSlug, oID, tableName),
 		DataURL:          chart.DataURL,
 		Config:           chart.Config,
 		Description:      chart.Description,
 		Status:           chart.Status,
-		FeaturedMediumID: medium.ID,
-		ThemeID:          chart.ThemeID,
+		FeaturedMediumID: &medium.ID,
+		ThemeID:          themeID,
 		PublishedDate:    chart.PublishedDate,
 		OrganisationID:   uint(oID),
 	}
 
-	tx.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
-	tx.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
+	if len(chart.TagIDs) > 0 {
+		tx.Model(&model.Tag{}).Where(chart.TagIDs).Find(&result.Tags)
+	}
+	if len(chart.CategoryIDs) > 0 {
+		tx.Model(&model.Category{}).Where(chart.CategoryIDs).Find(&result.Categories)
+	}
 
-	err = tx.Model(&model.Chart{}).Set("gorm:association_autoupdate", false).Create(&result).Error
+	err = tx.Model(&model.Chart{}).Create(&result).Error
 
 	if err != nil {
 		tx.Rollback()

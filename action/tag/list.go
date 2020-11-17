@@ -11,7 +11,7 @@ import (
 
 // list response
 type paging struct {
-	Total int         `json:"total"`
+	Total int64       `json:"total"`
 	Nodes []model.Tag `json:"nodes"`
 }
 

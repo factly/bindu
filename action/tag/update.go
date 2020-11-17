@@ -15,6 +15,7 @@ import (
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"gorm.io/gorm"
 )
 
 // update - Update tag by id
@@ -77,14 +78,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get table name
+	stmt := &gorm.Statement{DB: config.DB}
+	_ = stmt.Parse(&model.Tag{})
+	tableName := stmt.Schema.Table
+
 	var tagSlug string
 
 	if result.Slug == tag.Slug {
 		tagSlug = result.Slug
 	} else if tag.Slug != "" && slug.Check(tag.Slug) {
-		tagSlug = slug.Approve(tag.Slug, oID, config.DB.NewScope(&model.Tag{}).TableName())
+		tagSlug = slug.Approve(tag.Slug, oID, tableName)
 	} else {
-		tagSlug = slug.Approve(slug.Make(tag.Name), oID, config.DB.NewScope(&model.Tag{}).TableName())
+		tagSlug = slug.Approve(slug.Make(tag.Name), oID, tableName)
 	}
 
 	config.DB.Model(&result).Updates(model.Tag{

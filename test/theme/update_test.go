@@ -83,13 +83,13 @@ func TestThemeUpdate(t *testing.T) {
 		themeSelectMock(mock)
 
 		mock.ExpectBegin()
-		mock.ExpectExec(`UPDATE \"bi_theme\" SET (.+)  WHERE (.+) \"bi_theme\".\"id\" = `).
-			WithArgs(updatedByteData, updatedTheme["name"], test.AnyTime{}, 1).
+		mock.ExpectExec(`UPDATE \"bi_theme\"`).
+			WithArgs(test.AnyTime{}, updatedTheme["name"], updatedByteData, 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
 		mock.ExpectQuery(selectQuery).
-			WithArgs(1).
+			WithArgs(1, 1).
 			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, updatedTheme["name"], updatedByteData))
 

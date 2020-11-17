@@ -46,37 +46,6 @@ var res = map[string]interface{}{
 	"published_date": time.Time{},
 }
 
-func chartInsertMock(mock sqlmock.Sqlmock) {
-	mock.ExpectQuery(mediumQuery).
-		WithArgs(1, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], byteMediumData))
-	mock.ExpectQuery(themeQuery).
-		WithArgs(1, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}).
-			AddRow(1, time.Now(), time.Now(), nil, 1, theme["name"], byteThemeData))
-	mock.ExpectQuery(`INSERT INTO "bi_chart"`).
-		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, data["title"], data["slug"], byteDescriptionData,
-			data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
-	mock.ExpectExec(`INSERT INTO "bi_chart_tag"`).
-		WithArgs(1, 1, 1, 1).
-		WillReturnResult(sqlmock.NewResult(0, 1))
-	mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
-		WithArgs(1, 1, 1, 1).
-		WillReturnResult(sqlmock.NewResult(0, 1))
-}
-
-func chartPreloadMock(mock sqlmock.Sqlmock) {
-	mediumQueryMock(mock)
-
-	themeQueryMock(mock)
-
-	tagQueryMock(mock)
-
-	categoryQueryMock(mock)
-}
-
 func TestChartCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
