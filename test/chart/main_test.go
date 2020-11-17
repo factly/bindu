@@ -188,38 +188,63 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	chartPreloadMock(mock)
 }
 
-func chartTagUpdate(mock sqlmock.Sqlmock) {
+func chartTagUpdate(mock sqlmock.Sqlmock, err error) {
 	tagQueryMock(mock)
 	mediumQueryMock(mock)
 	themeQueryMock(mock)
 
-	mock.ExpectQuery(`INSERT INTO "bi_tag"`).
-		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "Elections", "elections", "", 1, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
-	mock.ExpectExec(`INSERT INTO "bi_chart_tag"`).
-		WithArgs(1, 1).
-		WillReturnResult(sqlmock.NewResult(0, 1))
+	if err != nil {
+		mock.ExpectQuery(`INSERT INTO "bi_tag"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "Elections", "elections", "", 1, 1).
+			WillReturnError(err)
+		mock.ExpectExec(`INSERT INTO "bi_chart_tag"`).
+			WithArgs(1, 1).
+			WillReturnError(err)
+		mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_tag"`)).
+			WithArgs(1, 1).
+			WillReturnError(err)
+	} else {
+		mock.ExpectQuery(`INSERT INTO "bi_tag"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "Elections", "elections", "", 1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+		mock.ExpectExec(`INSERT INTO "bi_chart_tag"`).
+			WithArgs(1, 1).
+			WillReturnResult(sqlmock.NewResult(0, 1))
 
-	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_tag"`)).
-		WithArgs(1, 1).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_tag"`)).
+			WithArgs(1, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+	}
 }
 
-func chartCategoryUpdate(mock sqlmock.Sqlmock) {
+func chartCategoryUpdate(mock sqlmock.Sqlmock, err error) {
 	categoryQueryMock(mock)
 	mediumQueryMock(mock)
 	themeQueryMock(mock)
 
-	mock.ExpectQuery(`INSERT INTO "bi_category"`).
-		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "Elections", "elections", "", 1, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
-	mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
-		WithArgs(1, 1).
-		WillReturnResult(sqlmock.NewResult(0, 1))
+	if err != nil {
+		mock.ExpectQuery(`INSERT INTO "bi_category"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "Elections", "elections", "", 1, 1).
+			WillReturnError(err)
+		mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
+			WithArgs(1, 1).
+			WillReturnError(err)
 
-	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_category"`)).
-		WithArgs(1, 1).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_category"`)).
+			WithArgs(1, 1).
+			WillReturnError(err)
+	} else {
+		mock.ExpectQuery(`INSERT INTO "bi_category"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "Elections", "elections", "", 1, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+		mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
+			WithArgs(1, 1).
+			WillReturnResult(sqlmock.NewResult(0, 1))
+
+		mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_category"`)).
+			WithArgs(1, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+	}
 }
 
 func chartUpdateMock(mock sqlmock.Sqlmock, chart map[string]interface{}) {

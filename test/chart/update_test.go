@@ -1,6 +1,8 @@
 package chart
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -136,8 +138,8 @@ func TestChartUpdate(t *testing.T) {
 		chartSelectMock(mock)
 
 		mock.ExpectBegin()
-		chartTagUpdate(mock)
-		chartCategoryUpdate(mock)
+		chartTagUpdate(mock, nil)
+		chartCategoryUpdate(mock, nil)
 
 		mediumQueryMock(mock)
 		themeQueryMock(mock)
@@ -154,7 +156,7 @@ func TestChartUpdate(t *testing.T) {
 			WithJSON(updateChart).
 			Expect().
 			Status(http.StatusOK).JSON().Object().ContainsMap(res)
-
+		test.ExpectationsMet(t, mock)
 	})
 	t.Run("update chart with different slug", func(t *testing.T) {
 		updateChart := updateData
@@ -167,8 +169,8 @@ func TestChartUpdate(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
 
 		mock.ExpectBegin()
-		chartTagUpdate(mock)
-		chartCategoryUpdate(mock)
+		chartTagUpdate(mock, nil)
+		chartCategoryUpdate(mock, nil)
 
 		mediumQueryMock(mock)
 		themeQueryMock(mock)
@@ -196,8 +198,8 @@ func TestChartUpdate(t *testing.T) {
 		slugCheckMock(mock)
 
 		mock.ExpectBegin()
-		chartTagUpdate(mock)
-		chartCategoryUpdate(mock)
+		chartTagUpdate(mock, nil)
+		chartCategoryUpdate(mock, nil)
 
 		mediumQueryMock(mock)
 		themeQueryMock(mock)
@@ -219,4 +221,118 @@ func TestChartUpdate(t *testing.T) {
 		test.ExpectationsMet(t, mock)
 	})
 
+	t.Run("update chart when medium id = 0", func(t *testing.T) {
+		updateChart := updateData
+		description, _ := json.Marshal(updateChart["description"])
+		config, _ := json.Marshal(updateChart["config"])
+		updateChart["slug"] = "pie"
+
+		chartSelectMock(mock)
+
+		mock.ExpectBegin()
+		chartTagUpdate(mock, nil)
+		chartCategoryUpdate(mock, nil)
+
+		themeQueryMock(mock)
+		mock.ExpectExec(`UPDATE \"bi_chart\"`).
+			WithArgs(nil, test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		themeQueryMock(mock)
+		mock.ExpectExec(`UPDATE \"bi_chart\"`).
+			WithArgs(test.AnyTime{}, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["theme_id"], 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		res["slug"] = "pie"
+		selectAfterUpdate(mock, res)
+
+		mock.ExpectCommit()
+
+		updateChart["featured_medium_id"] = 0
+		e.PUT(path).
+			WithPath("chart_id", 1).
+			WithHeaders(headers).
+			WithJSON(updateChart).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(res)
+		updateChart["featured_medium_id"] = 1
+		test.ExpectationsMet(t, mock)
+	})
+
+	t.Run("update chart when theme id = 0", func(t *testing.T) {
+		updateChart := updateData
+		description, _ := json.Marshal(updateChart["description"])
+		config, _ := json.Marshal(updateChart["config"])
+		updateChart["slug"] = "pie"
+
+		chartSelectMock(mock)
+
+		mock.ExpectBegin()
+		chartTagUpdate(mock, nil)
+		chartCategoryUpdate(mock, nil)
+
+		mediumQueryMock(mock)
+		mock.ExpectExec(`UPDATE \"bi_chart\"`).
+			WithArgs(nil, test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		mediumQueryMock(mock)
+		mock.ExpectExec(`UPDATE \"bi_chart\"`).
+			WithArgs(test.AnyTime{}, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		res["slug"] = "pie"
+		selectAfterUpdate(mock, res)
+
+		mock.ExpectCommit()
+
+		updateChart["theme_id"] = 0
+		e.PUT(path).
+			WithPath("chart_id", 1).
+			WithHeaders(headers).
+			WithJSON(updateChart).
+			Expect().
+			Status(http.StatusOK).JSON().Object().ContainsMap(res)
+		updateChart["theme_id"] = 1
+		test.ExpectationsMet(t, mock)
+	})
+
+	t.Run("updating chart tags fail", func(t *testing.T) {
+		updateChart := updateData
+		updateChart["slug"] = "pie"
+
+		chartSelectMock(mock)
+
+		mock.ExpectBegin()
+		chartTagUpdate(mock, errors.New("cannot update chart tags"))
+
+		mock.ExpectRollback()
+
+		e.PUT(path).
+			WithPath("chart_id", 1).
+			WithHeaders(headers).
+			WithJSON(updateChart).
+			Expect().
+			Status(http.StatusInternalServerError)
+		test.ExpectationsMet(t, mock)
+	})
+
+	t.Run("updating chart categories fail", func(t *testing.T) {
+		updateChart := updateData
+		updateChart["slug"] = "pie"
+
+		chartSelectMock(mock)
+
+		mock.ExpectBegin()
+		chartTagUpdate(mock, nil)
+		chartCategoryUpdate(mock, errors.New("cannot update chart categories"))
+
+		mock.ExpectRollback()
+
+		e.PUT(path).
+			WithPath("chart_id", 1).
+			WithHeaders(headers).
+			WithJSON(updateChart).
+			Expect().
+			Status(http.StatusInternalServerError)
+		test.ExpectationsMet(t, mock)
+	})
 }
