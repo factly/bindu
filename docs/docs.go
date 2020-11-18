@@ -77,7 +77,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Category"
+                                "$ref": "#/definitions/category.paging"
                             }
                         }
                     }
@@ -855,7 +855,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Tag"
+                                "$ref": "#/definitions/tag.paging"
                             }
                         }
                     }
@@ -1097,7 +1097,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Theme"
+                                "$ref": "#/definitions/theme.paging"
                             }
                         }
                     }
@@ -1313,10 +1313,23 @@ var doc = `{
                 }
             }
         },
+        "category.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Category"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "chart.chart": {
             "type": "object",
             "required": [
-                "theme_id",
                 "title"
             ],
             "properties": {
@@ -1333,6 +1346,9 @@ var doc = `{
                     "type": "string"
                 },
                 "description": {
+                    "type": "string"
+                },
+                "featured_medium": {
                     "type": "string"
                 },
                 "featured_medium_id": {
@@ -1454,7 +1470,6 @@ var doc = `{
                     "type": "integer"
                 },
                 "medium": {
-                    "type": "object",
                     "$ref": "#/definitions/model.Medium"
                 },
                 "organisation_id": {
@@ -1476,7 +1491,6 @@ var doc = `{
                     }
                 },
                 "theme": {
-                    "type": "object",
                     "$ref": "#/definitions/model.Theme"
                 },
                 "theme_id": {
@@ -1535,7 +1549,6 @@ var doc = `{
                     "type": "integer"
                 },
                 "permission": {
-                    "type": "object",
                     "$ref": "#/definitions/model.organisationUser"
                 },
                 "slug": {
@@ -1633,6 +1646,20 @@ var doc = `{
                 }
             }
         },
+        "tag.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Tag"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "tag.tag": {
             "type": "object",
             "required": [
@@ -1647,6 +1674,20 @@ var doc = `{
                 },
                 "slug": {
                     "type": "string"
+                }
+            }
+        },
+        "theme.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Theme"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

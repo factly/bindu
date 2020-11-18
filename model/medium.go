@@ -11,6 +11,6 @@ type Medium struct {
 	Name           string         `json:"name"`
 	Slug           string         `json:"slug"`
 	Type           string         `json:"type"`
-	URL            postgres.Jsonb `json:"url"`
+	URL            postgres.Jsonb `json:"url" swaggertype:"primitive,string"`
 	OrganisationID uint           `json:"organisation_id"`
 }

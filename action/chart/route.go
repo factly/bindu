@@ -12,8 +12,8 @@ type chart struct {
 	Title            string         `json:"title" validate:"required,min=3,max=50"`
 	Slug             string         `json:"slug"`
 	DataURL          string         `json:"data_url"`
-	Config           postgres.Jsonb `json:"config"`
-	Description      postgres.Jsonb `json:"description"`
+	Config           postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
+	Description      postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
 	Status           string         `json:"status"`
 	FeaturedMedium   string         `json:"featured_medium"`
 	FeaturedMediumID uint           `json:"featured_medium_id"`

@@ -62,7 +62,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Category"
+                                "$ref": "#/definitions/category.paging"
                             }
                         }
                     }
@@ -840,7 +840,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Tag"
+                                "$ref": "#/definitions/tag.paging"
                             }
                         }
                     }
@@ -1082,7 +1082,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Theme"
+                                "$ref": "#/definitions/theme.paging"
                             }
                         }
                     }
@@ -1298,10 +1298,23 @@
                 }
             }
         },
+        "category.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Category"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "chart.chart": {
             "type": "object",
             "required": [
-                "theme_id",
                 "title"
             ],
             "properties": {
@@ -1318,6 +1331,9 @@
                     "type": "string"
                 },
                 "description": {
+                    "type": "string"
+                },
+                "featured_medium": {
                     "type": "string"
                 },
                 "featured_medium_id": {
@@ -1439,7 +1455,6 @@
                     "type": "integer"
                 },
                 "medium": {
-                    "type": "object",
                     "$ref": "#/definitions/model.Medium"
                 },
                 "organisation_id": {
@@ -1461,7 +1476,6 @@
                     }
                 },
                 "theme": {
-                    "type": "object",
                     "$ref": "#/definitions/model.Theme"
                 },
                 "theme_id": {
@@ -1520,7 +1534,6 @@
                     "type": "integer"
                 },
                 "permission": {
-                    "type": "object",
                     "$ref": "#/definitions/model.organisationUser"
                 },
                 "slug": {
@@ -1618,6 +1631,20 @@
                 }
             }
         },
+        "tag.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Tag"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "tag.tag": {
             "type": "object",
             "required": [
@@ -1632,6 +1659,20 @@
                 },
                 "slug": {
                     "type": "string"
+                }
+            }
+        },
+        "theme.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Theme"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

@@ -14,9 +14,9 @@ type Chart struct {
 	config.Base
 	Title            string         `json:"title"`
 	Slug             string         `json:"slug"`
-	Description      postgres.Jsonb `json:"description" sql:"jsonb"`
+	Description      postgres.Jsonb `json:"description" sql:"jsonb" swaggertype:"primitive,string"`
 	DataURL          string         `json:"data_url"`
-	Config           postgres.Jsonb `json:"config"`
+	Config           postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
 	Status           string         `json:"status"`
 	FeaturedMediumID *uint          `gorm:"column:featured_medium_id;default:NULL" json:"featured_medium_id"`
 	Medium           *Medium        `gorm:"foreignKey:featured_medium_id" json:"medium"`
