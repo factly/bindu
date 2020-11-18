@@ -10,7 +10,7 @@ type medium struct {
 	Name string         `json:"name" validate:"required,min=3,max=50"`
 	Slug string         `json:"slug"`
 	Type string         `json:"type"`
-	URL  postgres.Jsonb `json:"url"`
+	URL  postgres.Jsonb `json:"url" swaggertype:"primitive,string"`
 }
 
 // Router - Group of medium router

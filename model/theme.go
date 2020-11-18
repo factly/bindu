@@ -9,6 +9,6 @@ import (
 type Theme struct {
 	config.Base
 	Name           string         `json:"name" validate:"required"`
-	Config         postgres.Jsonb `json:"config"`
+	Config         postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
 	OrganisationID uint           `json:"organisation_id"`
 }

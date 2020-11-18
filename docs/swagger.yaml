@@ -11,6 +11,15 @@ definitions:
     required:
     - name
     type: object
+  category.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Category'
+        type: array
+      total:
+        type: integer
+    type: object
   chart.chart:
     properties:
       category_ids:
@@ -22,6 +31,8 @@ definitions:
       data_url:
         type: string
       description:
+        type: string
+      featured_medium:
         type: string
       featured_medium_id:
         type: integer
@@ -42,7 +53,6 @@ definitions:
       title:
         type: string
     required:
-    - theme_id
     - title
     type: object
   medium.medium:
@@ -106,7 +116,6 @@ definitions:
         type: integer
       medium:
         $ref: '#/definitions/model.Medium'
-        type: object
       organisation_id:
         type: integer
       published_date:
@@ -121,7 +130,6 @@ definitions:
         type: array
       theme:
         $ref: '#/definitions/model.Theme'
-        type: object
       theme_id:
         type: integer
       title:
@@ -160,7 +168,6 @@ definitions:
         type: integer
       permission:
         $ref: '#/definitions/model.organisationUser'
-        type: object
       slug:
         type: string
       title:
@@ -223,6 +230,15 @@ definitions:
       updated_at:
         type: string
     type: object
+  tag.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Tag'
+        type: array
+      total:
+        type: integer
+    type: object
   tag.tag:
     properties:
       description:
@@ -233,6 +249,15 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  theme.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Theme'
+        type: array
+      total:
+        type: integer
     type: object
   theme.theme:
     properties:
@@ -288,7 +313,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Category'
+              $ref: '#/definitions/category.paging'
             type: array
       summary: Show all categories
       tags:
@@ -818,7 +843,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Tag'
+              $ref: '#/definitions/tag.paging'
             type: array
       summary: Show all tags
       tags:
@@ -983,7 +1008,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Theme'
+              $ref: '#/definitions/theme.paging'
             type: array
       summary: Show all themes
       tags:
