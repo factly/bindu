@@ -154,7 +154,7 @@ function Chart() {
               }}
             </Form.Item>
           </div>
-          <div className="option-container" style={{ right: showOptions ? '0' : '-250px' }}>
+          <div className="option-container" style={{ right: showOptions ? '0' : '-400px' }}>
             <ChartOption form={form} />
           </div>
         </Card>

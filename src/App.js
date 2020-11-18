@@ -6,6 +6,12 @@ import './App.css';
 import 'antd/dist/antd.css';
 import Home from './pages/home/index.js';
 import Templates from './pages/templates/index.js';
+import Tags from './pages/tags/index.js';
+import TagsCreate from './pages/tags/CreateTag';
+import TagsEdit from './pages/tags/EditTag';
+import Categories from './pages/categories/index.js';
+import CategoriesCreate from './pages/categories/CreateCategory';
+import CategoriesEdit from './pages/categories/EditCategory';
 import Chart from './pages/charts/index.js';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
@@ -22,6 +28,30 @@ const routes = [
   {
     path: '/',
     Component: Home,
+  },
+  {
+    path: '/tags',
+    Component: Tags,
+  },
+  {
+    path: '/tags/:id/edit',
+    Component: TagsEdit,
+  },
+  {
+    path: '/tags/create',
+    Component: TagsCreate,
+  },
+  {
+    path: '/categories',
+    Component: Categories,
+  },
+  {
+    path: '/categories/create',
+    Component: CategoriesCreate,
+  },
+  {
+    path: '/categories/:id/edit',
+    Component: CategoriesEdit,
   },
 ];
 
