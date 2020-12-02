@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -35,10 +36,16 @@ import (
 func create(w http.ResponseWriter, r *http.Request) {
 
 	oID, err := util.GetOrganisation(r.Context())
-
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -90,7 +97,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		OrganisationID: uint(oID),
 	}
 
-	tx := config.DB.Begin()
+	tx := config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 
 	err = tx.Model(&model.Medium{}).Create(&medium).Error
 

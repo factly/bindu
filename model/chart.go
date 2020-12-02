@@ -71,3 +71,20 @@ func (c *Chart) BeforeSave(tx *gorm.DB) (e error) {
 
 	return nil
 }
+
+var chartUser config.ContextKey = "chart_user"
+
+// BeforeCreate hook
+func (chart *Chart) BeforeCreate(tx *gorm.DB) error {
+	ctx := tx.Statement.Context
+	userID := ctx.Value(chartUser)
+
+	if userID == nil {
+		return nil
+	}
+	uID := userID.(int)
+
+	chart.CreatedByID = uint(uID)
+	chart.UpdatedByID = uint(uID)
+	return nil
+}

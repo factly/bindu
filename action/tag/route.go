@@ -1,6 +1,9 @@
 package tag
 
-import "github.com/go-chi/chi"
+import (
+	"github.com/factly/bindu-server/config"
+	"github.com/go-chi/chi"
+)
 
 // tag model
 type tag struct {
@@ -8,6 +11,8 @@ type tag struct {
 	Slug        string `json:"slug"`
 	Description string `json:"description"`
 }
+
+var userContext config.ContextKey = "tag_user"
 
 // Router - Group of tag router
 func Router() chi.Router {

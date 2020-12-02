@@ -42,12 +42,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	oID, err := util.GetOrganisation(r.Context())
-
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
+
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
 	medium := &medium{}
 	err = json.NewDecoder(r.Body).Decode(&medium)
 	if err != nil {
@@ -94,10 +101,17 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.DB.Model(&result).Updates(model.Medium{
-		Name: medium.Name,
-		Slug: mediumSlug,
-		Type: medium.Type,
-		URL:  medium.URL,
+		Base:        config.Base{UpdatedByID: uint(uID)},
+		Name:        medium.Name,
+		Slug:        mediumSlug,
+		Title:       medium.Title,
+		Type:        medium.Type,
+		Description: medium.Description,
+		AltText:     medium.AltText,
+		Caption:     medium.Caption,
+		FileSize:    medium.FileSize,
+		URL:         medium.URL,
+		Dimensions:  medium.Dimensions,
 	}).First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)

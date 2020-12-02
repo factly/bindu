@@ -1,6 +1,7 @@
 package medium
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -32,10 +33,16 @@ import (
 func create(w http.ResponseWriter, r *http.Request) {
 
 	oID, err := util.GetOrganisation(r.Context())
-
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -71,12 +78,18 @@ func create(w http.ResponseWriter, r *http.Request) {
 	result := &model.Medium{
 		Name:           medium.Name,
 		Slug:           slug.Approve(mediumSlug, oID, tableName),
+		Title:          medium.Title,
 		Type:           medium.Type,
+		Description:    medium.Description,
+		Caption:        medium.Caption,
+		AltText:        medium.AltText,
+		FileSize:       medium.FileSize,
 		URL:            medium.URL,
+		Dimensions:     medium.Dimensions,
 		OrganisationID: uint(oID),
 	}
 
-	err = config.DB.Model(&model.Medium{}).Create(&result).Error
+	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Medium{}).Create(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)

@@ -42,12 +42,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	oID, err := util.GetOrganisation(r.Context())
-
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
+
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
 	tag := &tag{}
 	err = json.NewDecoder(r.Body).Decode(&tag)
 
@@ -94,6 +101,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.DB.Model(&result).Updates(model.Tag{
+		Base:        config.Base{UpdatedByID: uint(uID)},
 		Name:        tag.Name,
 		Slug:        tagSlug,
 		Description: tag.Description,

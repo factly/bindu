@@ -40,12 +40,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	oID, err := util.GetOrganisation(r.Context())
-
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
+
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
 	theme := &theme{}
 
 	err = json.NewDecoder(r.Body).Decode(&theme)
@@ -78,6 +85,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.DB.Model(&result).Updates(model.Theme{
+		Base:   config.Base{UpdatedByID: uint(uID)},
 		Name:   theme.Name,
 		Config: theme.Config,
 	}).First(&result)

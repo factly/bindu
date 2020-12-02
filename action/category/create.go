@@ -1,6 +1,7 @@
 package category
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -32,10 +33,16 @@ import (
 func create(w http.ResponseWriter, r *http.Request) {
 
 	oID, err := util.GetOrganisation(r.Context())
-
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -76,7 +83,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		OrganisationID: uint(oID),
 	}
 
-	err = config.DB.Model(&model.Category{}).Create(&result).Error
+	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Category{}).Create(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)
