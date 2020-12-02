@@ -27,7 +27,7 @@ func TestCategoryDetails(t *testing.T) {
 			WithPath("category_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 	})
 
 	t.Run("category record not found", func(t *testing.T) {

@@ -30,7 +30,7 @@ func TestTagUpdate(t *testing.T) {
 			WithPath("tag_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 	})
 
 	t.Run("cannot decode tag", func(t *testing.T) {

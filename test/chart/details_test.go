@@ -27,7 +27,7 @@ func TestChartDetails(t *testing.T) {
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 	})
 
 	t.Run("chart record not found", func(t *testing.T) {

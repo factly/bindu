@@ -3,6 +3,9 @@ package action
 import (
 	"fmt"
 
+	"github.com/factly/x/healthx"
+
+	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
@@ -45,13 +48,18 @@ func RegisterRoutes() *chi.Mux {
 		fmt.Println("Swagger @ http://localhost:7000/swagger/index.html")
 	}
 
-	r.With(util.CheckUser, util.CheckOrganisation).Group(func(r chi.Router) {
+	r.With(util.GormRequestID, util.CheckUser, util.CheckOrganisation).Group(func(r chi.Router) {
 		r.Mount("/categories", category.Router())
 		r.Mount("/charts", chart.Router())
 		r.Mount("/media", medium.Router())
 		r.Mount("/organisations", organisation.Router())
 		r.Mount("/tags", tag.Router())
 		r.Mount("/themes", theme.Router())
+	})
+
+	sqlDB, _ := config.DB.DB()
+	healthx.RegisterRoutes(r, healthx.ReadyCheckers{
+		"database": sqlDB.Ping,
 	})
 
 	return r

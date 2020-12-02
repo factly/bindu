@@ -27,7 +27,7 @@ func TestThemeDetails(t *testing.T) {
 			WithPath("theme_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 	})
 
 	t.Run("theme record not found", func(t *testing.T) {
