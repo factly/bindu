@@ -30,7 +30,7 @@ func TestCategoryUpdate(t *testing.T) {
 			WithPath("category_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 	})
 
 	t.Run("cannot decode category", func(t *testing.T) {

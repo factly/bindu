@@ -32,6 +32,7 @@ var headers = map[string]string{
 
 func TestOrganisationList(t *testing.T) {
 	test.SetEnv()
+	_ = test.SetupMockDB()
 	defer gock.Disable()
 	test.MockServer()
 	defer gock.DisableNetworking()

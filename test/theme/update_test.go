@@ -43,7 +43,7 @@ func TestThemeUpdate(t *testing.T) {
 			WithPath("theme_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 	})
 
 	t.Run("cannot decode theme", func(t *testing.T) {

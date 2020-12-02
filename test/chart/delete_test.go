@@ -29,7 +29,7 @@ func TestChartDelete(t *testing.T) {
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 
 	})
 
