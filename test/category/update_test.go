@@ -98,7 +98,7 @@ func TestCategoryUpdate(t *testing.T) {
 		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_category"`).
 			WithArgs("politics%", 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, "Politics", "politics"))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, "Politics", "politics"))
 
 		categoryUpdateMock(mock, updatedCategory)
 

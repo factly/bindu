@@ -5,25 +5,28 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"gopkg.in/h2non/gock.v1"
 )
 
 var updateData = map[string]interface{}{
-	"name": "Politics",
-	"type": "jpg",
-	"url": `{"image": { 
-		"src": "Images/politics/Sun.png",
-		"name": "sun1",
-		"hOffset": 250,
-		"vOffset": 250,
-		"alignment": "center"
-	}}`,
+	"name":        "Image",
+	"slug":        "image",
+	"type":        "jpg",
+	"title":       "Sample image",
+	"description": "desc",
+	"caption":     "sample",
+	"alt_text":    "sample",
+	"file_size":   100,
+	"url": postgres.Jsonb{
+		RawMessage: []byte(`{"raw":"http://testimage.com/test.jpg"}`),
+	},
+	"dimensions": "testdims",
 }
 
 func TestMediumUpdate(t *testing.T) {
@@ -36,17 +39,6 @@ func TestMediumUpdate(t *testing.T) {
 
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
-	res := map[string]interface{}{
-		"name": "Politics",
-		"type": "jpg",
-		"url": `{"image": { 
-			"src": "Images/politics/Sun.png",
-			"name": "sun1",
-			"hOffset": 250,
-			"vOffset": 250,
-			"alignment": "center"
-		}}`,
-	}
 
 	t.Run("invalid medium id", func(t *testing.T) {
 		e.PUT(path).
@@ -88,56 +80,50 @@ func TestMediumUpdate(t *testing.T) {
 	})
 	t.Run("update medium", func(t *testing.T) {
 		updatedMedium := updateData
-		updatedMedium["slug"] = "politics"
+		updatedMedium["slug"] = "image"
 
 		mediumSelectMock(mock)
 
 		mediumUpdateMock(mock, updatedMedium)
-		res["slug"] = "politics"
 
-		selectAfterUpdate(mock, res)
+		selectAfterUpdate(mock, updateData)
 
 		e.PUT(path).
 			WithPath("medium_id", 1).
 			WithHeaders(headers).
 			WithJSON(updatedMedium).
 			Expect().
-			Status(http.StatusOK).JSON().Object().ContainsMap(res)
+			Status(http.StatusOK).JSON().Object().ContainsMap(updateData)
 
 	})
 
 	t.Run("update medium by id with empty slug", func(t *testing.T) {
 		updatedMedium := updateData
-		updatedMedium["slug"] = "politics-1"
+		updatedMedium["slug"] = "image"
 
 		mediumSelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_medium"`).
-			WithArgs("politics%", 1).
-			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, updatedMedium["name"], "politics", updatedMedium["type"], byteData))
-
+			WithArgs("image%", 1).
+			WillReturnRows(sqlmock.NewRows(columns))
 		mediumUpdateMock(mock, updatedMedium)
 
-		res["slug"] = "politics-1"
+		selectAfterUpdate(mock, updatedMedium)
 
-		selectAfterUpdate(mock, res)
-
-		updatedMedium["slug"] = ""
-
+		data["slug"] = ""
 		e.PUT(path).
 			WithPath("medium_id", 1).
 			WithHeaders(headers).
-			WithJSON(updatedMedium).
+			WithJSON(data).
 			Expect().
-			Status(http.StatusOK).JSON().Object().ContainsMap(res)
-
+			Status(http.StatusOK).JSON().Object().ContainsMap(updatedMedium)
+		data["slug"] = "image"
 	})
 
 	t.Run("update medium with different slug", func(t *testing.T) {
 
 		updatedMedium := updateData
-		updatedMedium["slug"] = "politics-test"
+		updatedMedium["slug"] = "image-test"
 
 		mediumSelectMock(mock)
 
@@ -147,16 +133,16 @@ func TestMediumUpdate(t *testing.T) {
 
 		mediumUpdateMock(mock, updatedMedium)
 
-		res["slug"] = "politics-test"
-		selectAfterUpdate(mock, res)
+		selectAfterUpdate(mock, updatedMedium)
 
+		updateData["slug"] = "image-test"
 		e.PUT(path).
 			WithPath("medium_id", 1).
 			WithHeaders(headers).
-			WithJSON(updatedMedium).
+			WithJSON(updateData).
 			Expect().
-			Status(http.StatusOK).JSON().Object().ContainsMap(res)
-
+			Status(http.StatusOK).JSON().Object().ContainsMap(updateData)
+		updateData["slug"] = "image"
 	})
 
 }

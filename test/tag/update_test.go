@@ -97,7 +97,7 @@ func TestTagUpdate(t *testing.T) {
 		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_tag"`).
 			WithArgs("elections%", 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, updatedTag["name"], "elections"))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, updatedTag["name"], "elections"))
 
 		tagUpdateMock(mock, updatedTag)
 

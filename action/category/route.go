@@ -1,6 +1,9 @@
 package category
 
-import "github.com/go-chi/chi"
+import (
+	"github.com/factly/bindu-server/config"
+	"github.com/go-chi/chi"
+)
 
 // category request model
 type category struct {
@@ -8,6 +11,8 @@ type category struct {
 	Slug        string `json:"slug"`
 	Description string `json:"description"`
 }
+
+var userContext config.ContextKey = "category_user"
 
 // Router - Group of category router
 func Router() chi.Router {

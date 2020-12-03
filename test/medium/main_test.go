@@ -1,12 +1,13 @@
 package medium
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/jinzhu/gorm/dialects/postgres"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util/test"
@@ -22,34 +23,35 @@ var invalidData = map[string]interface{}{
 }
 
 var data = map[string]interface{}{
-	"name": "Politics",
-	"slug": "politics",
-	"type": "jpg",
-	"url": `{"image": { 
-        "src": "Images/Sun.png",
-        "name": "sun1",
-        "hOffset": 250,
-        "vOffset": 250,
-        "alignment": "center"
-    }}`,
+	"name":        "Image",
+	"slug":        "image",
+	"type":        "jpg",
+	"title":       "Sample image",
+	"description": "desc",
+	"caption":     "sample",
+	"alt_text":    "sample",
+	"file_size":   100,
+	"url": postgres.Jsonb{
+		RawMessage: []byte(`{"raw":"http://testimage.com/test.jpg"}`),
+	},
+	"dimensions": "testdims",
 }
 
 var mediumWithoutSlug = map[string]interface{}{
-	"name": "Politics",
-	"slug": "",
-	"type": "jpg",
-	"url": `{"image": { 
-        "src": "Images/Sun.png",
-        "name": "sun1",
-        "hOffset": 250,
-        "vOffset": 250,
-        "alignment": "center"
-    }}`,
+	"name":        "Image",
+	"type":        "jpg",
+	"title":       "Sample image",
+	"description": "desc",
+	"caption":     "sample",
+	"alt_text":    "sample",
+	"file_size":   100,
+	"url": postgres.Jsonb{
+		RawMessage: []byte(`{"raw":"http://testimage.com/test.jpg"}`),
+	},
+	"dimensions": "testdims",
 }
 
-var byteData, _ = json.Marshal(data["url"])
-
-var columns = []string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug", "type", "url"}
+var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "name", "slug", "type", "title", "description", "caption", "alt_text", "file_size", "url", "dimensions", "organisation_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_medium"`)
 var chartQuery = regexp.QuoteMeta(`SELECT count(1) FROM "bi_chart"`)
@@ -63,7 +65,7 @@ func mediumSelectMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, 1, data["name"], data["slug"], data["type"], byteData))
+			AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["name"], data["slug"], data["type"], data["title"], data["description"], data["caption"], data["alt_text"], data["file_size"], data["url"], data["dimensions"], 1))
 }
 
 func mediumChartExpect(mock sqlmock.Sqlmock, count int) {
@@ -82,14 +84,16 @@ func recordNotFoundMock(mock sqlmock.Sqlmock) {
 func slugCheckMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT slug, organisation_id FROM "bi_medium"`)).
 		WithArgs(fmt.Sprint(data["slug"], "%"), 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "slug"}))
+		WillReturnRows(sqlmock.NewRows(columns))
 }
 
 func mediumInsertMock(mock sqlmock.Sqlmock) {
 	mock.ExpectBegin()
 	mock.ExpectQuery(`INSERT INTO "bi_medium"`).
-		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, data["name"], data["slug"], data["type"], byteData, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["name"], data["slug"], data["type"], data["title"], data["description"], data["caption"], data["alt_text"], data["file_size"], data["url"], data["dimensions"], 1).
+		WillReturnRows(sqlmock.
+			NewRows([]string{"id"}).
+			AddRow(1))
 	mock.ExpectCommit()
 }
 
@@ -99,20 +103,18 @@ func mediumCountQuery(mock sqlmock.Sqlmock, count int) {
 }
 
 func mediumUpdateMock(mock sqlmock.Sqlmock, medium map[string]interface{}) {
-	var urlByteData, _ = json.Marshal(medium["url"])
 	mock.ExpectBegin()
 	mock.ExpectExec(`UPDATE \"bi_medium\"`).
-		WithArgs(test.AnyTime{}, medium["name"], medium["slug"], medium["type"], urlByteData, 1).
+		WithArgs(test.AnyTime{}, 1, medium["name"], medium["slug"], medium["type"], medium["title"], medium["description"], medium["caption"], medium["alt_text"], medium["file_size"], medium["url"], medium["dimensions"], 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 }
 
 func selectAfterUpdate(mock sqlmock.Sqlmock, medium map[string]interface{}) {
-	urlByteData, _ := json.Marshal(medium["url"])
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, 1, medium["name"], medium["slug"], medium["type"], urlByteData))
+			AddRow(1, time.Now(), time.Now(), nil, 1, 1, medium["name"], medium["slug"], medium["type"], medium["title"], medium["description"], medium["caption"], medium["alt_text"], medium["file_size"], medium["url"], medium["dimensions"], 1))
 }
 
 func TestMain(m *testing.M) {

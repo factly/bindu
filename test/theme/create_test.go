@@ -47,7 +47,7 @@ func TestCategoryCreate(t *testing.T) {
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "bi_theme"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, data["name"], byteData, 1).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["name"], byteData, 1).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 		mock.ExpectCommit()
 

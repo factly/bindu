@@ -14,19 +14,6 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-// func chartTagMock(mock sqlmock.Sqlmock) {
-// 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_tag" INNER JOIN "bi_chart_tag"`)).
-// 		WithArgs(sqlmock.AnyArg()).
-// 		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).
-// 			AddRow(1, time.Now(), time.Now(), nil, tag["name"], tag["slug"], 1, 1))
-// }
-// func chartCategoryMock(mock sqlmock.Sqlmock) {
-// 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_category" INNER JOIN "bi_chart_category"`)).
-// 		WithArgs(sqlmock.AnyArg()).
-// 		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
-// 			AddRow(1, time.Now(), time.Now(), nil, category["name"], category["slug"], 1, 1))
-// }
-
 func TestChartList(t *testing.T) {
 	mock := test.SetupMockDB()
 
@@ -130,9 +117,9 @@ func TestChartList(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, chartlist[0]["title"], chartlist[0]["slug"], byteDescriptionDataOne,
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, chartlist[0]["title"], chartlist[0]["slug"], byteDescriptionDataOne,
 					chartlist[0]["data_url"], byteConfigDataOne, chartlist[0]["status"], chartlist[0]["featured_medium_id"], chartlist[0]["theme_id"], time.Time{}, 1).
-				AddRow(2, time.Now(), time.Now(), nil, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
 					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["theme_id"], time.Time{}, 1))
 
 		chartPreloadMock(mock)
@@ -159,7 +146,7 @@ func TestChartList(t *testing.T) {
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
 					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["theme_id"], time.Time{}, 1))
 
 		chartPreloadMock(mock)

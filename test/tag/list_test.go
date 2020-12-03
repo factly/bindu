@@ -53,8 +53,8 @@ func TestTagList(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, taglist[0]["name"], taglist[0]["slug"]).
-				AddRow(2, time.Now(), time.Now(), nil, taglist[1]["name"], taglist[1]["slug"]))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, taglist[0]["name"], taglist[0]["slug"]).
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, taglist[1]["name"], taglist[1]["slug"]))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -77,7 +77,7 @@ func TestTagList(t *testing.T) {
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, taglist[1]["name"], taglist[1]["slug"]))
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, taglist[1]["name"], taglist[1]["slug"]))
 
 		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{

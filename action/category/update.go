@@ -42,12 +42,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	oID, err := util.GetOrganisation(r.Context())
-
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
+
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
 	category := &category{}
 	err = json.NewDecoder(r.Body).Decode(&category)
 
@@ -95,6 +102,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.DB.Model(&result).Updates(model.Category{
+		Base:        config.Base{UpdatedByID: uint(uID)},
 		Name:        category.Name,
 		Slug:        categorySlug,
 		Description: category.Description,

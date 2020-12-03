@@ -3,6 +3,7 @@ package chart
 import (
 	"time"
 
+	"github.com/factly/bindu-server/config"
 	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -23,6 +24,8 @@ type chart struct {
 	CategoryIDs      []uint         `json:"category_ids"`
 	TagIDs           []uint         `json:"tag_ids"`
 }
+
+var userContext config.ContextKey = "chart_user"
 
 // Router - Group of chart router
 func Router() chi.Router {

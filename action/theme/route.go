@@ -1,6 +1,7 @@
 package theme
 
 import (
+	"github.com/factly/bindu-server/config"
 	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -11,6 +12,8 @@ type theme struct {
 	Config      postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
 	Description string         `json:"description"`
 }
+
+var userContext config.ContextKey = "theme_user"
 
 // Router - Group of theme router
 func Router() chi.Router {
