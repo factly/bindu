@@ -83,7 +83,7 @@ func TestChartCreate(t *testing.T) {
 		mock.ExpectBegin()
 
 		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "", "", "", sqlmock.AnyArg(), 1).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 		slugCheckMock(mock)
@@ -97,7 +97,7 @@ func TestChartCreate(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 
 		chartPreloadMock(mock)
@@ -119,7 +119,7 @@ func TestChartCreate(t *testing.T) {
 		mock.ExpectBegin()
 
 		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, "", "", "", sqlmock.AnyArg(), 1).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 		slugCheckMock(mock)
@@ -133,7 +133,7 @@ func TestChartCreate(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, data["title"], data["slug"], byteDescriptionData,
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 
 		chartPreloadMock(mock)

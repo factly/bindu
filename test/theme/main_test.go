@@ -34,7 +34,7 @@ var invalidData = map[string]interface{}{
 
 var byteData, _ = json.Marshal(data["config"])
 
-var columns = []string{"id", "created_at", "updated_at", "deleted_at", "organisation_id", "name", "config"}
+var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "organisation_id", "name", "config"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_theme"`)
 var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_theme" SET "deleted_at"=`)
@@ -54,7 +54,7 @@ func themeSelectMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, 1, data["name"], byteData))
+			AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, data["name"], byteData))
 
 }
 

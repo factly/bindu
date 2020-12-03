@@ -68,8 +68,8 @@ func TestThemeList(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, themelist[0]["name"], byteData0).
-				AddRow(2, time.Now(), time.Now(), nil, 1, themelist[1]["name"], byteData1))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, themelist[0]["name"], byteData0).
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -92,7 +92,7 @@ func TestThemeList(t *testing.T) {
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, 1, themelist[1]["name"], byteData1))
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1))
 
 		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{

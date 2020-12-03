@@ -1,7 +1,6 @@
 package medium
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,30 +25,9 @@ func TestMediumList(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	mediumlist := []map[string]interface{}{
-		{"name": "Test Medium 1",
-			"type": "png",
-			"slug": "test-medium-1",
-			"url": `{"image": { 
-			"src": "Images/Sun.png",
-			"name": "sun1",
-			"hOffset": 250,
-			"vOffset": 250,
-			"alignment": "center"
-		}}`},
-		{"name": "Test Medium 2",
-			"type": "jpg",
-			"slug": "test-medium-2",
-			"url": `{"image": { 
-			"src": "Images/Sun.png",
-			"name": "sun2",
-			"hOffset": 250,
-			"vOffset": 250,
-			"alignment": "center"
-		}}`},
+		{"name": "Sample Medium 1", "slug": "test-medium-1"},
+		{"name": "Sample Medium 2", "slug": "test-medium-2"},
 	}
-
-	byteData0, _ := json.Marshal(mediumlist[0]["url"])
-	byteData1, _ := json.Marshal(mediumlist[1]["url"])
 
 	t.Run("get empty list of media", func(t *testing.T) {
 
@@ -74,8 +52,8 @@ func TestMediumList(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, mediumlist[0]["name"], mediumlist[0]["slug"], mediumlist[0]["type"], byteData0).
-				AddRow(2, time.Now(), time.Now(), nil, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], byteData1))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, mediumlist[0]["name"], mediumlist[0]["slug"], mediumlist[0]["type"], mediumlist[0]["title"], mediumlist[0]["description"], mediumlist[0]["caption"], mediumlist[0]["alt_text"], mediumlist[0]["file_size"], mediumlist[0]["url"], mediumlist[0]["dimensions"], 1).
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], mediumlist[1]["title"], mediumlist[1]["description"], mediumlist[1]["caption"], mediumlist[1]["alt_text"], mediumlist[1]["file_size"], mediumlist[1]["url"], mediumlist[1]["dimensions"], 1))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -98,7 +76,7 @@ func TestMediumList(t *testing.T) {
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], byteData1))
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, mediumlist[1]["name"], mediumlist[1]["slug"], mediumlist[1]["type"], mediumlist[1]["title"], mediumlist[1]["description"], mediumlist[1]["caption"], mediumlist[1]["alt_text"], mediumlist[1]["file_size"], mediumlist[1]["url"], mediumlist[1]["dimensions"], 1))
 
 		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{

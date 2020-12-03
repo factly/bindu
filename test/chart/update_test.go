@@ -240,7 +240,7 @@ func TestChartUpdate(t *testing.T) {
 
 		themeQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(test.AnyTime{}, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["theme_id"], 1).
+			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["theme_id"], 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)
@@ -277,7 +277,7 @@ func TestChartUpdate(t *testing.T) {
 
 		mediumQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(test.AnyTime{}, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], 1).
+			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)

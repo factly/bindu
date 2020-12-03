@@ -31,7 +31,7 @@ var invalidData = map[string]interface{}{
 	"name": "ab",
 }
 
-var columns = []string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}
+var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "name", "slug"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_tag"`)
 var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_tag" SET "deleted_at"=`)
@@ -49,7 +49,7 @@ func slugCheckMock(mock sqlmock.Sqlmock) {
 func tagInsertMock(mock sqlmock.Sqlmock) {
 	mock.ExpectBegin()
 	mock.ExpectQuery(`INSERT INTO "bi_tag"`).
-		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, data["name"], data["slug"], "", 1).
+		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["name"], data["slug"], "", 1).
 		WillReturnRows(sqlmock.
 			NewRows([]string{"id"}).
 			AddRow(1))
@@ -67,14 +67,14 @@ func tagSelectMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
+			AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["name"], data["slug"]))
 }
 
 func tagSelectWithOutOrg(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, data["name"], data["slug"]))
+			AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["name"], data["slug"]))
 }
 
 // check tag associated with any chart before deleting
@@ -87,7 +87,7 @@ func tagChartExpect(mock sqlmock.Sqlmock, count int) {
 func tagUpdateMock(mock sqlmock.Sqlmock, tag map[string]interface{}) {
 	mock.ExpectBegin()
 	mock.ExpectExec(`UPDATE \"bi_tag\"`).
-		WithArgs(test.AnyTime{}, tag["name"], tag["slug"], 1).
+		WithArgs(test.AnyTime{}, 1, tag["name"], tag["slug"], 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 }
@@ -101,7 +101,7 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, tag map[string]interface{}) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, tag["name"], tag["slug"]))
+			AddRow(1, time.Now(), time.Now(), nil, 1, 1, tag["name"], tag["slug"]))
 }
 
 func TestMain(m *testing.M) {

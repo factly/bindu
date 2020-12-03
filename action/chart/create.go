@@ -93,6 +93,10 @@ func create(w http.ResponseWriter, r *http.Request) {
 	msgJSONB.RawMessage = msg
 
 	medium := model.Medium{
+		Base: config.Base{
+			CreatedByID: uint(uID),
+			UpdatedByID: uint(uID),
+		},
 		URL:            msgJSONB,
 		OrganisationID: uint(oID),
 	}
