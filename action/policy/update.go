@@ -2,7 +2,6 @@ package policy
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/factly/bindu-server/action/user"
@@ -11,7 +10,6 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
 	"github.com/go-chi/chi"
-	"github.com/spf13/viper"
 )
 
 // update - Update policy
@@ -60,32 +58,15 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* delete old policy */
-	commanPolicyString := fmt.Sprint(":org:", organisationID, ":app:bindu:space:", spaceID, ":")
 	policyID := chi.URLParam(r, "policy_id")
-
-	policyID = "id" + commanPolicyString + policyID
-
-	req, err := http.NewRequest("DELETE", viper.GetString("keto_url")+"/engines/acp/ory/regex/policies/"+policyID, nil)
-	if err != nil {
+	if policyID == "" {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.NetworkError()))
-		return
-	}
-
-	defer resp.Body.Close()
 
 	/* User req */
+	policyReq.Name = policyID
 	result := Mapper(Composer(organisationID, spaceID, policyReq), user.Mapper(organisationID, userID))
 
 	renderx.JSON(w, http.StatusOK, result)
