@@ -2,6 +2,7 @@ package medium
 
 import (
 	"github.com/factly/bindu-server/config"
+	"github.com/factly/bindu-server/util"
 	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -26,13 +27,15 @@ var userContext config.ContextKey = "medium_user"
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/", list)
-	r.Post("/", create)
+	entity := "media"
+
+	r.With(util.CheckKetoPolicy(entity, "get")).Get("/", list)
+	r.With(util.CheckKetoPolicy(entity, "create")).Post("/", create)
 
 	r.Route("/{medium_id}", func(r chi.Router) {
-		r.Get("/", details)
-		r.Put("/", update)
-		r.Delete("/", delete)
+		r.With(util.CheckKetoPolicy(entity, "get")).Get("/", details)
+		r.With(util.CheckKetoPolicy(entity, "update")).Put("/", update)
+		r.With(util.CheckKetoPolicy(entity, "delete")).Delete("/", delete)
 	})
 
 	return r

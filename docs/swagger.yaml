@@ -224,6 +224,32 @@ definitions:
       updated_by_id:
         type: integer
     type: object
+  model.Permission:
+    properties:
+      actions:
+        items:
+          type: string
+        type: array
+      resource:
+        type: string
+    type: object
+  model.Policy:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/model.Permission'
+        type: array
+      users:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+    type: object
   model.Space:
     properties:
       contact_info:
@@ -329,6 +355,31 @@ definitions:
     required:
     - name
     type: object
+  model.User:
+    properties:
+      birth_date:
+        type: string
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
   model.organisationUser:
     properties:
       created_at:
@@ -345,6 +396,30 @@ definitions:
         type: string
       updated_by_id:
         type: integer
+    type: object
+  policy.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Policy'
+        type: array
+      total:
+        type: integer
+    type: object
+  policy.policyReq:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/model.Permission'
+        type: array
+      users:
+        items:
+          type: string
+        type: array
     type: object
   space.orgWithSpace:
     properties:
@@ -446,6 +521,15 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  user.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+      total:
+        type: integer
     type: object
 host: localhost:7000
 info:
@@ -990,6 +1074,186 @@ paths:
       summary: Show all organisations
       tags:
       - Organisation
+  /policies:
+    get:
+      description: Get all policies
+      operationId: get-all-policy
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/policy.paging'
+      summary: Get all policies
+      tags:
+      - Policy
+    post:
+      description: Create policy
+      operationId: add-policy
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Policy Object
+        in: body
+        name: Policy
+        required: true
+        schema:
+          $ref: '#/definitions/policy.policyReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Policy'
+      summary: Create policy
+      tags:
+      - Policy
+  /policies/{policy_id}:
+    delete:
+      description: GeDeletet policy by ID
+      operationId: delete-policy-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Policy ID
+        in: path
+        name: policy_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Policy'
+      summary: Delete policy by ID
+      tags:
+      - Policy
+    get:
+      description: Get policy by ID
+      operationId: get-policy-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Policy ID
+        in: path
+        name: policy_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Policy'
+      summary: Get policy by ID
+      tags:
+      - Policy
+    put:
+      description: Update policy
+      operationId: update-policy
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Policy Object
+        in: body
+        name: Policy
+        required: true
+        schema:
+          $ref: '#/definitions/policy.policyReq'
+      - description: Policy ID
+        in: path
+        name: policy_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Policy'
+      summary: Update policy
+      tags:
+      - Policy
+  /policies/default:
+    post:
+      description: Create Default Policies
+      operationId: add-default-policies
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/policy.paging'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create Default Policies
+      tags:
+      - Policy
   /spaces:
     get:
       description: Get all spaces
@@ -1421,4 +1685,37 @@ paths:
       summary: Update a theme by id
       tags:
       - Theme
+  /users:
+    get:
+      description: Get all Users
+      operationId: get-all-users
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.paging'
+      summary: Show all Users
+      tags:
+      - Users
 swagger: "2.0"

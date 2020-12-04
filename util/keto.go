@@ -66,3 +66,54 @@ func IsAllowed(result KetoAllowed) (int, error) {
 
 	return resp.StatusCode, nil
 }
+
+// CheckKetoPolicy returns middleware that checks the permissions of user from keto server
+func CheckKetoPolicy(entity, action string) func(h http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+
+			sID, err := GetSpace(ctx)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			uID, err := GetUser(ctx)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			oID, err := GetOrganisation(ctx)
+
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			commonString := fmt.Sprint(":org:", oID, ":app:bindu:space:", sID, ":")
+
+			kresource := fmt.Sprint("resources", commonString, entity)
+			kaction := fmt.Sprint("actions", commonString, entity, ":", action)
+
+			result := KetoAllowed{}
+
+			result.Action = kaction
+			result.Resource = kresource
+			result.Subject = fmt.Sprint(uID)
+
+			resStatus, err := IsAllowed(result)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			if resStatus != 200 {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			h.ServeHTTP(w, r)
+		})
+	}
+}
