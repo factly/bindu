@@ -28,14 +28,14 @@ import (
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param Chart body chart true "Chart Object"
 // @Success 201 {object} model.Chart
 // @Failure 400 {array} string
 // @Router /charts [post]
 func create(w http.ResponseWriter, r *http.Request) {
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -97,8 +97,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 			CreatedByID: uint(uID),
 			UpdatedByID: uint(uID),
 		},
-		URL:            msgJSONB,
-		OrganisationID: uint(oID),
+		URL:     msgJSONB,
+		SpaceID: uint(sID),
 	}
 
 	tx := config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
@@ -131,7 +131,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	result := &model.Chart{
 		Title:            chart.Title,
-		Slug:             slug.Approve(chartSlug, oID, tableName),
+		Slug:             slug.Approve(chartSlug, sID, tableName),
 		DataURL:          chart.DataURL,
 		Config:           chart.Config,
 		Description:      chart.Description,
@@ -139,7 +139,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		FeaturedMediumID: &medium.ID,
 		ThemeID:          themeID,
 		PublishedDate:    chart.PublishedDate,
-		OrganisationID:   uint(oID),
+		SpaceID:          uint(sID),
 	}
 
 	if len(chart.TagIDs) > 0 {

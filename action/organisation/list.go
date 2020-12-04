@@ -22,7 +22,7 @@ type paging struct {
 // @ID get-all-organisations
 // @Produce  json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param limit query string false "limit per page"
 // @Param page query string false "page number"
 // @Success 200 {array} model.Organisation

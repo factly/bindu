@@ -20,7 +20,7 @@ import (
 // @Tags Chart
 // @ID delete-chart-by-id
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param chart_id path string true "Chart ID"
 // @Success 200
 // @Failure 400 {array} string
@@ -36,11 +36,10 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
-
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -50,7 +49,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 
 	// check record exists or not
 	err = config.DB.Where(&model.Chart{
-		OrganisationID: uint(oID),
+		SpaceID: uint(sID),
 	}).First(&result).Error
 
 	if err != nil {

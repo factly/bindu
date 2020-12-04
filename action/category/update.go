@@ -26,8 +26,8 @@ import (
 // @Produce json
 // @Consume json
 // @Param X-User header string true "User ID"
+// @Param X-Space header string true "Space ID"
 // @Param category_id path string true "Category ID"
-// @Param X-Organisation header string true "Organisation ID"
 // @Param Category body category false "Category"
 // @Success 200 {object} model.Category
 // @Router /categories/{category_id} [put]
@@ -41,7 +41,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -77,7 +77,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// check record exists or not
 	err = config.DB.Where(&model.Category{
-		OrganisationID: uint(oID),
+		SpaceID: uint(sID),
 	}).First(&result).Error
 
 	if err != nil {
@@ -96,9 +96,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 	if result.Slug == category.Slug {
 		categorySlug = result.Slug
 	} else if category.Slug != "" && slug.Check(category.Slug) {
-		categorySlug = slug.Approve(category.Slug, oID, tableName)
+		categorySlug = slug.Approve(category.Slug, sID, tableName)
 	} else {
-		categorySlug = slug.Approve(slug.Make(category.Name), oID, tableName)
+		categorySlug = slug.Approve(slug.Make(category.Name), sID, tableName)
 	}
 
 	config.DB.Model(&result).Updates(model.Category{

@@ -2,6 +2,7 @@ package category
 
 import (
 	"github.com/factly/bindu-server/config"
+	"github.com/factly/bindu-server/util"
 	"github.com/go-chi/chi"
 )
 
@@ -18,13 +19,15 @@ var userContext config.ContextKey = "category_user"
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/", list)
-	r.Post("/", create)
+	entity := "categories"
+
+	r.With(util.CheckKetoPolicy(entity, "get")).Get("/", list)
+	r.With(util.CheckKetoPolicy(entity, "create")).Post("/", create)
 
 	r.Route("/{category_id}", func(r chi.Router) {
-		r.Get("/", details)
-		r.Put("/", update)
-		r.Delete("/", delete)
+		r.With(util.CheckKetoPolicy(entity, "get")).Get("/", details)
+		r.With(util.CheckKetoPolicy(entity, "update")).Put("/", update)
+		r.With(util.CheckKetoPolicy(entity, "delete")).Delete("/", delete)
 	})
 
 	return r

@@ -23,12 +23,13 @@ type Chart struct {
 	ThemeID          *uint          `gorm:"column:theme_id" json:"theme_id"`
 	Theme            *Theme         `gorm:"foreignKey:theme_id;default:NULL" json:"theme"`
 	PublishedDate    time.Time      `json:"published_date"`
-	OrganisationID   uint           `json:"organisation_id"`
+	SpaceID          uint           `gorm:"column:space_id" json:"space_id"`
+	Space            *Space         `json:"space,omitempty"`
 	Tags             []Tag          `gorm:"many2many:chart_tag;" json:"tags"`
 	Categories       []Category     `gorm:"many2many:chart_category;" json:"categories"`
 }
 
-// BeforeSave - to check organisation for medium & theme
+// BeforeSave - to check space for medium & theme
 func (c *Chart) BeforeSave(tx *gorm.DB) (e error) {
 
 	if c.FeaturedMediumID != nil && *c.FeaturedMediumID > 0 {
@@ -36,11 +37,11 @@ func (c *Chart) BeforeSave(tx *gorm.DB) (e error) {
 		medium.ID = *c.FeaturedMediumID
 
 		err := tx.Model(&Medium{}).Where(Medium{
-			OrganisationID: c.OrganisationID,
+			SpaceID: c.SpaceID,
 		}).First(&medium).Error
 
 		if err != nil {
-			return errors.New("medium do not belong to same organisation")
+			return errors.New("medium do not belong to same space")
 		}
 	}
 
@@ -49,23 +50,23 @@ func (c *Chart) BeforeSave(tx *gorm.DB) (e error) {
 		theme.ID = *c.ThemeID
 
 		err := tx.Model(&Theme{}).Where(Theme{
-			OrganisationID: c.OrganisationID,
+			SpaceID: c.SpaceID,
 		}).First(&theme).Error
 
 		if err != nil {
-			return errors.New("theme do not belong to same organisation")
+			return errors.New("theme do not belong to same space")
 		}
 	}
 
 	for _, tag := range c.Tags {
-		if tag.OrganisationID != c.OrganisationID {
-			return errors.New("some tags do not belong to same organisation")
+		if tag.SpaceID != c.SpaceID {
+			return errors.New("some tags do not belong to same space")
 		}
 	}
 
 	for _, category := range c.Categories {
-		if category.OrganisationID != c.OrganisationID {
-			return errors.New("some categories do not belong to same organisation")
+		if category.SpaceID != c.SpaceID {
+			return errors.New("some categories do not belong to same space")
 		}
 	}
 
@@ -75,7 +76,7 @@ func (c *Chart) BeforeSave(tx *gorm.DB) (e error) {
 var chartUser config.ContextKey = "chart_user"
 
 // BeforeCreate hook
-func (chart *Chart) BeforeCreate(tx *gorm.DB) error {
+func (c *Chart) BeforeCreate(tx *gorm.DB) error {
 	ctx := tx.Statement.Context
 	userID := ctx.Value(chartUser)
 
@@ -84,7 +85,7 @@ func (chart *Chart) BeforeCreate(tx *gorm.DB) error {
 	}
 	uID := userID.(int)
 
-	chart.CreatedByID = uint(uID)
-	chart.UpdatedByID = uint(uID)
+	c.CreatedByID = uint(uID)
+	c.UpdatedByID = uint(uID)
 	return nil
 }

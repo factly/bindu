@@ -25,14 +25,14 @@ import (
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param Tag body tag true "Tag Object"
 // @Success 201 {object} model.Tag
 // @Failure 400 {array} string
 // @Router /tags [post]
 func create(w http.ResponseWriter, r *http.Request) {
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -77,10 +77,10 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Tag{
-		Name:           tag.Name,
-		Slug:           slug.Approve(tagSlug, oID, tableName),
-		Description:    tag.Description,
-		OrganisationID: uint(oID),
+		Name:        tag.Name,
+		Slug:        slug.Approve(tagSlug, sID, tableName),
+		Description: tag.Description,
+		SpaceID:     uint(sID),
 	}
 
 	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Tag{}).Create(&result).Error

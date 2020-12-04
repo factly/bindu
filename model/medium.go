@@ -19,8 +19,8 @@ type Medium struct {
 	FileSize    int64          `gorm:"column:file_size" json:"file_size"`
 	URL         postgres.Jsonb `gorm:"column:url" json:"url" swaggertype:"primitive,string"`
 
-	Dimensions     string `gorm:"column:dimensions" json:"dimensions"`
-	OrganisationID uint   `json:"organisation_id"`
+	Dimensions string `gorm:"column:dimensions" json:"dimensions"`
+	SpaceID    uint   `gorm:"column:space_id" json:"space_id"`
 }
 
 var mediumUser config.ContextKey = "medium_user"

@@ -26,8 +26,8 @@ import (
 // @Produce json
 // @Consume json
 // @Param X-User header string true "User ID"
+// @Param X-Space header string true "Space ID"
 // @Param medium_id path string true "Medium ID"
-// @Param X-Organisation header string true "Organisation ID"
 // @Param Medium body medium false "Medium"
 // @Success 200 {object} model.Medium
 // @Router /media/{medium_id} [put]
@@ -41,7 +41,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -76,7 +76,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// check record exists or not
 	err = config.DB.Where(&model.Medium{
-		OrganisationID: uint(oID),
+		SpaceID: uint(sID),
 	}).First(&result).Error
 
 	if err != nil {
@@ -95,9 +95,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 	if result.Slug == medium.Slug {
 		mediumSlug = result.Slug
 	} else if medium.Slug != "" && slug.Check(medium.Slug) {
-		mediumSlug = slug.Approve(medium.Slug, oID, tableName)
+		mediumSlug = slug.Approve(medium.Slug, sID, tableName)
 	} else {
-		mediumSlug = slug.Approve(slug.Make(medium.Name), oID, tableName)
+		mediumSlug = slug.Approve(slug.Make(medium.Name), sID, tableName)
 	}
 
 	config.DB.Model(&result).Updates(model.Medium{

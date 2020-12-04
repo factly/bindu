@@ -26,8 +26,8 @@ import (
 // @Produce json
 // @Consume json
 // @Param X-User header string true "User ID"
+// @Param X-Space header string true "Space ID"
 // @Param tag_id path string true "Tag ID"
-// @Param X-Organisation header string true "Organisation ID"
 // @Param Tag body tag false "Tag"
 // @Success 200 {object} model.Tag
 // @Router /tags/{tag_id} [put]
@@ -41,7 +41,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -76,7 +76,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// check record exists or not
 	err = config.DB.Where(&model.Tag{
-		OrganisationID: uint(oID),
+		SpaceID: uint(sID),
 	}).First(&result).Error
 
 	if err != nil {
@@ -95,9 +95,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 	if result.Slug == tag.Slug {
 		tagSlug = result.Slug
 	} else if tag.Slug != "" && slug.Check(tag.Slug) {
-		tagSlug = slug.Approve(tag.Slug, oID, tableName)
+		tagSlug = slug.Approve(tag.Slug, sID, tableName)
 	} else {
-		tagSlug = slug.Approve(slug.Make(tag.Name), oID, tableName)
+		tagSlug = slug.Approve(slug.Make(tag.Name), sID, tableName)
 	}
 
 	config.DB.Model(&result).Updates(model.Tag{

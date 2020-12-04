@@ -20,7 +20,7 @@ import (
 // @ID get-chart-by-id
 // @Produce  json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param chart_id path string true "Chart ID"
 // @Success 200 {object} model.Chart
 // @Router /charts/{chart_id} [get]
@@ -35,11 +35,10 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
-
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -48,7 +47,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 	result.ID = uint(id)
 
 	err = config.DB.Model(&model.Chart{}).Where(&model.Chart{
-		OrganisationID: uint(oID),
+		SpaceID: uint(sID),
 	}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result).Error
 
 	if err != nil {
