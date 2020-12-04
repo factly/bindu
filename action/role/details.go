@@ -1,4 +1,4 @@
-package policy
+package role
 
 import (
 	"encoding/json"
@@ -15,53 +15,50 @@ import (
 	"github.com/spf13/viper"
 )
 
-// details - Get policy by ID
-// @Summary Get policy by ID
-// @Description Get policy by ID
-// @Tags Policy
-// @ID get-policy-by-id
+// details - Get Role by ID
+// @Summary Get Role by ID
+// @Description Get Role by ID
+// @Tags Role
+// @ID get-role-by-id
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
-// @Param policy_id path string true "Policy ID"
-// @Success 200 {object} model.Policy
-// @Router /policies/{policy_id} [get]
+// @Param role_id path string true "Role ID"
+// @Success 200 {object} model.Role
+// @Router /roles/{role_id} [get]
 func details(w http.ResponseWriter, r *http.Request) {
-	spaceID, err := util.GetSpace(r.Context())
-
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
-	userID, err := util.GetUser(r.Context())
-
+	uID, err := util.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
-	organisationID, err := util.GetOrganisation(r.Context())
-
+	oID, err := util.GetOrganisation(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
-	policyID := chi.URLParam(r, "policy_id")
-	if policyID == "" {
+	roleID := chi.URLParam(r, "role_id")
+	if roleID == "" {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
 
-	ketoPolicyID := fmt.Sprint("id:org:", organisationID, ":app:bindu:space:", spaceID, ":", policyID)
+	ketoRoleID := fmt.Sprint("roles:org:", oID, ":app:bindu:space:", sID, ":", roleID)
 
-	resp, err := util.Request("GET", viper.GetString("keto_url")+"/engines/acp/ory/regex/policies/"+ketoPolicyID, nil)
+	resp, err := util.Request("GET", viper.GetString("keto_url")+"/engines/acp/ory/regex/roles/"+ketoRoleID, nil)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -74,21 +71,22 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var ketoRole model.KetoRole
+
 	defer resp.Body.Close()
 
-	ketoPolicy := model.KetoPolicy{}
-	err = json.NewDecoder(resp.Body).Decode(&ketoPolicy)
-
+	err = json.NewDecoder(resp.Body).Decode(&ketoRole)
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}
 
 	/* User req */
-	userMap := user.Mapper(organisationID, userID)
+	userMap := user.Mapper(oID, uID)
 
-	result := Mapper(ketoPolicy, userMap)
+	result := Mapper(ketoRole, userMap)
 
 	renderx.JSON(w, http.StatusOK, result)
+
 }

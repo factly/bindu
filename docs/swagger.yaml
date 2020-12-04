@@ -250,6 +250,17 @@ definitions:
           $ref: '#/definitions/model.User'
         type: array
     type: object
+  model.Role:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+    type: object
   model.Space:
     properties:
       contact_info:
@@ -420,6 +431,28 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  role.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+      total:
+        type: integer
+    type: object
+  role.roleReq:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      users:
+        items:
+          type: string
+        type: array
+    required:
+    - name
     type: object
   space.orgWithSpace:
     properties:
@@ -1089,6 +1122,14 @@ paths:
         name: X-Space
         required: true
         type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
       produces:
       - application/json
       responses:
@@ -1099,8 +1140,8 @@ paths:
       summary: Get all policies
       tags:
       - Policy
-    post:
-      description: Create policy
+    put:
+      description: Upsert policy
       operationId: add-policy
       parameters:
       - description: User ID
@@ -1126,7 +1167,7 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/model.Policy'
-      summary: Create policy
+      summary: Upsert policy
       tags:
       - Policy
   /policies/{policy_id}:
@@ -1188,41 +1229,6 @@ paths:
       summary: Get policy by ID
       tags:
       - Policy
-    put:
-      description: Update policy
-      operationId: update-policy
-      parameters:
-      - description: User ID
-        in: header
-        name: X-User
-        required: true
-        type: string
-      - description: Space ID
-        in: header
-        name: X-Space
-        required: true
-        type: string
-      - description: Policy Object
-        in: body
-        name: Policy
-        required: true
-        schema:
-          $ref: '#/definitions/policy.policyReq'
-      - description: Policy ID
-        in: path
-        name: policy_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Policy'
-      summary: Update policy
-      tags:
-      - Policy
   /policies/default:
     post:
       description: Create Default Policies
@@ -1254,6 +1260,125 @@ paths:
       summary: Create Default Policies
       tags:
       - Policy
+  /roles:
+    get:
+      description: Get all roles
+      operationId: get-all-roles
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/role.paging'
+      summary: Get all roles
+      tags:
+      - Role
+    put:
+      description: Upsert Role
+      operationId: add-role
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Role Object
+        in: body
+        name: Role
+        required: true
+        schema:
+          $ref: '#/definitions/role.roleReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Role'
+      summary: Upsert Role
+      tags:
+      - Role
+  /roles/{role_id}:
+    delete:
+      description: Delete Role by ID
+      operationId: delete-role-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Role ID
+        in: path
+        name: role_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200": {}
+      summary: Delete Role by ID
+      tags:
+      - Role
+    get:
+      description: Get Role by ID
+      operationId: get-role-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Role ID
+        in: path
+        name: role_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Role'
+      summary: Get Role by ID
+      tags:
+      - Role
   /spaces:
     get:
       description: Get all spaces

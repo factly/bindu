@@ -8,7 +8,7 @@ import (
 
 // KavachChecker checks if Kavach is ready
 func KavachChecker() error {
-	res, err := GetRequest(viper.GetString("kavach_url")+"/health/ready", nil)
+	res, err := Request("GET", viper.GetString("kavach_url")+"/health/ready", nil)
 	if err != nil {
 		return err
 	}
@@ -22,7 +22,7 @@ func KavachChecker() error {
 
 // KetoChecker checks if keto is ready
 func KetoChecker() error {
-	res, err := GetRequest(viper.GetString("keto_url")+"/health/ready", nil)
+	res, err := Request("GET", viper.GetString("keto_url")+"/health/ready", nil)
 	if err != nil {
 		return err
 	}

@@ -41,7 +41,6 @@ func Mapper(ketoPolicy model.KetoPolicy, userMap map[string]model.User) model.Po
 
 	var result model.Policy
 	nameAll := strings.Split(ketoPolicy.ID, ":")
-	result.ID = nameAll[len(nameAll)-1]
 	result.Name = nameAll[len(nameAll)-1]
 	result.Description = ketoPolicy.Description
 	result.Permissions = permissions
@@ -76,7 +75,7 @@ func GetPermissions(ketoPolicy model.KetoPolicy, userID uint) []model.Permission
 
 // GetAllPolicies gives list of all keto policies
 func GetAllPolicies() ([]model.KetoPolicy, error) {
-	resp, err := util.GetRequest(viper.GetString("keto_url")+"/engines/acp/ory/regex/policies", nil)
+	resp, err := util.Request("GET", viper.GetString("keto_url")+"/engines/acp/ory/regex/policies", nil)
 	if err != nil {
 		return nil, err
 	}
