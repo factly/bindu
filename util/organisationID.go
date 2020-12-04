@@ -9,56 +9,43 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/spf13/viper"
 )
 
 type ctxKeyOrganisationID int
 
-// OrganisationIDKey is the key that holds the unique organisation ID in a request context.
+// OrganisationIDKey is the key that holds the unique user ID in a request context.
 const OrganisationIDKey ctxKeyOrganisationID = 0
 
-// CheckOrganisation check X-Organisation in header
-func CheckOrganisation(h http.Handler) http.Handler {
+// GenerateOrganisation check X-User in header
+func GenerateOrganisation(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.Trim(r.URL.Path, "/") != "organisations" {
-			org := r.Header.Get("X-Organisation")
-			if org == "" {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
 
-			oID, err := strconv.Atoi(org)
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-
-			orgs, err := RequestOrganisation(r)
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-
-			foundOrg := false
-			for _, each := range orgs {
-				if each.Base.ID == uint(oID) {
-					foundOrg = true
-					break
-				}
-			}
-
-			if !foundOrg {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-
+		if strings.Split(strings.Trim(r.URL.Path, "/"), "/")[0] != "spaces" {
 			ctx := r.Context()
-			ctx = context.WithValue(ctx, OrganisationIDKey, oID)
+			sID, err := GetSpace(ctx)
+
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			space := &model.Space{}
+			space.ID = uint(sID)
+
+			err = config.DB.First(&space).Error
+
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			ctx = context.WithValue(ctx, OrganisationIDKey, space.OrganisationID)
 			h.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
-
 		h.ServeHTTP(w, r)
 	})
 }

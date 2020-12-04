@@ -8,11 +8,12 @@ import (
 // Tag model
 type Tag struct {
 	config.Base
-	Name           string   `json:"name"`
-	Slug           string   `json:"slug"`
-	Description    string   `json:"description"`
-	OrganisationID uint     `json:"organisation_id"`
-	Charts         []*Chart `gorm:"many2many:chart_tag;" json:"charts"`
+	Name        string   `json:"name"`
+	Slug        string   `json:"slug"`
+	Description string   `json:"description"`
+	SpaceID     uint     `gorm:"column:space_id" json:"space_id"`
+	Space       *Space   `json:"space,omitempty"`
+	Charts      []*Chart `gorm:"many2many:chart_tag;" json:"charts"`
 }
 
 var tagUser config.ContextKey = "tag_user"

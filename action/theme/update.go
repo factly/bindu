@@ -24,8 +24,8 @@ import (
 // @Produce json
 // @Consume json
 // @Param X-User header string true "User ID"
+// @Param X-Space header string true "Space ID"
 // @Param theme_id path string true "Theme ID"
-// @Param X-Organisation header string true "Organisation ID"
 // @Param Theme body theme false "Theme"
 // @Success 200 {object} model.Theme
 // @Router /themes/{theme_id} [put]
@@ -39,7 +39,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -75,7 +75,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// check record exists or not
 	err = config.DB.Where(&model.Theme{
-		OrganisationID: uint(oID),
+		SpaceID: uint(sID),
 	}).First(&result).Error
 
 	if err != nil {

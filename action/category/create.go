@@ -25,14 +25,14 @@ import (
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param Category body category true "Category Object"
 // @Success 201 {object} model.Category
 // @Failure 400 {array} string
 // @Router /categories [post]
 func create(w http.ResponseWriter, r *http.Request) {
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -77,10 +77,10 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Category{
-		Name:           category.Name,
-		Slug:           slug.Approve(categorySlug, oID, tableName),
-		Description:    category.Description,
-		OrganisationID: uint(oID),
+		Name:        category.Name,
+		Slug:        slug.Approve(categorySlug, sID, tableName),
+		Description: category.Description,
+		SpaceID:     uint(sID),
 	}
 
 	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Category{}).Create(&result).Error

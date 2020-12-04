@@ -26,8 +26,8 @@ import (
 // @Produce json
 // @Consume json
 // @Param X-User header string true "User ID"
+// @Param X-Space header string true "Space ID"
 // @Param chart_id path string true "Chart ID"
-// @Param X-Organisation header string true "Organisation ID"
 // @Param Chart body chart false "Chart"
 // @Success 200 {object} model.Chart
 // @Router /charts/{chart_id} [put]
@@ -41,7 +41,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -75,7 +75,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// check record exists or not
 	err = config.DB.Where(&model.Chart{
-		OrganisationID: uint(oID),
+		SpaceID: uint(sID),
 	}).First(&result).Error
 
 	if err != nil {
@@ -94,9 +94,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 	if result.Slug == chart.Slug {
 		chartSlug = result.Slug
 	} else if chart.Slug != "" && slug.Check(chart.Slug) {
-		chartSlug = slug.Approve(chart.Slug, oID, tableName)
+		chartSlug = slug.Approve(chart.Slug, sID, tableName)
 	} else {
-		chartSlug = slug.Approve(slug.Make(chart.Title), oID, tableName)
+		chartSlug = slug.Approve(slug.Make(chart.Title), sID, tableName)
 	}
 
 	tx := config.DB.Begin()

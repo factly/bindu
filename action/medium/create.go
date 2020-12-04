@@ -25,14 +25,14 @@ import (
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param Medium body medium true "Medium Object"
 // @Success 201 {object} model.Medium
 // @Failure 400 {array} string
 // @Router /media [post]
 func create(w http.ResponseWriter, r *http.Request) {
 
-	oID, err := util.GetOrganisation(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -76,17 +76,17 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Medium{
-		Name:           medium.Name,
-		Slug:           slug.Approve(mediumSlug, oID, tableName),
-		Title:          medium.Title,
-		Type:           medium.Type,
-		Description:    medium.Description,
-		Caption:        medium.Caption,
-		AltText:        medium.AltText,
-		FileSize:       medium.FileSize,
-		URL:            medium.URL,
-		Dimensions:     medium.Dimensions,
-		OrganisationID: uint(oID),
+		Name:        medium.Name,
+		Slug:        slug.Approve(mediumSlug, sID, tableName),
+		Title:       medium.Title,
+		Type:        medium.Type,
+		Description: medium.Description,
+		Caption:     medium.Caption,
+		AltText:     medium.AltText,
+		FileSize:    medium.FileSize,
+		URL:         medium.URL,
+		Dimensions:  medium.Dimensions,
+		SpaceID:     uint(sID),
 	}
 
 	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Medium{}).Create(&result).Error

@@ -53,8 +53,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -103,8 +103,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -158,8 +158,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -200,16 +200,16 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Category ID",
-                        "name": "category_id",
-                        "in": "path",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
+                        "description": "Category ID",
+                        "name": "category_id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -247,8 +247,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -295,8 +295,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -345,8 +345,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -400,8 +400,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -442,16 +442,16 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Chart ID",
-                        "name": "chart_id",
-                        "in": "path",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
+                        "description": "Chart ID",
+                        "name": "chart_id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -489,8 +489,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -537,8 +537,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -587,8 +587,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -642,8 +642,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -684,16 +684,16 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Medium ID",
-                        "name": "medium_id",
-                        "in": "path",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
+                        "description": "Medium ID",
+                        "name": "medium_id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -731,8 +731,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -779,8 +779,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -810,6 +810,155 @@ var doc = `{
                 }
             }
         },
+        "/spaces": {
+            "get": {
+                "description": "Get all spaces",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Show all spaces",
+                "operationId": "get-all-spaces",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/space.orgWithSpace"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create space",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Create space",
+                "operationId": "add-space",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Space Object",
+                        "name": "Space",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/space.space"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Space"
+                        }
+                    }
+                }
+            }
+        },
+        "/spaces/{space_id}": {
+            "put": {
+                "description": "Update space",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Update space",
+                "operationId": "update-space",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "space_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Space Object",
+                        "name": "Space",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/space.space"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Space"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete space",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Delete space",
+                "operationId": "delete-space",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "space_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {}
+                }
+            }
+        },
         "/tags": {
             "get": {
                 "description": "Get all tags",
@@ -831,8 +980,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -881,8 +1030,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -936,8 +1085,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -978,16 +1127,16 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Tag ID",
-                        "name": "tag_id",
-                        "in": "path",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
+                        "description": "Tag ID",
+                        "name": "tag_id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -1025,8 +1174,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -1073,8 +1222,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -1123,8 +1272,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -1178,8 +1327,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -1220,16 +1369,16 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Theme ID",
-                        "name": "theme_id",
-                        "in": "path",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
+                        "description": "Theme ID",
+                        "name": "theme_id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -1267,8 +1416,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -1383,13 +1532,34 @@ var doc = `{
         "medium.medium": {
             "type": "object",
             "required": [
-                "name"
+                "dimensions",
+                "file_size",
+                "name",
+                "type"
             ],
             "properties": {
+                "alt_text": {
+                    "type": "string"
+                },
+                "caption": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dimensions": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
                 "slug": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "type": {
@@ -1416,6 +1586,9 @@ var doc = `{
                 "created_at": {
                     "type": "string"
                 },
+                "created_by_id": {
+                    "type": "integer"
+                },
                 "deleted_at": {
                     "type": "string"
                 },
@@ -1428,14 +1601,20 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "organisation_id": {
-                    "type": "integer"
-                },
                 "slug": {
                     "type": "string"
                 },
+                "space": {
+                    "$ref": "#/definitions/model.Space"
+                },
+                "space_id": {
+                    "type": "integer"
+                },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1453,6 +1632,9 @@ var doc = `{
                 },
                 "created_at": {
                     "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
                 },
                 "data_url": {
                     "type": "string"
@@ -1472,14 +1654,17 @@ var doc = `{
                 "medium": {
                     "$ref": "#/definitions/model.Medium"
                 },
-                "organisation_id": {
-                    "type": "integer"
-                },
                 "published_date": {
                     "type": "string"
                 },
                 "slug": {
                     "type": "string"
+                },
+                "space": {
+                    "$ref": "#/definitions/model.Space"
+                },
+                "space_id": {
+                    "type": "integer"
                 },
                 "status": {
                     "type": "string"
@@ -1501,17 +1686,38 @@ var doc = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 }
             }
         },
         "model.Medium": {
             "type": "object",
             "properties": {
+                "alt_text": {
+                    "type": "string"
+                },
+                "caption": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
+                "created_by_id": {
+                    "type": "integer"
+                },
                 "deleted_at": {
                     "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dimensions": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -1519,10 +1725,13 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "organisation_id": {
+                "slug": {
+                    "type": "string"
+                },
+                "space_id": {
                     "type": "integer"
                 },
-                "slug": {
+                "title": {
                     "type": "string"
                 },
                 "type": {
@@ -1530,6 +1739,9 @@ var doc = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 },
                 "url": {
                     "type": "string"
@@ -1542,7 +1754,13 @@ var doc = `{
                 "created_at": {
                     "type": "string"
                 },
+                "created_by_id": {
+                    "type": "integer"
+                },
                 "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "id": {
@@ -1559,6 +1777,86 @@ var doc = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Space": {
+            "type": "object",
+            "properties": {
+                "contact_info": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "fav_icon": {
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "fav_icon_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "logo": {
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "logo_id": {
+                    "type": "integer"
+                },
+                "logo_mobile": {
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "logo_mobile_id": {
+                    "type": "integer"
+                },
+                "mobile_icon": {
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "mobile_icon_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organisation_id": {
+                    "type": "integer"
+                },
+                "site_address": {
+                    "type": "string"
+                },
+                "site_title": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "social_media_urls": {
+                    "type": "string"
+                },
+                "tag_line": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
+                },
+                "verification_codes": {
+                    "type": "string"
                 }
             }
         },
@@ -1574,6 +1872,9 @@ var doc = `{
                 "created_at": {
                     "type": "string"
                 },
+                "created_by_id": {
+                    "type": "integer"
+                },
                 "deleted_at": {
                     "type": "string"
                 },
@@ -1586,14 +1887,20 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "organisation_id": {
-                    "type": "integer"
-                },
                 "slug": {
                     "type": "string"
                 },
+                "space": {
+                    "$ref": "#/definitions/model.Space"
+                },
+                "space_id": {
+                    "type": "integer"
+                },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1609,6 +1916,9 @@ var doc = `{
                 "created_at": {
                     "type": "string"
                 },
+                "created_by_id": {
+                    "type": "integer"
+                },
                 "deleted_at": {
                     "type": "string"
                 },
@@ -1618,11 +1928,17 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "organisation_id": {
+                "space": {
+                    "$ref": "#/definitions/model.Space"
+                },
+                "space_id": {
                     "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1631,6 +1947,9 @@ var doc = `{
             "properties": {
                 "created_at": {
                     "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
                 },
                 "deleted_at": {
                     "type": "string"
@@ -1642,6 +1961,101 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "space.orgWithSpace": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "permission": {
+                    "$ref": "#/definitions/model.organisationUser"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "spaces": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Space"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "space.space": {
+            "type": "object",
+            "required": [
+                "name",
+                "organisation_id"
+            ],
+            "properties": {
+                "contact_info": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "fav_icon_id": {
+                    "type": "integer"
+                },
+                "logo_id": {
+                    "type": "integer"
+                },
+                "logo_mobile_id": {
+                    "type": "integer"
+                },
+                "mobile_icon_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organisation_id": {
+                    "type": "integer"
+                },
+                "site_address": {
+                    "type": "string"
+                },
+                "site_title": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "social_media_urls": {
+                    "type": "string"
+                },
+                "tag_line": {
+                    "type": "string"
+                },
+                "verification_codes": {
                     "type": "string"
                 }
             }

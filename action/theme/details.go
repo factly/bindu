@@ -20,7 +20,7 @@ import (
 // @ID get-theme-by-id
 // @Produce  json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param theme_id path string true "Theme ID"
 // @Success 200 {object} model.Theme
 // @Router /themes/{theme_id} [get]
@@ -35,11 +35,10 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := util.GetOrganisation(r.Context())
-
+	sID, err := util.GetOrganisation(r.Context())
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -48,7 +47,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 	result.ID = uint(id)
 
 	err = config.DB.Model(&model.Theme{}).Where(&model.Theme{
-		OrganisationID: uint(oID),
+		SpaceID: uint(sID),
 	}).First(&result).Error
 
 	if err != nil {

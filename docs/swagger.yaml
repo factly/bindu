@@ -57,16 +57,31 @@ definitions:
     type: object
   medium.medium:
     properties:
+      alt_text:
+        type: string
+      caption:
+        type: string
+      description:
+        type: string
+      dimensions:
+        type: string
+      file_size:
+        type: integer
       name:
         type: string
       slug:
+        type: string
+      title:
         type: string
       type:
         type: string
       url:
         type: string
     required:
+    - dimensions
+    - file_size
     - name
+    - type
     type: object
   model.Category:
     properties:
@@ -76,6 +91,8 @@ definitions:
         type: array
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       description:
@@ -84,12 +101,16 @@ definitions:
         type: integer
       name:
         type: string
-      organisation_id:
-        type: integer
       slug:
         type: string
+      space:
+        $ref: '#/definitions/model.Space'
+      space_id:
+        type: integer
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
     required:
     - name
     - slug
@@ -104,6 +125,8 @@ definitions:
         type: string
       created_at:
         type: string
+      created_by_id:
+        type: integer
       data_url:
         type: string
       deleted_at:
@@ -116,12 +139,14 @@ definitions:
         type: integer
       medium:
         $ref: '#/definitions/model.Medium'
-      organisation_id:
-        type: integer
       published_date:
         type: string
       slug:
         type: string
+      space:
+        $ref: '#/definitions/model.Space'
+      space_id:
+        type: integer
       status:
         type: string
       tags:
@@ -136,25 +161,43 @@ definitions:
         type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
     type: object
   model.Medium:
     properties:
+      alt_text:
+        type: string
+      caption:
+        type: string
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
+      description:
+        type: string
+      dimensions:
+        type: string
+      file_size:
+        type: integer
       id:
         type: integer
       name:
         type: string
-      organisation_id:
-        type: integer
       slug:
+        type: string
+      space_id:
+        type: integer
+      title:
         type: string
       type:
         type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
       url:
         type: string
     type: object
@@ -162,7 +205,11 @@ definitions:
     properties:
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
+        type: string
+      description:
         type: string
       id:
         type: integer
@@ -174,6 +221,59 @@ definitions:
         type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
+    type: object
+  model.Space:
+    properties:
+      contact_info:
+        type: string
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      fav_icon:
+        $ref: '#/definitions/model.Medium'
+      fav_icon_id:
+        type: integer
+      id:
+        type: integer
+      logo:
+        $ref: '#/definitions/model.Medium'
+      logo_id:
+        type: integer
+      logo_mobile:
+        $ref: '#/definitions/model.Medium'
+      logo_mobile_id:
+        type: integer
+      mobile_icon:
+        $ref: '#/definitions/model.Medium'
+      mobile_icon_id:
+        type: integer
+      name:
+        type: string
+      organisation_id:
+        type: integer
+      site_address:
+        type: string
+      site_title:
+        type: string
+      slug:
+        type: string
+      social_media_urls:
+        type: string
+      tag_line:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+      verification_codes:
+        type: string
     type: object
   model.Tag:
     properties:
@@ -183,6 +283,8 @@ definitions:
         type: array
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       description:
@@ -191,12 +293,16 @@ definitions:
         type: integer
       name:
         type: string
-      organisation_id:
-        type: integer
       slug:
         type: string
+      space:
+        $ref: '#/definitions/model.Space'
+      space_id:
+        type: integer
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
     type: object
   model.Theme:
     properties:
@@ -204,16 +310,22 @@ definitions:
         type: string
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       id:
         type: integer
       name:
         type: string
-      organisation_id:
+      space:
+        $ref: '#/definitions/model.Space'
+      space_id:
         type: integer
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
     required:
     - name
     type: object
@@ -221,6 +333,8 @@ definitions:
     properties:
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       id:
@@ -229,6 +343,69 @@ definitions:
         type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
+    type: object
+  space.orgWithSpace:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      permission:
+        $ref: '#/definitions/model.organisationUser'
+      slug:
+        type: string
+      spaces:
+        items:
+          $ref: '#/definitions/model.Space'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
+  space.space:
+    properties:
+      contact_info:
+        type: string
+      description:
+        type: string
+      fav_icon_id:
+        type: integer
+      logo_id:
+        type: integer
+      logo_mobile_id:
+        type: integer
+      mobile_icon_id:
+        type: integer
+      name:
+        type: string
+      organisation_id:
+        type: integer
+      site_address:
+        type: string
+      site_title:
+        type: string
+      slug:
+        type: string
+      social_media_urls:
+        type: string
+      tag_line:
+        type: string
+      verification_codes:
+        type: string
+    required:
+    - name
+    - organisation_id
     type: object
   tag.paging:
     properties:
@@ -293,9 +470,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: limit per page
@@ -327,9 +504,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Category Object
@@ -364,9 +541,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Category ID
@@ -394,9 +571,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Category ID
@@ -423,14 +600,14 @@ paths:
         name: X-User
         required: true
         type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
       - description: Category ID
         in: path
         name: category_id
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
         required: true
         type: string
       - description: Category
@@ -458,9 +635,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: limit per page
@@ -492,9 +669,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Chart Object
@@ -529,9 +706,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Chart ID
@@ -559,9 +736,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Chart ID
@@ -588,14 +765,14 @@ paths:
         name: X-User
         required: true
         type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
       - description: Chart ID
         in: path
         name: chart_id
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
         required: true
         type: string
       - description: Chart
@@ -623,9 +800,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: limit per page
@@ -657,9 +834,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Medium Object
@@ -694,9 +871,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Medium ID
@@ -724,9 +901,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Medium ID
@@ -753,14 +930,14 @@ paths:
         name: X-User
         required: true
         type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
       - description: Medium ID
         in: path
         name: medium_id
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
         required: true
         type: string
       - description: Medium
@@ -788,9 +965,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: limit per page
@@ -813,6 +990,107 @@ paths:
       summary: Show all organisations
       tags:
       - Organisation
+  /spaces:
+    get:
+      description: Get all spaces
+      operationId: get-all-spaces
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/space.orgWithSpace'
+              type: array
+            type: array
+      summary: Show all spaces
+      tags:
+      - Space
+    post:
+      description: Create space
+      operationId: add-space
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space Object
+        in: body
+        name: Space
+        required: true
+        schema:
+          $ref: '#/definitions/space.space'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Space'
+      summary: Create space
+      tags:
+      - Space
+  /spaces/{space_id}:
+    delete:
+      description: Delete space
+      operationId: delete-space
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: path
+        name: space_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200": {}
+      summary: Delete space
+      tags:
+      - Space
+    put:
+      description: Update space
+      operationId: update-space
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: path
+        name: space_id
+        required: true
+        type: string
+      - description: Space Object
+        in: body
+        name: Space
+        required: true
+        schema:
+          $ref: '#/definitions/space.space'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Space'
+      summary: Update space
+      tags:
+      - Space
   /tags:
     get:
       description: Get all tags
@@ -823,9 +1101,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: limit per page
@@ -857,9 +1135,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Tag Object
@@ -894,9 +1172,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Tag ID
@@ -924,9 +1202,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Tag ID
@@ -953,14 +1231,14 @@ paths:
         name: X-User
         required: true
         type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
       - description: Tag ID
         in: path
         name: tag_id
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
         required: true
         type: string
       - description: Tag
@@ -988,9 +1266,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: limit per page
@@ -1022,9 +1300,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Theme Object
@@ -1059,9 +1337,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Theme ID
@@ -1089,9 +1367,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Theme ID
@@ -1118,14 +1396,14 @@ paths:
         name: X-User
         required: true
         type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
       - description: Theme ID
         in: path
         name: theme_id
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
         required: true
         type: string
       - description: Theme

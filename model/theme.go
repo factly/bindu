@@ -9,9 +9,10 @@ import (
 // Theme model
 type Theme struct {
 	config.Base
-	Name           string         `json:"name" validate:"required"`
-	Config         postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
-	OrganisationID uint           `json:"organisation_id"`
+	Name    string         `json:"name" validate:"required"`
+	Config  postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
+	SpaceID uint           `gorm:"column:space_id" json:"space_id"`
+	Space   *Space         `json:"space,omitempty"`
 }
 
 var themeUser config.ContextKey = "theme_user"

@@ -12,7 +12,8 @@ type organisationUser struct {
 // Organisation model
 type Organisation struct {
 	config.Base
-	Title      string           `json:"title"`
-	Slug       string           `json:"slug"`
-	Permission organisationUser `json:"permission"`
+	Title       string           `json:"title"`
+	Slug        string           `json:"slug"`
+	Description string           `json:"description"`
+	Permission  organisationUser `json:"permission"`
 }
