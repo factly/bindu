@@ -2251,9 +2251,6 @@ var doc = `{
                 "description": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string"
                 },
@@ -2263,10 +2260,10 @@ var doc = `{
                         "$ref": "#/definitions/model.Permission"
                     }
                 },
-                "users": {
+                "subjects": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.User"
+                        "type": "object"
                     }
                 }
             }
@@ -2540,7 +2537,7 @@ var doc = `{
                         "$ref": "#/definitions/model.Permission"
                     }
                 },
-                "users": {
+                "subjects": {
                     "type": "array",
                     "items": {
                         "type": "string"

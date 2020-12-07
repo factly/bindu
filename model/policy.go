@@ -18,8 +18,8 @@ type Permission struct {
 
 // Policy model
 type Policy struct {
-	Name        string       `json:"name"`
-	Description string       `json:"description"`
-	Permissions []Permission `json:"permissions"`
-	Users       []User       `json:"users"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
+	Permissions []Permission  `json:"permissions"`
+	Subjects    []interface{} `json:"subjects"`
 }

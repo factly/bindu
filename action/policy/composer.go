@@ -3,6 +3,7 @@ package policy
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/factly/bindu-server/util"
 
@@ -47,7 +48,18 @@ func Composer(oID int, sID int, inputPolicy policyReq) model.KetoPolicy {
 		}
 	}
 
-	result.Subjects = inputPolicy.Users
+	inpSubjects := make([]string, 0)
+
+	for _, subject := range inputPolicy.Subjects {
+		_, err := strconv.Atoi(subject)
+		if err != nil {
+			inpSubjects = append(inpSubjects, fmt.Sprint("roles:org:", oID, ":app:bindu:space:", sID, ":", subject))
+		} else {
+			inpSubjects = append(inpSubjects, subject)
+		}
+	}
+
+	result.Subjects = inpSubjects
 
 	resp, err := util.Request("PUT", viper.GetString("keto_url")+"/engines/acp/ory/regex/policies", result)
 	if err != nil {

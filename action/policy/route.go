@@ -10,7 +10,7 @@ type policyReq struct {
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
 	Permissions []model.Permission `json:"permissions"`
-	Users       []string           `json:"users"`
+	Subjects    []string           `json:"subjects"`
 }
 
 // Router - Group of medium router

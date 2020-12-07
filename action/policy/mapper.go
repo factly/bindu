@@ -2,7 +2,10 @@ package policy
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
+
+	"github.com/factly/bindu-server/action/role"
 
 	"github.com/factly/bindu-server/model"
 	"github.com/spf13/viper"
@@ -31,12 +34,28 @@ func Mapper(ketoPolicy model.KetoPolicy, userMap map[string]model.User) model.Po
 		permissions = append(permissions, eachRule)
 	}
 
-	authors := make([]model.User, 0)
-	for _, user := range ketoPolicy.Subjects {
-		val, exists := userMap[user]
-		if exists {
-			authors = append(authors, val)
+	subjects := make([]interface{}, 0)
+	for _, subject := range ketoPolicy.Subjects {
+		_, err := strconv.Atoi(subject)
+		if err != nil {
+			resp, err := util.Request("GET", viper.GetString("keto_url")+"/engines/acp/ory/regex/roles/"+subject, nil)
+			if err != nil {
+				continue
+			}
+
+			var ketoRole model.KetoRole
+			defer resp.Body.Close()
+			_ = json.NewDecoder(resp.Body).Decode(&ketoRole)
+			role := role.Mapper(ketoRole, userMap)
+
+			subjects = append(subjects, role)
+		} else {
+			val, exists := userMap[subject]
+			if exists {
+				subjects = append(subjects, val)
+			}
 		}
+
 	}
 
 	var result model.Policy
@@ -44,7 +63,7 @@ func Mapper(ketoPolicy model.KetoPolicy, userMap map[string]model.User) model.Po
 	result.Name = nameAll[len(nameAll)-1]
 	result.Description = ketoPolicy.Description
 	result.Permissions = permissions
-	result.Users = authors
+	result.Subjects = subjects
 
 	return result
 }

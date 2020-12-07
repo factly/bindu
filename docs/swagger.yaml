@@ -237,17 +237,15 @@ definitions:
     properties:
       description:
         type: string
-      id:
-        type: string
       name:
         type: string
       permissions:
         items:
           $ref: '#/definitions/model.Permission'
         type: array
-      users:
+      subjects:
         items:
-          $ref: '#/definitions/model.User'
+          type: object
         type: array
     type: object
   model.Role:
@@ -427,7 +425,7 @@ definitions:
         items:
           $ref: '#/definitions/model.Permission'
         type: array
-      users:
+      subjects:
         items:
           type: string
         type: array
