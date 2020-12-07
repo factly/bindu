@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/factly/bindu-server/action/policy"
+	"github.com/factly/bindu-server/action/role"
 	"github.com/factly/bindu-server/action/user"
 
 	"github.com/factly/x/healthx"
@@ -61,6 +62,7 @@ func RegisterRoutes() *chi.Mux {
 		r.Mount("/themes", theme.Router())
 		r.Mount("/spaces", space.Router())
 		r.Mount("/policies", policy.Router())
+		r.Mount("/roles", role.Router())
 		r.Mount("/users", user.Router())
 	})
 

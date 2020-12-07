@@ -1,4 +1,4 @@
-package policy
+package role
 
 import (
 	"fmt"
@@ -12,46 +12,43 @@ import (
 	"github.com/spf13/viper"
 )
 
-// delete - Delete policy by ID
-// @Summary Delete policy by ID
-// @Description GeDeletet policy by ID
-// @Tags Policy
-// @ID delete-policy-by-id
+// delete - Delete Role by ID
+// @Summary Delete Role by ID
+// @Description Delete Role by ID
+// @Tags Role
+// @ID delete-role-by-id
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
-// @Param policy_id path string true "Policy ID"
-// @Success 200 {object} model.Policy
-// @Router /policies/{policy_id} [delete]
+// @Param role_id path string true "Role ID"
+// @Success 200
+// @Router /roles/{role_id} [delete]
 func delete(w http.ResponseWriter, r *http.Request) {
-	spaceID, err := util.GetSpace(r.Context())
-
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
-	organisationID, err := util.GetOrganisation(r.Context())
-
+	oID, err := util.GetOrganisation(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
-	/* delete old policy */
-	policyID := chi.URLParam(r, "policy_id")
-	if policyID == "" {
+	roleID := chi.URLParam(r, "role_id")
+	if roleID == "" {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
 
-	ketoPolicyID := fmt.Sprint("id:org:", organisationID, ":app:bindu:space:", spaceID, ":"+policyID)
+	ketoRoleID := fmt.Sprint("roles:org:", oID, ":app:bindu:space:", sID, ":", roleID)
 
-	resp, err := util.Request("DELETE", viper.GetString("keto_url")+"/engines/acp/ory/regex/policies/"+ketoPolicyID, nil)
+	resp, err := util.Request("DELETE", viper.GetString("keto_url")+"/engines/acp/ory/regex/roles/"+ketoRoleID, nil)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -62,6 +59,5 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}
-
 	renderx.JSON(w, http.StatusOK, nil)
 }

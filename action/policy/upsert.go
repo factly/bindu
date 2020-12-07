@@ -11,9 +11,9 @@ import (
 	"github.com/factly/x/renderx"
 )
 
-// create - Create policy
-// @Summary Create policy
-// @Description Create policy
+// upsert - Upsert policy
+// @Summary Upsert policy
+// @Description Upsert policy
 // @Tags Policy
 // @ID add-policy
 // @Consume json
@@ -22,8 +22,8 @@ import (
 // @Param X-Space header string true "Space ID"
 // @Param Policy body policyReq true "Policy Object"
 // @Success 201 {object} model.Policy
-// @Router /policies [post]
-func create(w http.ResponseWriter, r *http.Request) {
+// @Router /policies [put]
+func upsert(w http.ResponseWriter, r *http.Request) {
 	spaceID, err := util.GetSpace(r.Context())
 
 	if err != nil {

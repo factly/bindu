@@ -1,6 +1,7 @@
-package policy
+package role
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -12,18 +13,19 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
+	"github.com/spf13/viper"
 )
 
 type paging struct {
-	Total int            `json:"total"`
-	Nodes []model.Policy `json:"nodes"`
+	Total int          `json:"total"`
+	Nodes []model.Role `json:"nodes"`
 }
 
-// list - Get all policies
-// @Summary Get all policies
-// @Description Get all policies
-// @Tags Policy
-// @ID get-all-policy
+// list - Get all roles
+// @Summary Get all roles
+// @Description Get all roles
+// @Tags Role
+// @ID get-all-roles
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
@@ -31,52 +33,60 @@ type paging struct {
 // @Param limit query string false "limit per page"
 // @Param page query string false "page number"
 // @Success 200 {object} paging
-// @Router /policies [get]
+// @Router /roles [get]
 func list(w http.ResponseWriter, r *http.Request) {
-	userID, err := util.GetUser(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
-	spaceID, err := util.GetSpace(r.Context())
+	uID, err := util.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
-	organisationID, err := util.GetOrganisation(r.Context())
+	oID, err := util.GetOrganisation(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
-	polices, err := GetAllPolicies()
+	resp, err := util.Request("GET", viper.GetString("keto_url")+"/engines/acp/ory/regex/roles", nil)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}
 
-	prefixName := fmt.Sprint("id:org:", organisationID, ":app:bindu:space:", spaceID, ":")
-	var onlyOrgPolicy []model.KetoPolicy
+	var ketoRoles []model.KetoRole
 
-	for _, each := range polices {
-		if strings.HasPrefix(each.ID, prefixName) {
-			onlyOrgPolicy = append(onlyOrgPolicy, each)
-		}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&ketoRoles)
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
 	}
 
-	for i, j := 0, len(onlyOrgPolicy)-1; i < j; i, j = i+1, j-1 {
-		onlyOrgPolicy[i], onlyOrgPolicy[j] = onlyOrgPolicy[j], onlyOrgPolicy[i]
+	prefixID := fmt.Sprint("roles:org:", oID, ":app:bindu:space:", sID, ":")
+
+	onlySpaceRoles := make([]model.KetoRole, 0)
+
+	for _, role := range ketoRoles {
+		if strings.HasPrefix(role.ID, prefixID) {
+			onlySpaceRoles = append(onlySpaceRoles, role)
+		}
 	}
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	total := len(onlyOrgPolicy)
+	total := len(onlySpaceRoles)
 	lowerLimit := offset
 	upperLimit := offset + limit
 	if offset > total {
@@ -87,19 +97,20 @@ func list(w http.ResponseWriter, r *http.Request) {
 		upperLimit = total
 	}
 
-	onlyOrgPolicy = onlyOrgPolicy[lowerLimit:upperLimit]
+	onlySpaceRoles = onlySpaceRoles[lowerLimit:upperLimit]
 
 	/* User req */
-	userMap := user.Mapper(organisationID, userID)
+	userMap := user.Mapper(oID, uID)
 
-	pagePolicies := make([]model.Policy, 0)
+	pageRoles := make([]model.Role, 0)
 
-	for _, each := range onlyOrgPolicy {
-		pagePolicies = append(pagePolicies, Mapper(each, userMap))
+	for _, each := range onlySpaceRoles {
+		pageRoles = append(pageRoles, Mapper(each, userMap))
 	}
 
 	var result paging
-	result.Nodes = pagePolicies
+	result.Nodes = pageRoles
 	result.Total = total
+
 	renderx.JSON(w, http.StatusOK, result)
 }

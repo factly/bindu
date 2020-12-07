@@ -1,10 +1,11 @@
 package policy
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
+	"strconv"
+
+	"github.com/factly/bindu-server/util"
 
 	"github.com/spf13/viper"
 
@@ -23,7 +24,7 @@ func contains(s []string, e string) bool {
 
 // Composer create keto policy
 func Composer(oID int, sID int, inputPolicy policyReq) model.KetoPolicy {
-	allowedResources := []string{"categories", "charts", "media", "policies", "tags", "themes"}
+	allowedResources := []string{"categories", "charts", "media", "policies", "roles", "tags", "themes"}
 	allowedActions := []string{"get", "create", "update", "delete", "publish"}
 	result := model.KetoPolicy{}
 
@@ -47,23 +48,20 @@ func Composer(oID int, sID int, inputPolicy policyReq) model.KetoPolicy {
 		}
 	}
 
-	result.Subjects = inputPolicy.Users
+	inpSubjects := make([]string, 0)
 
-	buf := new(bytes.Buffer)
-	err := json.NewEncoder(buf).Encode(&result)
-	if err != nil {
-		loggerx.Error(err)
+	for _, subject := range inputPolicy.Subjects {
+		_, err := strconv.Atoi(subject)
+		if err != nil {
+			inpSubjects = append(inpSubjects, fmt.Sprint("roles:org:", oID, ":app:bindu:space:", sID, ":", subject))
+		} else {
+			inpSubjects = append(inpSubjects, subject)
+		}
 	}
 
-	req, err := http.NewRequest("PUT", viper.GetString("keto_url")+"/engines/acp/ory/regex/policies", buf)
-	if err != nil {
-		loggerx.Error(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
+	result.Subjects = inpSubjects
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-
+	resp, err := util.Request("PUT", viper.GetString("keto_url")+"/engines/acp/ory/regex/policies", result)
 	if err != nil {
 		return model.KetoPolicy{}
 	}
@@ -71,7 +69,6 @@ func Composer(oID int, sID int, inputPolicy policyReq) model.KetoPolicy {
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
-
 	if err != nil {
 		loggerx.Error(err)
 	}

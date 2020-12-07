@@ -10,12 +10,6 @@ type KetoPolicy struct {
 	Description string   `json:"description"`
 }
 
-// KetoRole model
-type KetoRole struct {
-	ID      string   `json:"id"`
-	Members []string `json:"members"`
-}
-
 // Permission model
 type Permission struct {
 	Resource string   `json:"resource"`
@@ -24,9 +18,8 @@ type Permission struct {
 
 // Policy model
 type Policy struct {
-	ID          string       `json:"id"`
-	Name        string       `json:"name"`
-	Description string       `json:"description"`
-	Permissions []Permission `json:"permissions"`
-	Users       []User       `json:"users"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
+	Permissions []Permission  `json:"permissions"`
+	Subjects    []interface{} `json:"subjects"`
 }
