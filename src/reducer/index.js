@@ -4,6 +4,7 @@ import organisation from './organisation.js';
 import categories from './categories';
 import tags from './tags';
 import charts from './charts';
+import settings from './settings';
 
 export default combineReducers({
   templates,
@@ -11,4 +12,5 @@ export default combineReducers({
   categories,
   tags,
   charts,
+  settings,
 });
