@@ -12,10 +12,13 @@ import TagsEdit from './pages/tags/EditTag';
 import Categories from './pages/categories/index.js';
 import CategoriesCreate from './pages/categories/CreateCategory';
 import CategoriesEdit from './pages/categories/EditCategory';
-import Chart from './pages/charts/index.js';
+import SavedCharts from './pages/charts/saved.js';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import BasicLayout from './layout/basic/index.js';
+import EditCharts from './pages/charts/EditCharts.js';
+import CreateCharts from './pages/charts/CreateChart.js';
+
 const routes = [
   {
     path: '/templates',
@@ -23,7 +26,15 @@ const routes = [
   },
   {
     path: '/chart/:id',
-    Component: Chart,
+    Component: CreateCharts,
+  },
+  {
+    path: '/charts/saved',
+    Component: SavedCharts,
+  },
+  {
+    path: '/charts/:id/edit',
+    Component: EditCharts,
   },
   {
     path: '/',

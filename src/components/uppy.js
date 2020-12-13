@@ -18,7 +18,7 @@ function UppyUploader({ onUpload }) {
     id: 'uppy-media',
     meta: { type: 'avatar' },
     restrictions: {
-      allowedFileTypes: ['.json'],
+      allowedFileTypes: ['.json', '.csv'],
     },
     autoProceed: false,
     onBeforeUpload: (files) => {

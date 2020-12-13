@@ -1,33 +1,19 @@
 import React from 'react';
-import { Layout, Card, Menu, Space } from 'antd';
+import { Layout, Card } from 'antd';
 
-import { Link } from 'react-router-dom';
-import OrganisationSelector from '../../components/OrganisationSelector';
+import './basic.css';
+import Sidebar from '../../components/GlobalNav/Sidebar';
+import Header from '../../components/GlobalNav/Header';
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 function BasicLayout(props) {
   const { children } = props;
   return (
-    <Layout>
+    <Layout hasSider={true}>
+      <Sidebar />
       <Layout>
-        <Header className="header">
-          <Space direction="horizontal" size={48}>
-            <OrganisationSelector />
-            <Menu theme="light" mode="horizontal">
-              <Menu.Item key="1">
-                <Link to={'/templates'}>Templates</Link>
-              </Menu.Item>
-              <Menu.Item key="2">Saved Charts</Menu.Item>
-              <Menu.Item key="3">
-                <Link to={'/tags'}>Tags</Link>
-              </Menu.Item>
-              <Menu.Item key="4">
-                <Link to={'/categories'}>Categories</Link>
-              </Menu.Item>
-            </Menu>
-          </Space>
-        </Header>
+        <Header />
         <Content className="layout-content">
           <Card bordered={false} className="wrap-children-content">
             {children}
