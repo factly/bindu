@@ -24,8 +24,18 @@ function SavedCharts() {
       renderItem={(chart, index) => {
         return (
           <List.Item>
-            <Link key={index}>
-              <Card hoverable cover={<img alt="example" src={chart.medium?.url.proxy} />}>
+            <Link key={index} to={`/charts/${chart.id}/edit`}>
+              <Card
+                hoverable
+                cover={
+                  <img
+                    width={180}
+                    height={150}
+                    alt="example"
+                    src={chart.medium?.url.url.replace('minio', '127.0.0.1')}
+                  />
+                }
+              >
                 <Meta title={chart.title} />
               </Card>
             </Link>

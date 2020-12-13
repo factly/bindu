@@ -19,7 +19,7 @@ import UppyUploader from '../../components/uppy';
 import { b64toBlob } from '../../utils/file';
 import { addChart } from '../../actions/charts';
 
-function Chart() {
+function Chart({ data = {}, onSubmit }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
@@ -35,6 +35,17 @@ function Chart() {
     _.set(values, ['data', 'url'], dataDetails.url.raw);
     form.setFieldsValue(values);
   };
+
+  React.useEffect(() => {
+    if (data.id) {
+      form.setFieldsValue({
+        ...data.config,
+        categories: data.categories,
+        tags: data.tags,
+      });
+      setChartName(data.title);
+    }
+  }, [data]);
 
   const downloadSampleData = () => {
     const url = form.getFieldValue(['data', 'url']);
@@ -57,16 +68,15 @@ function Chart() {
   const saveChart = async () => {
     const { tags, categories, ...values } = form.getFieldValue();
     const imageBlob = await view?.toImageURL('png', 1);
-    dispatch(
-      addChart({
-        title: chartName,
-        data_url: values.data.url,
-        config: values,
-        featured_medium: imageBlob,
-        category_ids: categories,
-        tag_ids: tags,
-      }),
-    );
+
+    onSubmit({
+      title: chartName,
+      data_url: values.data.url,
+      config: values,
+      featured_medium: imageBlob,
+      category_ids: categories,
+      tag_ids: tags,
+    });
   };
 
   const IconSize = 20;
