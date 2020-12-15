@@ -13,5 +13,7 @@ func Migration() {
 		&Theme{},
 		&OrganisationPermission{},
 		&SpacePermission{},
+		&OrganisationPermissionRequest{},
+		&SpacePermissionRequest{},
 	)
 }
