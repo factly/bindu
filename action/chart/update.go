@@ -153,6 +153,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	tx.Model(&result).Select("IsPublic").Updates(model.Chart{IsPublic: chart.IsPublic})
 	err = tx.Model(&result).Omit("Tags", "Categories").Updates(model.Chart{
 		Base:             config.Base{UpdatedByID: uint(uID)},
 		Title:            chart.Title,

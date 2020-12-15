@@ -163,6 +163,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Config:           chart.Config,
 		Description:      chart.Description,
 		Status:           chart.Status,
+		IsPublic:         chart.IsPublic,
 		FeaturedMediumID: &medium.ID,
 		ThemeID:          themeID,
 		PublishedDate:    chart.PublishedDate,
