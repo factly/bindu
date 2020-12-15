@@ -34,6 +34,13 @@ type ketoPolicy struct {
 	Description string   `json:"description"`
 }
 
+// OrganisationPermission model
+type OrganisationPermission struct {
+	Base
+	OrganisationID uint  `gorm:"column:organisation_id" json:"organisation_id"`
+	Spaces         int64 `gorm:"column:spaces" json:"spaces"`
+}
+
 var ketoPolicyPath string = "/engines/acp/ory/regex/policies"
 
 // CheckSuperOrganisation checks if super organisation is present in kavach or not
@@ -146,6 +153,12 @@ func CreateSuperOrganisation() error {
 			return err
 		}
 
+		// create permissions for super organisation
+		err = createSuperOrganisationPermissions(respOrganisation.ID)
+		if err != nil {
+			return err
+		}
+
 		// create keto policy for super organisation
 		_, err = createKetoPolicy(respOrganisation.ID)
 		if err != nil {
@@ -253,6 +266,13 @@ func createKavachOrganisation(userID string) (*http.Response, error) {
 		return nil, errors.New("could not create organisation in kavach")
 	}
 	return resp, nil
+}
+
+func createSuperOrganisationPermissions(oID uint) error {
+	return DB.Model(&OrganisationPermission{}).Create(&OrganisationPermission{
+		OrganisationID: oID,
+		Spaces:         -1,
+	}).Error
 }
 
 func createKetoPolicy(organisationID uint) (*http.Response, error) {

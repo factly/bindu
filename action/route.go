@@ -3,6 +3,7 @@ package action
 import (
 	"fmt"
 
+	"github.com/factly/bindu-server/action/permission"
 	"github.com/factly/bindu-server/action/policy"
 	"github.com/factly/bindu-server/action/role"
 	"github.com/factly/bindu-server/action/user"
@@ -64,6 +65,7 @@ func RegisterRoutes() *chi.Mux {
 		r.Mount("/policies", policy.Router())
 		r.Mount("/roles", role.Router())
 		r.Mount("/users", user.Router())
+		r.Mount("/permissions", permission.Router())
 	})
 
 	sqlDB, _ := config.DB.DB()
