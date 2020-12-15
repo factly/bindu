@@ -32,12 +32,17 @@ func main() {
 
 	model.Migration()
 
+	err := config.CreateSuperOrganisation()
+	if err != nil {
+		log.Println(err)
+	}
+
 	minio.SetupClient()
 
 	// register routes
 	r := action.RegisterRoutes()
 
-	err := http.ListenAndServe(":8000", r)
+	err = http.ListenAndServe(":8000", r)
 
 	if err != nil {
 		log.Fatal(err)
