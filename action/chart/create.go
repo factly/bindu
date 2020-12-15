@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/factly/bindu-server/util/minio"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 
 	"github.com/factly/bindu-server/config"
@@ -65,6 +66,32 @@ func create(w http.ResponseWriter, r *http.Request) {
 		loggerx.Error(errors.New("validation error"))
 		errorx.Render(w, validationError)
 		return
+	}
+
+	if viper.GetBool("create_super_organisation") {
+		// Fetch space permissions
+		permission := model.SpacePermission{}
+		err = config.DB.Model(&model.SpacePermission{}).Where(&model.SpacePermission{
+			SpaceID: uint(sID),
+		}).First(&permission).Error
+
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot create more charts", http.StatusUnprocessableEntity)))
+			return
+		}
+
+		// Fetch total number of charts in space
+		var totCharts int64
+		config.DB.Model(&model.Chart{}).Where(&model.Chart{
+			SpaceID: uint(sID),
+		}).Count(&totCharts)
+
+		if totCharts >= permission.Charts && permission.Charts > 0 {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot create more charts", http.StatusUnprocessableEntity)))
+			return
+		}
 	}
 
 	mediaURL, err := minio.Upload(r, chart.FeaturedMedium)
