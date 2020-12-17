@@ -31,7 +31,16 @@ type Space struct {
 	OrganisationID    int            `gorm:"column:organisation_id" json:"organisation_id"`
 }
 
+// SpacePermission model
+type SpacePermission struct {
+	config.Base
+	SpaceID uint   `gorm:"column:space_id" json:"space_id"`
+	Space   *Space `gorm:"foreignKey:space_id" json:"space,omitempty"`
+	Charts  int64  `gorm:"column:charts" json:"charts"`
+}
+
 var spaceUser config.ContextKey = "space_user"
+var spacePermissionUser config.ContextKey = "space_perm_user"
 
 // BeforeCreate hook
 func (space *Space) BeforeCreate(tx *gorm.DB) error {
@@ -45,6 +54,21 @@ func (space *Space) BeforeCreate(tx *gorm.DB) error {
 
 	space.CreatedByID = uint(uID)
 	space.UpdatedByID = uint(uID)
+	return nil
+}
+
+// BeforeCreate hook
+func (sp *SpacePermission) BeforeCreate(tx *gorm.DB) error {
+	ctx := tx.Statement.Context
+	userID := ctx.Value(spacePermissionUser)
+
+	if userID == nil {
+		return nil
+	}
+	uID := userID.(int)
+
+	sp.CreatedByID = uint(uID)
+	sp.UpdatedByID = uint(uID)
 	return nil
 }
 

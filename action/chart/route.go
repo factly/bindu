@@ -17,6 +17,7 @@ type chart struct {
 	Config           postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
 	Description      postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
 	Status           string         `json:"status"`
+	IsPublic         bool           `json:"is_public"`
 	FeaturedMedium   string         `json:"featured_medium"`
 	FeaturedMediumID uint           `json:"featured_medium_id"`
 	ThemeID          uint           `json:"theme_id"`

@@ -11,5 +11,9 @@ func Migration() {
 		&Category{},
 		&Tag{},
 		&Theme{},
+		&OrganisationPermission{},
+		&SpacePermission{},
+		&OrganisationPermissionRequest{},
+		&SpacePermissionRequest{},
 	)
 }

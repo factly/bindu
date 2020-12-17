@@ -224,6 +224,50 @@ definitions:
       updated_by_id:
         type: integer
     type: object
+  model.OrganisationPermission:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      organisation_id:
+        type: integer
+      spaces:
+        type: integer
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
+  model.OrganisationPermissionRequest:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      organisation_id:
+        type: integer
+      spaces:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
   model.Permission:
     properties:
       actions:
@@ -309,6 +353,54 @@ definitions:
         type: integer
       verification_codes:
         type: string
+    type: object
+  model.SpacePermission:
+    properties:
+      charts:
+        type: integer
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      space:
+        $ref: '#/definitions/model.Space'
+      space_id:
+        type: integer
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
+  model.SpacePermissionRequest:
+    properties:
+      charts:
+        type: integer
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      space:
+        $ref: '#/definitions/model.Space'
+      space_id:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
     type: object
   model.Tag:
     properties:
@@ -406,6 +498,95 @@ definitions:
       updated_by_id:
         type: integer
     type: object
+  organisation.orgPermissionRes:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      is_admin:
+        type: boolean
+      organisation_id:
+        type: integer
+      space_permissions:
+        items:
+          $ref: '#/definitions/model.SpacePermission'
+        type: array
+      spaces:
+        type: integer
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
+  organisation.orgWithPermissions:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      permission:
+        $ref: '#/definitions/model.OrganisationPermission'
+      slug:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
+  organisation.organisationPermission:
+    properties:
+      organisation_id:
+        type: integer
+      spaces:
+        type: integer
+    required:
+    - organisation_id
+    type: object
+  organisation.organisationPermissionRequest:
+    properties:
+      description:
+        type: string
+      organisation_id:
+        type: integer
+      spaces:
+        type: integer
+      title:
+        type: string
+    required:
+    - organisation_id
+    - title
+    type: object
+  organisation.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/organisation.orgWithPermissions'
+        type: array
+      total:
+        type: integer
+    type: object
+  organisationPermission.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.OrganisationPermissionRequest'
+        type: array
+      total:
+        type: integer
+    type: object
   policy.paging:
     properties:
       nodes:
@@ -479,6 +660,15 @@ definitions:
       updated_by_id:
         type: integer
     type: object
+  space.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/space.spaceWithPermissions'
+        type: array
+      total:
+        type: integer
+    type: object
   space.space:
     properties:
       contact_info:
@@ -512,6 +702,91 @@ definitions:
     required:
     - name
     - organisation_id
+    type: object
+  space.spacePermission:
+    properties:
+      charts:
+        type: integer
+      space_id:
+        type: integer
+    required:
+    - space_id
+    type: object
+  space.spacePermissionRequest:
+    properties:
+      charts:
+        type: integer
+      description:
+        type: string
+      space_id:
+        type: integer
+      title:
+        type: string
+    required:
+    - space_id
+    - title
+    type: object
+  space.spaceWithPermissions:
+    properties:
+      contact_info:
+        type: string
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      fav_icon:
+        $ref: '#/definitions/model.Medium'
+      fav_icon_id:
+        type: integer
+      id:
+        type: integer
+      logo:
+        $ref: '#/definitions/model.Medium'
+      logo_id:
+        type: integer
+      logo_mobile:
+        $ref: '#/definitions/model.Medium'
+      logo_mobile_id:
+        type: integer
+      mobile_icon:
+        $ref: '#/definitions/model.Medium'
+      mobile_icon_id:
+        type: integer
+      name:
+        type: string
+      organisation_id:
+        type: integer
+      permission:
+        $ref: '#/definitions/model.SpacePermission'
+      site_address:
+        type: string
+      site_title:
+        type: string
+      slug:
+        type: string
+      social_media_urls:
+        type: string
+      tag_line:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+      verification_codes:
+        type: string
+    type: object
+  spacePermission.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.SpacePermissionRequest'
+        type: array
+      total:
+        type: integer
     type: object
   tag.paging:
     properties:
@@ -1105,6 +1380,423 @@ paths:
       summary: Show all organisations
       tags:
       - Organisation
+  /permissions/organisations:
+    get:
+      description: Get all organisation permissions
+      operationId: get-all-org-permissions
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/organisation.paging'
+            type: array
+      summary: Show all organisation permissions
+      tags:
+      - Organisation_Permissions
+    post:
+      description: Create organisation permission
+      operationId: add-org-permission
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Permission Object
+        in: body
+        name: Permission
+        required: true
+        schema:
+          $ref: '#/definitions/organisation.organisationPermission'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.OrganisationPermission'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create organisation permission
+      tags:
+      - Organisation_Permissions
+  /permissions/organisations/{permission_id}:
+    delete:
+      description: Delete Organisation permission by ID
+      operationId: delete-org-permission-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Permission ID
+        in: path
+        name: permission_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete a Organisation permission
+      tags:
+      - Organisation_Permissions
+    put:
+      description: Update Organisation permission by ID
+      operationId: update-org-permission-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Permission ID
+        in: path
+        name: permission_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Permission Body
+        in: body
+        name: Permission
+        schema:
+          $ref: '#/definitions/organisation.organisationPermission'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OrganisationPermission'
+      summary: Update a Organisation permission by id
+      tags:
+      - Organisation_Permissions
+  /permissions/organisations/my:
+    get:
+      description: Get my organisation permissions
+      operationId: get-org-permission-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/organisation.orgPermissionRes'
+      summary: Show a my organisation permissions
+      tags:
+      - Organisation_Permissions
+  /permissions/organisations/request:
+    post:
+      description: Create organisation permission request
+      operationId: add-org-permission-request
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request Object
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/organisation.organisationPermissionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.OrganisationPermissionRequest'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create organisation permission request
+      tags:
+      - Organisation_Permissions
+  /permissions/spaces:
+    get:
+      description: Get all Space permissions
+      operationId: get-all-space-permissions
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/space.paging'
+            type: array
+      summary: Show all Space permissions
+      tags:
+      - Space_Permissions
+    post:
+      description: Create Space permission
+      operationId: add-space-permission
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Permission Object
+        in: body
+        name: Permission
+        required: true
+        schema:
+          $ref: '#/definitions/space.spacePermission'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.SpacePermission'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create Space permission
+      tags:
+      - Space_Permissions
+  /permissions/spaces/{permission_id}:
+    delete:
+      description: Delete Space permission by ID
+      operationId: delete-space-permission-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Permission ID
+        in: path
+        name: permission_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete a Space permission
+      tags:
+      - Space_Permissions
+    get:
+      description: Get Space permissions
+      operationId: get-space-permission-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Permission ID
+        in: path
+        name: permission_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SpacePermission'
+      summary: Show a Space permissions
+      tags:
+      - Space_Permissions
+    put:
+      description: Update Space permission by ID
+      operationId: update-space-permission-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Permission ID
+        in: path
+        name: permission_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Permission Body
+        in: body
+        name: Permission
+        schema:
+          $ref: '#/definitions/space.spacePermission'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SpacePermission'
+      summary: Update a Space permission by id
+      tags:
+      - Space_Permissions
+  /permissions/spaces/my:
+    get:
+      description: Get my Space permissions
+      operationId: get-my-space-permissions
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SpacePermission'
+      summary: Show a my Space permissions
+      tags:
+      - Space_Permissions
+  /permissions/spaces/request:
+    post:
+      description: Create space permission request
+      operationId: add-space-permission-request
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request Object
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/space.spacePermissionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.SpacePermissionRequest'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create space permission request
+      tags:
+      - Space_Permissions
   /policies:
     get:
       description: Get all policies
@@ -1258,6 +1950,380 @@ paths:
       summary: Create Default Policies
       tags:
       - Policy
+  /requests/organisation-permissions:
+    get:
+      description: Get all organisation permissions requests
+      operationId: get-all-org-permissions-requests
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/organisationPermission.paging'
+            type: array
+      summary: Show all organisation permissions requests
+      tags:
+      - Organisation_Permissions_Request
+  /requests/organisation-permissions/{request_id}:
+    delete:
+      description: Delete Organisation permission request by ID
+      operationId: delete-org-permission-request-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: request_id
+        required: true
+        type: string
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete a Organisation permission request
+      tags:
+      - Organisation_Permissions_Request
+    get:
+      description: Get organisation permissions requests detail
+      operationId: get-org-permission-request-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: request_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OrganisationPermissionRequest'
+      summary: Show a organisation permissions requests detail
+      tags:
+      - Organisation_Permissions_Request
+  /requests/organisation-permissions/{request_id}/approve:
+    post:
+      description: approve organisation permission
+      operationId: approve-org-permission
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: request_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.OrganisationPermission'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: approve organisation permission
+      tags:
+      - Organisation_Permissions_Request
+  /requests/organisation-permissions/{request_id}/reject:
+    post:
+      description: reject organisation permission
+      operationId: reject-org-permission
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: request_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: reject organisation permission
+      tags:
+      - Organisation_Permissions_Request
+  /requests/organisation-permissions/my:
+    get:
+      description: Get all my organisation permissions requests
+      operationId: get-all-my-org-permissions-requests
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/organisationPermission.paging'
+            type: array
+      summary: Show all my organisation permissions requests
+      tags:
+      - Organisation_Permissions_Request
+  /requests/space-permissions:
+    get:
+      description: Get all space permissions requests
+      operationId: get-all-space-permissions-requests
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/spacePermission.paging'
+            type: array
+      summary: Show all space permissions requests
+      tags:
+      - Space_Permissions_Request
+  /requests/space-permissions/{request_id}:
+    delete:
+      description: Delete Space permission request by ID
+      operationId: delete-space-permission-request-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: request_id
+        required: true
+        type: string
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete a Space permission request
+      tags:
+      - Space_Permissions_Request
+    get:
+      description: Get space permissions requests detail
+      operationId: get-space-permission-request-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: request_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SpacePermissionRequest'
+      summary: Show a space permissions requests detail
+      tags:
+      - Space_Permissions_Request
+  /requests/space-permissions/{request_id}/approve:
+    post:
+      description: approve space permission
+      operationId: approve-space-permission
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: request_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.SpacePermission'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: approve space permission
+      tags:
+      - Space_Permissions_Request
+  /requests/space-permissions/{request_id}/reject:
+    post:
+      description: reject space permission
+      operationId: reject-space-permission
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: request_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: reject space permission
+      tags:
+      - Space_Permissions_Request
+  /requests/space-permissions/my:
+    get:
+      description: Get all my space permissions requests
+      operationId: get-all-my-space-permissions-requests
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/spacePermission.paging'
+            type: array
+      summary: Show all my space permissions requests
+      tags:
+      - Space_Permissions_Request
   /roles:
     get:
       description: Get all roles

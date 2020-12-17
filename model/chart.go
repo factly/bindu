@@ -18,6 +18,7 @@ type Chart struct {
 	DataURL          string         `json:"data_url"`
 	Config           postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
 	Status           string         `json:"status"`
+	IsPublic         bool           `gorm:"column:is_public" json:"is_public"`
 	FeaturedMediumID *uint          `gorm:"column:featured_medium_id;default:NULL" json:"featured_medium_id"`
 	Medium           *Medium        `gorm:"foreignKey:featured_medium_id" json:"medium"`
 	ThemeID          *uint          `gorm:"column:theme_id" json:"theme_id"`

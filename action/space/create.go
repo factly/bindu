@@ -14,6 +14,7 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
+	"github.com/spf13/viper"
 )
 
 // create - Create space
@@ -65,6 +66,41 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var superOrgID int
+	if viper.GetBool("create_super_organisation") {
+		superOrgID, err = util.GetSuperOrganisationID()
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+
+		// Fetch organisation permissions
+		permission := model.OrganisationPermission{}
+		err = config.DB.Model(&model.OrganisationPermission{}).Where(&model.OrganisationPermission{
+			OrganisationID: uint(space.OrganisationID),
+		}).First(&permission).Error
+
+		if err != nil && space.OrganisationID != superOrgID {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot create more spaces", http.StatusUnprocessableEntity)))
+			return
+		}
+
+		if err == nil {
+			// Fetch total number of spaces in organisation
+			var totSpaces int64
+			config.DB.Model(&model.Space{}).Where(&model.Space{
+				OrganisationID: space.OrganisationID,
+			}).Count(&totSpaces)
+
+			if totSpaces >= permission.Spaces && permission.Spaces > 0 {
+				errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot create more spaces", http.StatusUnprocessableEntity)))
+				return
+			}
+		}
+	}
+
 	var spaceSlug string
 	if space.Slug != "" && slug.Check(space.Slug) {
 		spaceSlug = space.Slug
@@ -93,6 +129,30 @@ func create(w http.ResponseWriter, r *http.Request) {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
+	}
+
+	if viper.GetBool("create_super_organisation") {
+		// Create SpacePermission for super organisation
+		var spacePermission model.SpacePermission
+		if superOrgID == space.OrganisationID {
+			spacePermission = model.SpacePermission{
+				SpaceID: result.ID,
+				Charts:  -1,
+			}
+		} else {
+			spacePermission = model.SpacePermission{
+				SpaceID: result.ID,
+				Charts:  viper.GetInt64("default_number_of_charts"),
+			}
+		}
+		var spacePermContext config.ContextKey = "space_perm_user"
+		if err = tx.WithContext(context.WithValue(r.Context(), spacePermContext, uID)).Create(&spacePermission).Error; err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+
 	}
 
 	tx.Commit()
