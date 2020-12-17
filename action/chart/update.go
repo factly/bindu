@@ -9,12 +9,14 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/bindu-server/util/minio"
 	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"gorm.io/gorm"
 )
 
@@ -99,7 +101,46 @@ func update(w http.ResponseWriter, r *http.Request) {
 		chartSlug = slug.Approve(slug.Make(chart.Title), sID, tableName)
 	}
 
+	mediaURL, err := minio.Upload(r, chart.FeaturedMedium)
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	mediumJSON := map[string]interface{}{
+		"url": mediaURL,
+	}
+
+	mediumByte, err := json.Marshal(mediumJSON)
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	msg := json.RawMessage(mediumByte)
+
+	var msgJSONB postgres.Jsonb
+
+	msgJSONB.RawMessage = msg
+
+	medium := model.Medium{
+		URL:     msgJSONB,
+		SpaceID: uint(sID),
+	}
+
 	tx := config.DB.Begin()
+
+	err = tx.Model(&model.Medium{}).Create(&medium).Error
+
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		return
+	}
 
 	newTags := make([]model.Tag, 0)
 	if len(chart.TagIDs) > 0 {
