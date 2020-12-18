@@ -35,7 +35,7 @@ function OptionComponent(props) {
   let component;
 
   useEffect(() => {
-    form.setFieldsValue(component.spec);
+    if (!props.data.id) form.setFieldsValue(component.spec);
   }, [id, component]);
 
   switch (id) {
