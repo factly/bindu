@@ -69,7 +69,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	var superOrgID int
 	if viper.GetBool("create_super_organisation") {
-		superOrgID, err = util.GetSuperOrganisationID()
+		superOrgID, err = middlewarex.GetSuperOrganisationID("bindu")
 		if err != nil {
 			loggerx.Error(err)
 			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
