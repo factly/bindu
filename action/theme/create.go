@@ -8,7 +8,6 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
@@ -31,7 +30,7 @@ import (
 // @Router /themes [post]
 func create(w http.ResponseWriter, r *http.Request) {
 
-	sID, err := util.GetSpace(r.Context())
+	sID, err := middlewarex.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))

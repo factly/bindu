@@ -8,7 +8,6 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/minio"
 	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
@@ -44,7 +43,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sID, err := util.GetSpace(r.Context())
+	sID, err := middlewarex.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))

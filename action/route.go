@@ -58,7 +58,7 @@ func RegisterRoutes() *chi.Mux {
 		fmt.Println("Swagger @ http://localhost:7000/swagger/index.html")
 	}
 
-	r.With(util.GormRequestID, middlewarex.CheckUser, util.CheckSpace, util.GenerateOrganisation).Group(func(r chi.Router) {
+	r.With(util.GormRequestID, middlewarex.CheckUser, middlewarex.CheckSpace(0), util.GenerateOrganisation).Group(func(r chi.Router) {
 		r.Mount("/categories", category.Router())
 		r.Mount("/charts", chart.Router())
 		r.Mount("/media", medium.Router())

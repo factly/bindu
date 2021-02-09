@@ -29,7 +29,7 @@ import (
 // @Success 200 {object} model.Role
 // @Router /roles/{role_id} [get]
 func details(w http.ResponseWriter, r *http.Request) {
-	sID, err := util.GetSpace(r.Context())
+	sID, err := middlewarex.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))

@@ -25,7 +25,7 @@ import (
 // @Success 201 {object} model.Policy
 // @Router /policies [put]
 func upsert(w http.ResponseWriter, r *http.Request) {
-	spaceID, err := util.GetSpace(r.Context())
+	spaceID, err := middlewarex.GetSpace(r.Context())
 
 	if err != nil {
 		loggerx.Error(err)

@@ -26,7 +26,7 @@ func GenerateOrganisation(h http.Handler) http.Handler {
 
 		if strings.Split(strings.Trim(r.URL.Path, "/"), "/")[0] != "spaces" {
 			ctx := r.Context()
-			sID, err := GetSpace(ctx)
+			sID, err := middlewarex.GetSpace(ctx)
 
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
