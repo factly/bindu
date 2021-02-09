@@ -11,6 +11,7 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
+	"github.com/factly/x/middlewarex"
 	"github.com/spf13/viper"
 )
 
@@ -65,7 +66,7 @@ func GetOrganisation(ctx context.Context) (int, error) {
 // RequestOrganisation - request kavach to get all organisations of user
 func RequestOrganisation(r *http.Request) ([]model.Organisation, error) {
 
-	uID, err := GetUser(r.Context())
+	uID, err := middlewarex.GetUser(r.Context())
 
 	if err != nil {
 		return nil, err

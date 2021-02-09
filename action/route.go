@@ -12,6 +12,7 @@ import (
 	"github.com/factly/bindu-server/action/user"
 
 	"github.com/factly/x/healthx"
+	"github.com/factly/x/middlewarex"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/util"
@@ -57,7 +58,7 @@ func RegisterRoutes() *chi.Mux {
 		fmt.Println("Swagger @ http://localhost:7000/swagger/index.html")
 	}
 
-	r.With(util.GormRequestID, util.CheckUser, util.CheckSpace, util.GenerateOrganisation).Group(func(r chi.Router) {
+	r.With(util.GormRequestID, middlewarex.CheckUser, util.CheckSpace, util.GenerateOrganisation).Group(func(r chi.Router) {
 		r.Mount("/categories", category.Router())
 		r.Mount("/charts", chart.Router())
 		r.Mount("/media", medium.Router())
@@ -72,7 +73,7 @@ func RegisterRoutes() *chi.Mux {
 		r.Mount("/requests", request.Router())
 	})
 
-	r.With(util.CheckUser).Group(func(r chi.Router) {
+	r.With(middlewarex.CheckUser).Group(func(r chi.Router) {
 		r.Mount("/permissions/organisations/request", organisationReq.OrgRequestRouter())
 		r.Mount("/permissions/spaces/request", spaceReq.SpaceRequestRouter())
 	})

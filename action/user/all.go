@@ -5,6 +5,7 @@ import (
 
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
+	"github.com/factly/x/middlewarex"
 )
 
 // All - to return all authors
@@ -17,7 +18,7 @@ func All(ctx context.Context) (map[string]model.User, error) {
 		return authors, err
 	}
 
-	userID, err := util.GetUser(ctx)
+	userID, err := middlewarex.GetUser(ctx)
 
 	if err != nil {
 		return authors, err
