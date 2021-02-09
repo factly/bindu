@@ -8,11 +8,11 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
 	"gorm.io/gorm"
 )
@@ -70,15 +70,15 @@ func create(w http.ResponseWriter, r *http.Request) {
 	tableName := stmt.Schema.Table
 
 	var tagSlug string
-	if tag.Slug != "" && slug.Check(tag.Slug) {
+	if tag.Slug != "" && slugx.Check(tag.Slug) {
 		tagSlug = tag.Slug
 	} else {
-		tagSlug = slug.Make(tag.Name)
+		tagSlug = slugx.Make(tag.Name)
 	}
 
 	result := &model.Tag{
 		Name:        tag.Name,
-		Slug:        slug.Approve(tagSlug, sID, tableName),
+		Slug:        slugx.Approve(&config.DB, tagSlug, sID, tableName),
 		Description: tag.Description,
 		SpaceID:     uint(sID),
 	}

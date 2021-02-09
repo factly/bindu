@@ -9,11 +9,11 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util/minio"
-	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm/dialects/postgres"
@@ -95,10 +95,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	if result.Slug == chart.Slug {
 		chartSlug = result.Slug
-	} else if chart.Slug != "" && slug.Check(chart.Slug) {
-		chartSlug = slug.Approve(chart.Slug, sID, tableName)
+	} else if chart.Slug != "" && slugx.Check(chart.Slug) {
+		chartSlug = slugx.Approve(&config.DB, chart.Slug, sID, tableName)
 	} else {
-		chartSlug = slug.Approve(slug.Make(chart.Title), sID, tableName)
+		chartSlug = slugx.Approve(&config.DB, slugx.Make(chart.Title), sID, tableName)
 	}
 
 	mediaURL, err := minio.Upload(r, chart.FeaturedMedium)

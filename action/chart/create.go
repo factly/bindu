@@ -12,11 +12,11 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -145,10 +145,10 @@ func create(w http.ResponseWriter, r *http.Request) {
 	tableName := stmt.Schema.Table
 
 	var chartSlug string
-	if chart.Slug != "" && slug.Check(chart.Slug) {
+	if chart.Slug != "" && slugx.Check(chart.Slug) {
 		chartSlug = chart.Slug
 	} else {
-		chartSlug = slug.Make(chart.Title)
+		chartSlug = slugx.Make(chart.Title)
 	}
 
 	themeID := &chart.ThemeID
@@ -158,7 +158,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	result := &model.Chart{
 		Title:            chart.Title,
-		Slug:             slug.Approve(chartSlug, sID, tableName),
+		Slug:             slugx.Approve(&config.DB, chartSlug, sID, tableName),
 		DataURL:          chart.DataURL,
 		Config:           chart.Config,
 		Description:      chart.Description,

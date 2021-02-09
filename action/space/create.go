@@ -5,15 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
-	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
 	"github.com/spf13/viper"
 )
@@ -103,16 +104,16 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var spaceSlug string
-	if space.Slug != "" && slug.Check(space.Slug) {
+	if space.Slug != "" && slugx.Check(space.Slug) {
 		spaceSlug = space.Slug
 	} else {
-		spaceSlug = slug.Make(space.Name)
+		spaceSlug = slugx.Make(space.Name)
 	}
 
 	result := model.Space{
 		Name:              space.Name,
 		SiteTitle:         space.SiteTitle,
-		Slug:              slug.ApproveSpaceSlug(spaceSlug),
+		Slug:              ApproveSpaceSlug(spaceSlug),
 		Description:       space.Description,
 		TagLine:           space.TagLine,
 		SiteAddress:       space.SiteAddress,
@@ -158,4 +159,34 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	tx.Commit()
 	renderx.JSON(w, http.StatusCreated, result)
+}
+
+// ApproveSpaceSlug return slug for space
+func ApproveSpaceSlug(slug string) string {
+	spaceList := make([]model.Space, 0)
+	config.DB.Model(&model.Space{}).Where("slug LIKE ? AND deleted_at IS NULL", slug+"%").Find(&spaceList)
+
+	count := 0
+	for {
+		flag := true
+		for _, each := range spaceList {
+			temp := slug
+			if count != 0 {
+				temp = temp + "-" + strconv.Itoa(count)
+			}
+			if each.Slug == temp {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			break
+		}
+		count++
+	}
+	temp := slug
+	if count != 0 {
+		temp = temp + "-" + strconv.Itoa(count)
+	}
+	return temp
 }

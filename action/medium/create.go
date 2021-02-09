@@ -8,11 +8,11 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
 	"gorm.io/gorm"
 )
@@ -69,15 +69,15 @@ func create(w http.ResponseWriter, r *http.Request) {
 	tableName := stmt.Schema.Table
 
 	var mediumSlug string
-	if medium.Slug != "" && slug.Check(medium.Slug) {
+	if medium.Slug != "" && slugx.Check(medium.Slug) {
 		mediumSlug = medium.Slug
 	} else {
-		mediumSlug = slug.Make(medium.Name)
+		mediumSlug = slugx.Make(medium.Name)
 	}
 
 	result := &model.Medium{
 		Name:        medium.Name,
-		Slug:        slug.Approve(mediumSlug, sID, tableName),
+		Slug:        slugx.Approve(&config.DB, mediumSlug, sID, tableName),
 		Title:       medium.Title,
 		Type:        medium.Type,
 		Description: medium.Description,

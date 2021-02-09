@@ -8,11 +8,11 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/bindu-server/util/slug"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
 	"gorm.io/gorm"
@@ -94,10 +94,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	if result.Slug == tag.Slug {
 		tagSlug = result.Slug
-	} else if tag.Slug != "" && slug.Check(tag.Slug) {
-		tagSlug = slug.Approve(tag.Slug, sID, tableName)
+	} else if tag.Slug != "" && slugx.Check(tag.Slug) {
+		tagSlug = slugx.Approve(&config.DB, tag.Slug, sID, tableName)
 	} else {
-		tagSlug = slug.Approve(slug.Make(tag.Name), sID, tableName)
+		tagSlug = slugx.Approve(&config.DB, slugx.Make(tag.Name), sID, tableName)
 	}
 
 	config.DB.Model(&result).Updates(model.Tag{
