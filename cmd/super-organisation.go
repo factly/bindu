@@ -15,6 +15,9 @@ var superOrgCmd = &cobra.Command{
 	Use:   "create-super-org",
 	Short: "Creates super organisation for bindu-server.",
 	Run: func(cmd *cobra.Command, args []string) {
+		// db setup
+		config.SetupDB()
+
 		err := config.CreateSuperOrganisation()
 		if err != nil {
 			log.Println(err)
