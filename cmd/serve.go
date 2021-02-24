@@ -18,11 +18,6 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Starts server for bindu-server.",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := config.CreateSuperOrganisation()
-		if err != nil {
-			log.Println(err)
-		}
-
 		minio.SetupClient()
 
 		// db setup
@@ -30,7 +25,7 @@ var serveCmd = &cobra.Command{
 		// register routes
 		r := action.RegisterRoutes()
 
-		err = http.ListenAndServe(":8000", r)
+		err := http.ListenAndServe(":8000", r)
 
 		if err != nil {
 			log.Fatal(err)
