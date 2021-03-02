@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/factly/x v0.0.9
+	github.com/factly/x v0.0.20
 	github.com/gavv/httpexpect/v2 v2.1.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.1.1
@@ -17,7 +17,6 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/http-swagger v0.0.0-20200308142732-58ac5e232fba
 	github.com/swaggo/swag v1.6.7
-	golang.org/x/sys v0.0.0-20200803210538-64077c9b5642 // indirect
 	golang.org/x/tools v0.0.0-20200827163409-021d7c6f1ec3 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

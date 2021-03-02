@@ -8,6 +8,7 @@ import (
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 )
 
@@ -24,7 +25,7 @@ import (
 // @Success 201 {object} model.Policy
 // @Router /policies [put]
 func upsert(w http.ResponseWriter, r *http.Request) {
-	spaceID, err := util.GetSpace(r.Context())
+	spaceID, err := middlewarex.GetSpace(r.Context())
 
 	if err != nil {
 		loggerx.Error(err)
@@ -32,7 +33,7 @@ func upsert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, err := util.GetUser(r.Context())
+	userID, err := middlewarex.GetUser(r.Context())
 
 	if err != nil {
 		loggerx.Error(err)

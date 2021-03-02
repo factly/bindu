@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/x/middlewarex"
 	"github.com/spf13/viper"
 )
 
@@ -73,13 +74,13 @@ func CheckKetoPolicy(entity, action string) func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 
-			sID, err := GetSpace(ctx)
+			sID, err := middlewarex.GetSpace(ctx)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
-			uID, err := GetUser(ctx)
+			uID, err := middlewarex.GetUser(ctx)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
