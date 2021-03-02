@@ -13,7 +13,7 @@ import (
 
 func TestThemeDetails(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -23,6 +23,7 @@ func TestThemeDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid theme id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.GET(path).
 			WithPath("theme_id", "invalid_id").
 			WithHeaders(headers).
@@ -31,6 +32,7 @@ func TestThemeDetails(t *testing.T) {
 	})
 
 	t.Run("theme record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.GET(path).
@@ -41,6 +43,7 @@ func TestThemeDetails(t *testing.T) {
 	})
 
 	t.Run("get theme by id", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		themeSelectMock(mock)
 

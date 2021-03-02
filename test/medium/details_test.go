@@ -13,7 +13,7 @@ import (
 
 func TestMediumDetails(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -23,6 +23,7 @@ func TestMediumDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid medium id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.GET(path).
 			WithPath("medium_id", "invalid_id").
 			WithHeaders(headers).
@@ -31,6 +32,7 @@ func TestMediumDetails(t *testing.T) {
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.GET(path).
@@ -41,6 +43,7 @@ func TestMediumDetails(t *testing.T) {
 	})
 
 	t.Run("get medium by id", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		mediumSelectMock(mock)
 

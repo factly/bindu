@@ -16,7 +16,7 @@ import (
 
 func TestCategoryUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -26,6 +26,7 @@ func TestCategoryUpdate(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid category id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("category_id", "invalid_id").
 			WithHeaders(headers).
@@ -34,6 +35,7 @@ func TestCategoryUpdate(t *testing.T) {
 	})
 
 	t.Run("cannot decode category", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.PUT(path).
 			WithPath("category_id", 1).
@@ -44,6 +46,7 @@ func TestCategoryUpdate(t *testing.T) {
 	})
 
 	t.Run("Unprocessable category", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.PUT(path).
 			WithPath("category_id", 1).
@@ -55,6 +58,7 @@ func TestCategoryUpdate(t *testing.T) {
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
@@ -67,6 +71,7 @@ func TestCategoryUpdate(t *testing.T) {
 
 	t.Run("update category", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		updatedCategory := map[string]interface{}{
 			"name": "Politics",
 			"slug": "politics",
@@ -89,16 +94,17 @@ func TestCategoryUpdate(t *testing.T) {
 
 	t.Run("update category by id with empty slug", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		updatedCategory := map[string]interface{}{
 			"name": "Politics",
 			"slug": "politics-1",
 		}
 		categorySelectMock(mock)
 
-		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_category"`).
+		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_category"`).
 			WithArgs("politics%", 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, "Politics", "politics"))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, "Politics", "politics", 1))
 
 		categoryUpdateMock(mock, updatedCategory)
 
@@ -114,15 +120,16 @@ func TestCategoryUpdate(t *testing.T) {
 	})
 
 	t.Run("update category with different slug", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updatedCategory := map[string]interface{}{
 			"name": "Politics",
 			"slug": "testing-slug",
 		}
 		categorySelectMock(mock)
 
-		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_category"`).
+		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_category"`).
 			WithArgs(fmt.Sprint(updatedCategory["slug"], "%"), 1).
-			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "space_id"}))
 
 		categoryUpdateMock(mock, updatedCategory)
 

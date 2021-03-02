@@ -14,7 +14,7 @@ import (
 
 func TestCategoryDelete(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -24,6 +24,7 @@ func TestCategoryDelete(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid category id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.DELETE(path).
 			WithPath("category_id", "invalid_id").
 			WithHeaders(headers).
@@ -33,6 +34,7 @@ func TestCategoryDelete(t *testing.T) {
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.DELETE(path).
@@ -43,6 +45,7 @@ func TestCategoryDelete(t *testing.T) {
 	})
 
 	t.Run("check category associated with other entity", func(t *testing.T) {
+		test.CheckSpace(mock)
 		categorySelectMock(mock)
 
 		categoryChartExpect(mock, 1)
@@ -55,6 +58,7 @@ func TestCategoryDelete(t *testing.T) {
 	})
 
 	t.Run("category record deleted", func(t *testing.T) {
+		test.CheckSpace(mock)
 		categorySelectMock(mock)
 
 		categoryChartExpect(mock, 0)

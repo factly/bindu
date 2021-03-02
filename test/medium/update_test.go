@@ -31,7 +31,7 @@ var updateData = map[string]interface{}{
 
 func TestMediumUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -41,6 +41,7 @@ func TestMediumUpdate(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid medium id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("medium_id", "invalid_id").
 			WithHeaders(headers).
@@ -49,6 +50,7 @@ func TestMediumUpdate(t *testing.T) {
 	})
 	t.Run("cannot decode medium", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("medium_id", 1).
 			WithHeaders(headers).
@@ -59,6 +61,7 @@ func TestMediumUpdate(t *testing.T) {
 
 	t.Run("Unprocessable medium", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("medium_id", 1).
 			WithHeaders(headers).
@@ -69,6 +72,7 @@ func TestMediumUpdate(t *testing.T) {
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
@@ -79,6 +83,7 @@ func TestMediumUpdate(t *testing.T) {
 			Status(http.StatusNotFound)
 	})
 	t.Run("update medium", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updatedMedium := updateData
 		updatedMedium["slug"] = "image"
 
@@ -101,9 +106,10 @@ func TestMediumUpdate(t *testing.T) {
 		updatedMedium := updateData
 		updatedMedium["slug"] = "image"
 
+		test.CheckSpace(mock)
 		mediumSelectMock(mock)
 
-		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_medium"`).
+		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_medium"`).
 			WithArgs("image%", 1).
 			WillReturnRows(sqlmock.NewRows(columns))
 		mediumUpdateMock(mock, updatedMedium)
@@ -121,13 +127,14 @@ func TestMediumUpdate(t *testing.T) {
 	})
 
 	t.Run("update medium with different slug", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		updatedMedium := updateData
 		updatedMedium["slug"] = "image-test"
 
 		mediumSelectMock(mock)
 
-		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_medium"`).
+		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_medium"`).
 			WithArgs(fmt.Sprint(updatedMedium["slug"], "%"), 1).
 			WillReturnRows(sqlmock.NewRows(columns))
 

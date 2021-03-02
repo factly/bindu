@@ -14,7 +14,7 @@ import (
 
 func TestMediumDelete(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -24,6 +24,7 @@ func TestMediumDelete(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid medium id", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.DELETE(path).
 			WithPath("medium_id", "invalid_id").
@@ -34,6 +35,7 @@ func TestMediumDelete(t *testing.T) {
 	})
 
 	t.Run("medium record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		recordNotFoundMock(mock)
 
@@ -45,6 +47,7 @@ func TestMediumDelete(t *testing.T) {
 	})
 
 	t.Run("check medium associated with other entity", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		mediumSelectMock(mock)
 
@@ -58,6 +61,7 @@ func TestMediumDelete(t *testing.T) {
 	})
 
 	t.Run("medium record deleted", func(t *testing.T) {
+		test.CheckSpace(mock)
 		mediumSelectMock(mock)
 
 		mediumChartExpect(mock, 0)

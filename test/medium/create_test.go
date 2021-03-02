@@ -14,7 +14,7 @@ import (
 func TestMediumCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -25,6 +25,7 @@ func TestMediumCreate(t *testing.T) {
 
 	t.Run("cannot decode medium", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.POST(basePath).
 			WithHeaders(headers).
 			Expect().
@@ -34,6 +35,7 @@ func TestMediumCreate(t *testing.T) {
 
 	t.Run("Unprocessable medium", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.POST(basePath).
 			WithHeaders(headers).
 			WithJSON(invalidData).
@@ -44,6 +46,7 @@ func TestMediumCreate(t *testing.T) {
 
 	t.Run("create medium", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		slugCheckMock(mock)
 
 		mediumInsertMock(mock)
@@ -59,6 +62,7 @@ func TestMediumCreate(t *testing.T) {
 
 	t.Run("create medium with slug is empty", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		slugCheckMock(mock)
 
 		mediumInsertMock(mock)

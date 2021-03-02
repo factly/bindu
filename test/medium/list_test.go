@@ -15,7 +15,7 @@ import (
 
 func TestMediumList(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -30,6 +30,7 @@ func TestMediumList(t *testing.T) {
 	}
 
 	t.Run("get empty list of media", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		mediumCountQuery(mock, 0)
 
@@ -48,6 +49,7 @@ func TestMediumList(t *testing.T) {
 	})
 
 	t.Run("get non-empty list of media", func(t *testing.T) {
+		test.CheckSpace(mock)
 		mediumCountQuery(mock, len(mediumlist))
 
 		mock.ExpectQuery(selectQuery).
@@ -72,6 +74,7 @@ func TestMediumList(t *testing.T) {
 	})
 
 	t.Run("get media with pagination", func(t *testing.T) {
+		test.CheckSpace(mock)
 		mediumCountQuery(mock, len(mediumlist))
 
 		mock.ExpectQuery(paginationQuery).

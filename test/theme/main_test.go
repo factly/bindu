@@ -1,6 +1,7 @@
 package theme
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"os"
 	"regexp"
@@ -13,8 +14,8 @@ import (
 )
 
 var headers = map[string]string{
-	"X-Organisation": "1",
-	"X-User":         "1",
+	"X-Space": "1",
+	"X-User":  "1",
 }
 
 var data = map[string]interface{}{
@@ -34,7 +35,7 @@ var invalidData = map[string]interface{}{
 
 var byteData, _ = json.Marshal(data["config"])
 
-var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "organisation_id", "name", "config"}
+var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "organisation_id", "name", "config", "space_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_theme"`)
 var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_theme" SET "deleted_at"=`)
@@ -50,11 +51,11 @@ func recordNotFoundMock(mock sqlmock.Sqlmock) {
 		WillReturnRows(sqlmock.NewRows(columns))
 }
 
-func themeSelectMock(mock sqlmock.Sqlmock) {
+func themeSelectMock(mock sqlmock.Sqlmock, args ...driver.Value) {
 	mock.ExpectQuery(selectQuery).
-		WithArgs(1, 1).
+		WithArgs(args...).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, data["name"], byteData))
+			AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, data["name"], byteData, 1))
 
 }
 
@@ -76,7 +77,7 @@ func TestMain(m *testing.M) {
 
 	// Mock kavach server and allowing persisted external traffic
 	defer gock.Disable()
-	test.MockServer()
+	test.MockServers()
 	defer gock.DisableNetworking()
 
 	exitValue := m.Run()

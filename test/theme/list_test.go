@@ -16,7 +16,7 @@ import (
 
 func TestThemeList(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -46,7 +46,7 @@ func TestThemeList(t *testing.T) {
 	byteData1, _ := json.Marshal(themelist[1]["config"])
 
 	t.Run("get empty list of themes", func(t *testing.T) {
-
+		test.CheckSpace(mock)
 		themeCountQuery(mock, 0)
 
 		mock.ExpectQuery(selectQuery).
@@ -64,12 +64,13 @@ func TestThemeList(t *testing.T) {
 	})
 
 	t.Run("get non-empty list of themes", func(t *testing.T) {
+		test.CheckSpace(mock)
 		themeCountQuery(mock, len(themelist))
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, themelist[0]["name"], byteData0).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, themelist[0]["name"], byteData0, 1).
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1, 1))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -88,11 +89,12 @@ func TestThemeList(t *testing.T) {
 	})
 
 	t.Run("get themes with pagination", func(t *testing.T) {
+		test.CheckSpace(mock)
 		themeCountQuery(mock, len(themelist))
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1))
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1, 1))
 
 		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{

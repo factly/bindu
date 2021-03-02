@@ -15,8 +15,8 @@ import (
 )
 
 var headers = map[string]string{
-	"X-Organisation": "1",
-	"X-User":         "1",
+	"X-Space": "1",
+	"X-User":  "1",
 }
 var invalidData = map[string]interface{}{
 	"name": "po",
@@ -51,7 +51,7 @@ var mediumWithoutSlug = map[string]interface{}{
 	"dimensions": "testdims",
 }
 
-var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "name", "slug", "type", "title", "description", "caption", "alt_text", "file_size", "url", "dimensions", "organisation_id"}
+var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "name", "slug", "type", "title", "description", "caption", "alt_text", "file_size", "url", "dimensions", "space_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_medium"`)
 var chartQuery = regexp.QuoteMeta(`SELECT count(1) FROM "bi_chart"`)
@@ -82,7 +82,7 @@ func recordNotFoundMock(mock sqlmock.Sqlmock) {
 }
 
 func slugCheckMock(mock sqlmock.Sqlmock) {
-	mock.ExpectQuery(regexp.QuoteMeta(`SELECT slug, organisation_id FROM "bi_medium"`)).
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT slug, space_id FROM "bi_medium"`)).
 		WithArgs(fmt.Sprint(data["slug"], "%"), 1).
 		WillReturnRows(sqlmock.NewRows(columns))
 }
@@ -123,7 +123,7 @@ func TestMain(m *testing.M) {
 
 	// Mock kavach server and allowing persisted external traffic
 	defer gock.Disable()
-	test.MockServer()
+	test.MockServers()
 	defer gock.DisableNetworking()
 
 	exitValue := m.Run()

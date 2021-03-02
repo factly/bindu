@@ -16,7 +16,7 @@ import (
 
 func TestTagUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -26,6 +26,7 @@ func TestTagUpdate(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid tag id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("tag_id", "invalid_id").
 			WithHeaders(headers).
@@ -35,6 +36,7 @@ func TestTagUpdate(t *testing.T) {
 
 	t.Run("cannot decode tag", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("tag_id", 1).
 			WithHeaders(headers).
@@ -44,6 +46,7 @@ func TestTagUpdate(t *testing.T) {
 	})
 	t.Run("Unprocessable tag", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("tag_id", 1).
 			WithHeaders(headers).
@@ -54,6 +57,7 @@ func TestTagUpdate(t *testing.T) {
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
@@ -65,6 +69,7 @@ func TestTagUpdate(t *testing.T) {
 	})
 
 	t.Run("update tag", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		updatedTag := map[string]interface{}{
 			"name": "Elections",
@@ -88,16 +93,17 @@ func TestTagUpdate(t *testing.T) {
 
 	t.Run("update tag by id with empty slug", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		updatedTag := map[string]interface{}{
 			"name": "Elections",
 			"slug": "elections-1",
 		}
 		tagSelectMock(mock)
 
-		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_tag"`).
+		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_tag"`).
 			WithArgs("elections%", 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, updatedTag["name"], "elections"))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, updatedTag["name"], "elections", 1))
 
 		tagUpdateMock(mock, updatedTag)
 
@@ -113,15 +119,16 @@ func TestTagUpdate(t *testing.T) {
 	})
 
 	t.Run("update tag with different slug", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updatedTag := map[string]interface{}{
 			"name": "Elections",
 			"slug": "testing-slug",
 		}
 		tagSelectMock(mock)
 
-		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_tag"`).
+		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_tag"`).
 			WithArgs(fmt.Sprint(updatedTag["slug"], "%"), 1).
-			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "space_id"}))
 
 		tagUpdateMock(mock, updatedTag)
 

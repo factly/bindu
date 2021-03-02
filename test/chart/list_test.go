@@ -16,7 +16,7 @@ import (
 
 func TestChartList(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -92,6 +92,7 @@ func TestChartList(t *testing.T) {
 	byteDescriptionDataTwo, _ := json.Marshal(chartlist[1]["description"])
 
 	t.Run("get empty list of chart", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		mock.ExpectQuery(countQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow("0"))
@@ -111,6 +112,7 @@ func TestChartList(t *testing.T) {
 	})
 
 	t.Run("get non-empty list of chart", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		mock.ExpectQuery(countQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(chartlist)))
@@ -141,6 +143,7 @@ func TestChartList(t *testing.T) {
 	})
 
 	t.Run("get chart with pagination", func(t *testing.T) {
+		test.CheckSpace(mock)
 		mock.ExpectQuery(countQuery).
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(chartlist)))
 

@@ -14,6 +14,8 @@ import (
 func TestCategoryDetails(t *testing.T) {
 	mock := test.SetupMockDB()
 
+	test.MockServers()
+
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -23,6 +25,7 @@ func TestCategoryDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid category id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.GET(path).
 			WithPath("category_id", "invalid_id").
 			WithHeaders(headers).
@@ -31,6 +34,7 @@ func TestCategoryDetails(t *testing.T) {
 	})
 
 	t.Run("category record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.GET(path).
@@ -41,6 +45,7 @@ func TestCategoryDetails(t *testing.T) {
 	})
 
 	t.Run("get category by id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		categorySelectMock(mock)
 
 		e.GET(path).

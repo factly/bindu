@@ -17,7 +17,8 @@ import (
 )
 
 var updateData = map[string]interface{}{
-	"title": "Pie",
+	"title":     "Pie",
+	"is_public": true,
 	"description": `{
 		"data": [
 			{
@@ -52,7 +53,7 @@ var updateData = map[string]interface{}{
 
 func TestChartUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -93,6 +94,7 @@ func TestChartUpdate(t *testing.T) {
 	}
 
 	t.Run("invalid chart id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
@@ -101,6 +103,7 @@ func TestChartUpdate(t *testing.T) {
 	})
 	t.Run("cannot decode chart", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("chart_id", 1).
 			WithHeaders(headers).
@@ -111,6 +114,7 @@ func TestChartUpdate(t *testing.T) {
 
 	t.Run("Unprocessable chart", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("chart_id", 1).
 			WithHeaders(headers).
@@ -121,6 +125,7 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("chart record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
@@ -132,12 +137,18 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("update chart", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updateChart := updateData
 		updateChart["slug"] = "pie"
 
 		chartSelectMock(mock)
 
 		mock.ExpectBegin()
+
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 0, 0, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 		chartTagUpdate(mock, nil)
 		chartCategoryUpdate(mock, nil)
 
@@ -159,16 +170,22 @@ func TestChartUpdate(t *testing.T) {
 		test.ExpectationsMet(t, mock)
 	})
 	t.Run("update chart with different slug", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updateChart := updateData
 		updateChart["slug"] = "pie-test"
 
 		chartSelectMock(mock)
 
-		mock.ExpectQuery(`SELECT slug, organisation_id FROM "bi_chart"`).
+		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_chart"`).
 			WithArgs(fmt.Sprint(updateChart["slug"], "%"), 1).
-			WillReturnRows(sqlmock.NewRows([]string{"slug", "organisation_id"}))
+			WillReturnRows(sqlmock.NewRows([]string{"slug", "space_id"}))
 
 		mock.ExpectBegin()
+
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 0, 0, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 		chartTagUpdate(mock, nil)
 		chartCategoryUpdate(mock, nil)
 
@@ -190,6 +207,7 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("update chart by id with empty slug", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		updateChart := updateData
 		updateChart["slug"] = "pie"
@@ -198,6 +216,11 @@ func TestChartUpdate(t *testing.T) {
 		slugCheckMock(mock)
 
 		mock.ExpectBegin()
+
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 0, 0, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 		chartTagUpdate(mock, nil)
 		chartCategoryUpdate(mock, nil)
 
@@ -222,6 +245,7 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("update chart when medium id = 0", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updateChart := updateData
 		description, _ := json.Marshal(updateChart["description"])
 		config, _ := json.Marshal(updateChart["config"])
@@ -230,12 +254,22 @@ func TestChartUpdate(t *testing.T) {
 		chartSelectMock(mock)
 
 		mock.ExpectBegin()
+
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 0, 0, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 		chartTagUpdate(mock, nil)
 		chartCategoryUpdate(mock, nil)
 
 		themeQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
 			WithArgs(nil, test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		themeQueryMock(mock)
+		mock.ExpectExec(`UPDATE \"bi_chart\"`).
+			WithArgs(true, 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		themeQueryMock(mock)
@@ -259,6 +293,7 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("update chart when theme id = 0", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updateChart := updateData
 		description, _ := json.Marshal(updateChart["description"])
 		config, _ := json.Marshal(updateChart["config"])
@@ -267,12 +302,22 @@ func TestChartUpdate(t *testing.T) {
 		chartSelectMock(mock)
 
 		mock.ExpectBegin()
+
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 0, 0, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 		chartTagUpdate(mock, nil)
 		chartCategoryUpdate(mock, nil)
 
 		mediumQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
 			WithArgs(nil, test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		mediumQueryMock(mock)
+		mock.ExpectExec(`UPDATE \"bi_chart\"`).
+			WithArgs(true, 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		mediumQueryMock(mock)
@@ -296,12 +341,17 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("updating chart tags fail", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updateChart := updateData
 		updateChart["slug"] = "pie"
 
 		chartSelectMock(mock)
 
 		mock.ExpectBegin()
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 0, 0, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 		chartTagUpdate(mock, errors.New("cannot update chart tags"))
 
 		mock.ExpectRollback()
@@ -316,12 +366,17 @@ func TestChartUpdate(t *testing.T) {
 	})
 
 	t.Run("updating chart categories fail", func(t *testing.T) {
+		test.CheckSpace(mock)
 		updateChart := updateData
 		updateChart["slug"] = "pie"
 
 		chartSelectMock(mock)
 
 		mock.ExpectBegin()
+		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 0, 0, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 		chartTagUpdate(mock, nil)
 		chartCategoryUpdate(mock, errors.New("cannot update chart categories"))
 
