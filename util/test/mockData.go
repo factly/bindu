@@ -109,39 +109,39 @@ var Dummy_AuthorList = []map[string]interface{}{
 
 var Dummy_KetoPolicy = []map[string]interface{}{
 	{
-		"id":          "id:org:1:app:dega:space:1:test-policy-4",
+		"id":          "id:org:1:app:bindu:space:1:test-policy-4",
 		"description": "",
 		"subjects": []string{
 			"1",
 			"2",
 		},
 		"resources": []string{
-			"resources:org:1:app:dega:space:1:categories",
-			"resources:org:1:app:dega:space:1:tags",
+			"resources:org:1:app:bindu:space:1:categories",
+			"resources:org:1:app:bindu:space:1:tags",
 		},
 		"actions": []string{
-			"actions:org:1:app:dega:space:1:categories:get",
-			"actions:org:1:app:dega:space:1:categories:create",
-			"actions:org:1:app:dega:space:1:tags:update",
-			"actions:org:1:app:dega:space:1:tags:delete",
+			"actions:org:1:app:bindu:space:1:categories:get",
+			"actions:org:1:app:bindu:space:1:categories:create",
+			"actions:org:1:app:bindu:space:1:tags:update",
+			"actions:org:1:app:bindu:space:1:tags:delete",
 		},
 		"effect":     "allow",
 		"conditions": nil,
 	},
 	{
-		"id":          "id:org:1:app:dega:space:1:test-policy-0",
+		"id":          "id:org:1:app:bindu:space:1:test-policy-0",
 		"description": "",
 		"subjects": []string{
 			"1",
 		},
 		"resources": []string{
-			"resources:org:12:app:dega:space:18:policies",
+			"resources:org:12:app:bindu:space:18:policies",
 		},
 		"actions": []string{
-			"actions:org:12:app:dega:space:18:policies:get",
-			"actions:org:12:app:dega:space:18:policies:create",
-			"actions:org:12:app:dega:space:18:policies:update",
-			"actions:org:12:app:dega:space:18:policies:delete",
+			"actions:org:12:app:bindu:space:18:policies:get",
+			"actions:org:12:app:bindu:space:18:policies:create",
+			"actions:org:12:app:bindu:space:18:policies:update",
+			"actions:org:12:app:bindu:space:18:policies:delete",
 		},
 		"effect":     "allow",
 		"conditions": nil,
@@ -157,19 +157,19 @@ var Dummy_Role = map[string]interface{}{
 
 // Dummy single policy
 var Dummy_SingleMock = map[string]interface{}{
-	"id":          "id:org:1:app:dega:space:1:test-policy-0",
+	"id":          "id:org:1:app:bindu:space:1:test-policy-0",
 	"description": "",
 	"subjects": []string{
 		"1",
 	},
 	"resources": []string{
-		"resources:org:12:app:dega:space:18:policies",
+		"resources:org:12:app:bindu:space:18:policies",
 	},
 	"actions": []string{
-		"actions:org:12:app:dega:space:18:policies:get",
-		"actions:org:12:app:dega:space:18:policies:create",
-		"actions:org:12:app:dega:space:18:policies:update",
-		"actions:org:12:app:dega:space:18:policies:delete",
+		"actions:org:12:app:bindu:space:18:policies:get",
+		"actions:org:12:app:bindu:space:18:policies:create",
+		"actions:org:12:app:bindu:space:18:policies:update",
+		"actions:org:12:app:bindu:space:18:policies:delete",
 	},
 	"effect":     "allow",
 	"conditions": nil,

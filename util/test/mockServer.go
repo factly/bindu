@@ -72,15 +72,8 @@ func KetoMock() {
 	gock.New(viper.GetString("keto_url")).
 		Delete("/engines/acp/ory/regex/policies/(.+)").
 		SetMatcher(gock.NewMatcher()).
-		AddMatcher(func(req *http.Request, ereq *gock.Request) (bool, error) {
-			if req.Method == "PUT" || req.Method == "DELETE" {
-				return true, nil
-			}
-
-			return false, nil
-		}).
 		Persist().
-		Reply(http.StatusOK).
+		Reply(http.StatusNoContent).
 		JSON(Dummy_KetoPolicy)
 
 	// GET and POST POLICY - returns a list of policies and post policy
