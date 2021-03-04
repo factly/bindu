@@ -46,7 +46,7 @@ func TestCategoryDelete(t *testing.T) {
 
 	t.Run("check category associated with other entity", func(t *testing.T) {
 		test.CheckSpace(mock)
-		categorySelectMock(mock)
+		SelectMock(mock)
 
 		categoryChartExpect(mock, 1)
 
@@ -59,7 +59,7 @@ func TestCategoryDelete(t *testing.T) {
 
 	t.Run("category record deleted", func(t *testing.T) {
 		test.CheckSpace(mock)
-		categorySelectMock(mock)
+		SelectMock(mock)
 
 		categoryChartExpect(mock, 0)
 

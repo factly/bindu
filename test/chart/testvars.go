@@ -4,9 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"os"
 	"regexp"
-	"testing"
 	"time"
 
 	"github.com/jinzhu/gorm/dialects/postgres"
@@ -14,7 +12,6 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
-	"gopkg.in/h2non/gock.v1"
 )
 
 var headers = map[string]string{
@@ -167,7 +164,7 @@ func recordNotFoundMock(mock sqlmock.Sqlmock) {
 		WillReturnRows(sqlmock.NewRows(columns))
 
 }
-func chartSelectMock(mock sqlmock.Sqlmock) {
+func SelectMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows(columns).
@@ -343,18 +340,4 @@ func slugCheckMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT slug, space_id FROM "bi_chart"`)).
 		WithArgs(fmt.Sprint(data["slug"], "%"), 1).
 		WillReturnRows(sqlmock.NewRows([]string{"space_id", "slug"}))
-}
-
-func TestMain(m *testing.M) {
-
-	test.SetEnv()
-
-	// Mock kavach server and allowing persisted external traffic
-	defer gock.Disable()
-	test.MockServers()
-	defer gock.DisableNetworking()
-
-	exitValue := m.Run()
-
-	os.Exit(exitValue)
 }

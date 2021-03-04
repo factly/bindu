@@ -46,7 +46,7 @@ func TestCategoryDetails(t *testing.T) {
 
 	t.Run("get category by id", func(t *testing.T) {
 		test.CheckSpace(mock)
-		categorySelectMock(mock)
+		SelectMock(mock)
 
 		e.GET(path).
 			WithPath("category_id", 1).

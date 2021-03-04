@@ -45,7 +45,7 @@ func TestMediumDetails(t *testing.T) {
 	t.Run("get medium by id", func(t *testing.T) {
 		test.CheckSpace(mock)
 
-		mediumSelectMock(mock)
+		SelectMock(mock)
 
 		e.GET(path).
 			WithPath("medium_id", 1).

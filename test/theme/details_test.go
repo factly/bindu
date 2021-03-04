@@ -45,7 +45,7 @@ func TestThemeDetails(t *testing.T) {
 	t.Run("get theme by id", func(t *testing.T) {
 		test.CheckSpace(mock)
 
-		themeSelectMock(mock)
+		SelectMock(mock)
 
 		e.GET(path).
 			WithPath("theme_id", 1).

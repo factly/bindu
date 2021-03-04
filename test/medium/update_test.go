@@ -87,7 +87,7 @@ func TestMediumUpdate(t *testing.T) {
 		updatedMedium := updateData
 		updatedMedium["slug"] = "image"
 
-		mediumSelectMock(mock)
+		SelectMock(mock)
 
 		mediumUpdateMock(mock, updatedMedium)
 
@@ -107,7 +107,7 @@ func TestMediumUpdate(t *testing.T) {
 		updatedMedium["slug"] = "image"
 
 		test.CheckSpace(mock)
-		mediumSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_medium"`).
 			WithArgs("image%", 1).
@@ -132,7 +132,7 @@ func TestMediumUpdate(t *testing.T) {
 		updatedMedium := updateData
 		updatedMedium["slug"] = "image-test"
 
-		mediumSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_medium"`).
 			WithArgs(fmt.Sprint(updatedMedium["slug"], "%"), 1).

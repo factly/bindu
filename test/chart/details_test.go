@@ -45,7 +45,7 @@ func TestChartDetails(t *testing.T) {
 	t.Run("get chart by id", func(t *testing.T) {
 		test.CheckSpace(mock)
 
-		chartSelectMock(mock)
+		SelectMock(mock)
 		chartPreloadMock(mock)
 
 		e.GET(path).

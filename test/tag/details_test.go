@@ -48,7 +48,7 @@ func TestTagDetails(t *testing.T) {
 
 	t.Run("get tag by id", func(t *testing.T) {
 		test.CheckSpace(mock)
-		tagSelectMock(mock, sqlmock.AnyArg(), sqlmock.AnyArg())
+		SelectMock(mock, sqlmock.AnyArg(), sqlmock.AnyArg())
 
 		e.GET(path).
 			WithPath("tag_id", 1).

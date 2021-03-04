@@ -48,7 +48,7 @@ func TestChartDelete(t *testing.T) {
 
 	t.Run("chart record deleted", func(t *testing.T) {
 		test.CheckSpace(mock)
-		chartSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 		mock.ExpectExec(deleteQuery).

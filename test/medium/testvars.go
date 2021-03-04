@@ -1,17 +1,15 @@
 package medium
 
 import (
+	"database/sql/driver"
 	"fmt"
-	"os"
 	"regexp"
-	"testing"
 	"time"
 
 	"github.com/jinzhu/gorm/dialects/postgres"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/util/test"
-	"gopkg.in/h2non/gock.v1"
 )
 
 var headers = map[string]string{
@@ -61,9 +59,9 @@ var paginationQuery = `SELECT \* FROM "bi_medium" (.+) LIMIT 1 OFFSET 1`
 var basePath = "/media"
 var path = "/media/{medium_id}"
 
-func mediumSelectMock(mock sqlmock.Sqlmock) {
+func SelectMock(mock sqlmock.Sqlmock, args ...driver.Value) {
 	mock.ExpectQuery(selectQuery).
-		WithArgs(1, 1).
+		WithArgs(args...).
 		WillReturnRows(sqlmock.NewRows(columns).
 			AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["name"], data["slug"], data["type"], data["title"], data["description"], data["caption"], data["alt_text"], data["file_size"], data["url"], data["dimensions"], 1))
 }
@@ -115,18 +113,4 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, medium map[string]interface{}) {
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows(columns).
 			AddRow(1, time.Now(), time.Now(), nil, 1, 1, medium["name"], medium["slug"], medium["type"], medium["title"], medium["description"], medium["caption"], medium["alt_text"], medium["file_size"], medium["url"], medium["dimensions"], 1))
-}
-
-func TestMain(m *testing.M) {
-
-	test.SetEnv()
-
-	// Mock kavach server and allowing persisted external traffic
-	defer gock.Disable()
-	test.MockServers()
-	defer gock.DisableNetworking()
-
-	exitValue := m.Run()
-
-	os.Exit(exitValue)
 }

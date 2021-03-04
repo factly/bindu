@@ -49,7 +49,7 @@ func TestThemeDelete(t *testing.T) {
 	t.Run("check theme associated with other entity", func(t *testing.T) {
 		test.CheckSpace(mock)
 
-		themeSelectMock(mock)
+		SelectMock(mock)
 
 		themeChartExpect(mock, 1)
 
@@ -63,7 +63,7 @@ func TestThemeDelete(t *testing.T) {
 	t.Run("theme record deleted", func(t *testing.T) {
 		test.CheckSpace(mock)
 
-		themeSelectMock(mock)
+		SelectMock(mock)
 
 		themeChartExpect(mock, 0)
 

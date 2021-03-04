@@ -141,7 +141,7 @@ func TestChartUpdate(t *testing.T) {
 		updateChart := updateData
 		updateChart["slug"] = "pie"
 
-		chartSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 
@@ -174,7 +174,7 @@ func TestChartUpdate(t *testing.T) {
 		updateChart := updateData
 		updateChart["slug"] = "pie-test"
 
-		chartSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_chart"`).
 			WithArgs(fmt.Sprint(updateChart["slug"], "%"), 1).
@@ -211,7 +211,7 @@ func TestChartUpdate(t *testing.T) {
 
 		updateChart := updateData
 		updateChart["slug"] = "pie"
-		chartSelectMock(mock)
+		SelectMock(mock)
 
 		slugCheckMock(mock)
 
@@ -251,7 +251,7 @@ func TestChartUpdate(t *testing.T) {
 		config, _ := json.Marshal(updateChart["config"])
 		updateChart["slug"] = "pie"
 
-		chartSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 
@@ -299,7 +299,7 @@ func TestChartUpdate(t *testing.T) {
 		config, _ := json.Marshal(updateChart["config"])
 		updateChart["slug"] = "pie"
 
-		chartSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 
@@ -345,7 +345,7 @@ func TestChartUpdate(t *testing.T) {
 		updateChart := updateData
 		updateChart["slug"] = "pie"
 
-		chartSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
@@ -370,7 +370,7 @@ func TestChartUpdate(t *testing.T) {
 		updateChart := updateData
 		updateChart["slug"] = "pie"
 
-		chartSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "bi_medium"`).

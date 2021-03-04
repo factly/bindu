@@ -76,7 +76,7 @@ func TestTagUpdate(t *testing.T) {
 			"slug": "elections",
 		}
 
-		tagSelectMock(mock)
+		SelectMock(mock)
 
 		tagUpdateMock(mock, updatedTag)
 
@@ -98,7 +98,7 @@ func TestTagUpdate(t *testing.T) {
 			"name": "Elections",
 			"slug": "elections-1",
 		}
-		tagSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_tag"`).
 			WithArgs("elections%", 1).
@@ -124,7 +124,7 @@ func TestTagUpdate(t *testing.T) {
 			"name": "Elections",
 			"slug": "testing-slug",
 		}
-		tagSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_tag"`).
 			WithArgs(fmt.Sprint(updatedTag["slug"], "%"), 1).

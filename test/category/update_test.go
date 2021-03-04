@@ -77,7 +77,7 @@ func TestCategoryUpdate(t *testing.T) {
 			"slug": "politics",
 		}
 
-		categorySelectMock(mock)
+		SelectMock(mock)
 
 		categoryUpdateMock(mock, updatedCategory)
 
@@ -99,7 +99,7 @@ func TestCategoryUpdate(t *testing.T) {
 			"name": "Politics",
 			"slug": "politics-1",
 		}
-		categorySelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_category"`).
 			WithArgs("politics%", 1).
@@ -125,7 +125,7 @@ func TestCategoryUpdate(t *testing.T) {
 			"name": "Politics",
 			"slug": "testing-slug",
 		}
-		categorySelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_category"`).
 			WithArgs(fmt.Sprint(updatedCategory["slug"], "%"), 1).

@@ -85,7 +85,7 @@ func TestThemeUpdate(t *testing.T) {
 	t.Run("update theme", func(t *testing.T) {
 
 		test.CheckSpace(mock)
-		themeSelectMock(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 		mock.ExpectExec(`UPDATE \"bi_theme\"`).

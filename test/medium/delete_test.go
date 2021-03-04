@@ -49,7 +49,7 @@ func TestMediumDelete(t *testing.T) {
 	t.Run("check medium associated with other entity", func(t *testing.T) {
 		test.CheckSpace(mock)
 
-		mediumSelectMock(mock)
+		SelectMock(mock)
 
 		mediumChartExpect(mock, 1)
 
@@ -62,7 +62,7 @@ func TestMediumDelete(t *testing.T) {
 
 	t.Run("medium record deleted", func(t *testing.T) {
 		test.CheckSpace(mock)
-		mediumSelectMock(mock)
+		SelectMock(mock)
 
 		mediumChartExpect(mock, 0)
 

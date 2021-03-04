@@ -46,7 +46,7 @@ func TestTagDelete(t *testing.T) {
 
 	t.Run("check tag associated with other entity", func(t *testing.T) {
 		test.CheckSpace(mock)
-		tagSelectMock(mock)
+		SelectMock(mock)
 
 		tagChartExpect(mock, 1)
 
@@ -59,7 +59,7 @@ func TestTagDelete(t *testing.T) {
 
 	t.Run("tag record deleted", func(t *testing.T) {
 		test.CheckSpace(mock)
-		tagSelectMock(mock)
+		SelectMock(mock)
 
 		tagChartExpect(mock, 0)
 

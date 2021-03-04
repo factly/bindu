@@ -10,4 +10,6 @@ func SetEnv() {
 	viper.Set("minio_bucket", "dega")
 	viper.Set("minio_key", "miniokey")
 	viper.Set("minio_secret", "miniosecret")
+
+	viper.Set("create_super_organisation", true)
 }
