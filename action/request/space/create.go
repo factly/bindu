@@ -1,4 +1,4 @@
-package organisation
+package space
 
 import (
 	"context"
@@ -16,21 +16,20 @@ import (
 	"github.com/factly/x/validationx"
 )
 
-// request - Create organisation permission request
-// @Summary Create organisation permission request
-// @Description Create organisation permission request
-// @Tags Organisation_Permissions
-// @ID add-org-permission-request
+// Create - Create space permission request
+// @Summary Create space permission request
+// @Description Create space permission request
+// @Tags Space_Permissions_Request
+// @ID add-space-permission-request
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
-// @Param Request body organisationPermissionRequest true "Request Object"
-// @Success 201 {object} model.OrganisationPermissionRequest
+// @Param Request body spacePermissionRequest true "Request Object"
+// @Success 201 {object} model.SpacePermissionRequest
 // @Failure 400 {array} string
-// @Router /permissions/organisations/request [post]
-func request(w http.ResponseWriter, r *http.Request) {
-
+// @Router /requests/spaces [post]
+func Create(w http.ResponseWriter, r *http.Request) {
 	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
@@ -38,7 +37,7 @@ func request(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := organisationPermissionRequest{}
+	request := spacePermissionRequest{}
 
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -54,7 +53,17 @@ func request(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isAdmin, err := util.CheckOwnerFromKavach(uID, int(request.OrganisationID))
+	space := model.Space{}
+	space.ID = uint(request.SpaceID)
+	// Fetch space for which request is made
+	err = config.DB.First(&space).Error
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("space not found", http.StatusNotFound)))
+		return
+	}
+
+	isAdmin, err := util.CheckOwnerFromKavach(uID, int(space.OrganisationID))
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.GetMessage(err.Error(), http.StatusInternalServerError)))
@@ -67,17 +76,17 @@ func request(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := model.OrganisationPermissionRequest{
+	result := model.SpacePermissionRequest{
 		Request: model.Request{
 			Title:       request.Title,
 			Description: request.Description,
 			Status:      "pending",
 		},
-		OrganisationID: request.OrganisationID,
-		Spaces:         request.Spaces,
+		SpaceID: uint(request.SpaceID),
+		Charts:  request.Charts,
 	}
 
-	err = config.DB.WithContext(context.WithValue(r.Context(), requestUserContext, uID)).Model(&model.OrganisationPermissionRequest{}).Create(&result).Error
+	err = config.DB.WithContext(context.WithValue(r.Context(), requestUserContext, uID)).Model(&model.SpacePermissionRequest{}).Create(&result).Error
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))

@@ -1,4 +1,4 @@
-package spacePermission
+package space
 
 import (
 	"net/http"
@@ -21,7 +21,7 @@ import (
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
 // @Success 200 {array} paging
-// @Router /requests/space-permissions/my [get]
+// @Router /requests/spaces/my [get]
 func my(w http.ResponseWriter, r *http.Request) {
 	sID, err := middlewarex.GetSpace(r.Context())
 	if err != nil {

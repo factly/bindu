@@ -1,4 +1,4 @@
-package organisationPermission
+package organisation
 
 import (
 	"net/http"
@@ -12,19 +12,18 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// delete - Delete Organisation permission request by id
-// @Summary Delete a Organisation permission request
-// @Description Delete Organisation permission request by ID
+// details - Get organisation permissions requests detail
+// @Summary Show a organisation permissions requests detail
+// @Description Get organisation permissions requests detail
 // @Tags Organisation_Permissions_Request
-// @ID delete-org-permission-request-by-id
+// @ID get-org-permission-request-by-id
+// @Produce  json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
 // @Param request_id path string true "Request ID"
-// @Success 200
-// @Failure 400 {array} string
-// @Router /requests/organisation-permissions/{request_id} [delete]
-func delete(w http.ResponseWriter, r *http.Request) {
-
+// @Success 200 {object} model.OrganisationPermissionRequest
+// @Router /requests/organisations/{request_id} [get]
+func details(w http.ResponseWriter, r *http.Request) {
 	requestID := chi.URLParam(r, "request_id")
 	id, err := strconv.Atoi(requestID)
 	if err != nil {
@@ -33,18 +32,15 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := model.OrganisationPermissionRequest{}
-	request.ID = uint(id)
+	result := model.OrganisationPermissionRequest{}
+	result.ID = uint(id)
 
-	// Check if the request exist or not
-	err = config.DB.First(&request).Error
+	err = config.DB.First(&result).Error
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
 		return
 	}
 
-	config.DB.Delete(&request)
-
-	renderx.JSON(w, http.StatusOK, nil)
+	renderx.JSON(w, http.StatusOK, result)
 }

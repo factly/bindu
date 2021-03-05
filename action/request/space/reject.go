@@ -1,4 +1,4 @@
-package organisationPermission
+package space
 
 import (
 	"context"
@@ -14,11 +14,11 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// reject - reject organisation permission
-// @Summary reject organisation permission
-// @Description reject organisation permission
-// @Tags Organisation_Permissions_Request
-// @ID reject-org-permission
+// reject - reject space permission
+// @Summary reject space permission
+// @Description reject space permission
+// @Tags Space_Permissions_Request
+// @ID reject-space-permission
 // @Consume json
 // @Produce json
 // @Param X-User header string true "User ID"
@@ -26,7 +26,7 @@ import (
 // @Param request_id path string true "Request ID"
 // @Success 200
 // @Failure 400 {array} string
-// @Router /requests/organisation-permissions/{request_id}/reject [post]
+// @Router /requests/spaces/{request_id}/reject [post]
 func reject(w http.ResponseWriter, r *http.Request) {
 
 	uID, err := middlewarex.GetUser(r.Context())
@@ -44,13 +44,14 @@ func reject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := model.OrganisationPermissionRequest{}
+	request := model.SpacePermissionRequest{}
 	request.ID = uint(id)
 
 	// Check if the request exist or not
-	err = config.DB.Where(&model.OrganisationPermissionRequest{
+	err = config.DB.Where(&model.SpacePermissionRequest{
 		Request: model.Request{Status: "pending"},
 	}).First(&request).Error
+
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
@@ -58,7 +59,7 @@ func reject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mark request as rejected
-	err = config.DB.WithContext(context.WithValue(r.Context(), permissionContext, uID)).Model(&request).Updates(&model.OrganisationPermissionRequest{
+	err = config.DB.WithContext(context.WithValue(r.Context(), permissionContext, uID)).Model(&request).Updates(&model.SpacePermissionRequest{
 		Request: model.Request{
 			Base:   config.Base{UpdatedByID: uint(uID)},
 			Status: "rejected",

@@ -1,4 +1,4 @@
-package organisationPermission
+package organisation
 
 import (
 	"context"
@@ -26,7 +26,7 @@ import (
 // @Param request_id path string true "Request ID"
 // @Success 201 {object} model.OrganisationPermission
 // @Failure 400 {array} string
-// @Router /requests/organisation-permissions/{request_id}/approve [post]
+// @Router /requests/organisations/{request_id}/approve [post]
 func approve(w http.ResponseWriter, r *http.Request) {
 
 	uID, err := middlewarex.GetUser(r.Context())

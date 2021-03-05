@@ -1,4 +1,4 @@
-package organisationPermission
+package organisation
 
 import (
 	"net/http"
@@ -21,7 +21,7 @@ import (
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
 // @Success 200 {array} paging
-// @Router /requests/organisation-permissions/my [get]
+// @Router /requests/organisations/my [get]
 func my(w http.ResponseWriter, r *http.Request) {
 	oID, err := util.GetOrganisation(r.Context())
 	if err != nil {

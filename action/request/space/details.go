@@ -1,4 +1,4 @@
-package spacePermission
+package space
 
 import (
 	"net/http"
@@ -12,19 +12,18 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// delete - Delete Space permission request by id
-// @Summary Delete a Space permission request
-// @Description Delete Space permission request by ID
+// details - Get space permissions requests detail
+// @Summary Show a space permissions requests detail
+// @Description Get space permissions requests detail
 // @Tags Space_Permissions_Request
-// @ID delete-space-permission-request-by-id
+// @ID get-space-permission-request-by-id
+// @Produce  json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
 // @Param request_id path string true "Request ID"
-// @Success 200
-// @Failure 400 {array} string
-// @Router /requests/space-permissions/{request_id} [delete]
-func delete(w http.ResponseWriter, r *http.Request) {
-
+// @Success 200 {object} model.SpacePermissionRequest
+// @Router /requests/spaces/{request_id} [get]
+func details(w http.ResponseWriter, r *http.Request) {
 	requestID := chi.URLParam(r, "request_id")
 	id, err := strconv.Atoi(requestID)
 	if err != nil {
@@ -33,18 +32,15 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := model.SpacePermissionRequest{}
-	request.ID = uint(id)
+	result := model.SpacePermissionRequest{}
+	result.ID = uint(id)
 
-	// Check if the request exist or not
-	err = config.DB.First(&request).Error
+	err = config.DB.First(&result).Error
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
 		return
 	}
 
-	config.DB.Delete(&request)
-
-	renderx.JSON(w, http.StatusOK, nil)
+	renderx.JSON(w, http.StatusOK, result)
 }

@@ -1,4 +1,4 @@
-package spacePermission
+package space
 
 import (
 	"net/http"
@@ -24,7 +24,7 @@ type paging struct {
 // @Param X-Space header string true "Space ID"
 // @Param status query string false "Status"
 // @Success 200 {array} paging
-// @Router /requests/space-permissions [get]
+// @Router /requests/spaces [get]
 func list(w http.ResponseWriter, r *http.Request) {
 	status := r.URL.Query().Get("status")
 	if status == "" {
