@@ -13,7 +13,6 @@ type organisationPermission struct {
 }
 
 var userContext config.ContextKey = "org_perm_user"
-var requestUserContext config.ContextKey = "request_user"
 
 // Router - Group of medium router
 func Router() chi.Router {

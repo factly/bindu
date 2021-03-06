@@ -13,7 +13,6 @@ type spacePermission struct {
 }
 
 var userContext config.ContextKey = "space_perm_user"
-var requestUserContext config.ContextKey = "request_user"
 
 // Router - Group of currency router
 func Router() chi.Router {

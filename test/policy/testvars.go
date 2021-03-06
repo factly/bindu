@@ -5,10 +5,6 @@ var headers = map[string]string{
 	"X-User":  "1",
 }
 
-var invalidHeader = map[string]string{
-	"X-Space": "1",
-}
-
 // valid policy
 var policy_test = map[string]interface{}{
 	"name": "test policy",
