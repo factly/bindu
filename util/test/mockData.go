@@ -149,9 +149,18 @@ var Dummy_KetoPolicy = []map[string]interface{}{
 }
 
 var Dummy_Role = map[string]interface{}{
-	"id": "roles:org:1:admin",
+	"id": "roles:org:1:app:bindu:space:1:admin",
 	"members": []string{
 		"1",
+	},
+}
+
+var Dummy_Role_List = []map[string]interface{}{
+	{
+		"id": "roles:org:1:app:bindu:space:1:admin",
+		"members": []string{
+			"1",
+		},
 	},
 }
 

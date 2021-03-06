@@ -82,10 +82,27 @@ func KetoMock() {
 		Reply(http.StatusOK).
 		JSON(Dummy_KetoPolicy)
 
-	gock.New(viper.GetString("keto_url") + "/engines/acp/ory/regex/roles/(.+)").
+	gock.New(viper.GetString("keto_url")).Get("/engines/acp/ory/regex/roles/(.+)").
 		Persist().
 		Reply(http.StatusOK).
 		JSON(Dummy_Role)
+
+	gock.New(viper.GetString("keto_url")).
+		Put("/engines/acp/ory/regex/roles").
+		Persist().
+		Reply(http.StatusOK).
+		JSON(Dummy_Role)
+
+	gock.New(viper.GetString("keto_url")).
+		Delete("/engines/acp/ory/regex/roles/(.+)").
+		SetMatcher(gock.NewMatcher()).
+		Persist().
+		Reply(http.StatusNoContent)
+
+	gock.New(viper.GetString("keto_url") + "/engines/acp/ory/regex/roles").
+		Persist().
+		Reply(http.StatusOK).
+		JSON(Dummy_Role_List)
 
 	// Creates a mock server for keto for provisioning Policy.Authorizer module.
 	gock.New(viper.GetString("keto_url")).
