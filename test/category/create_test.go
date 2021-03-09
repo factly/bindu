@@ -1,10 +1,11 @@
 package category
 
 import (
-	"github.com/factly/bindu-server/action"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/factly/bindu-server/action"
 
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
@@ -14,7 +15,7 @@ import (
 func TestCategoryCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -24,6 +25,7 @@ func TestCategoryCreate(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("cannot decode category", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.POST(basePath).
 			WithHeaders(headers).
@@ -33,6 +35,7 @@ func TestCategoryCreate(t *testing.T) {
 	})
 
 	t.Run("Unprocessable category", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.POST(basePath).
 			WithHeaders(headers).
@@ -43,6 +46,7 @@ func TestCategoryCreate(t *testing.T) {
 	})
 
 	t.Run("create category", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		slugCheckMock(mock)
 
@@ -59,6 +63,7 @@ func TestCategoryCreate(t *testing.T) {
 
 	t.Run("create category with slug is empty", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		slugCheckMock(mock)
 
 		categoryInsertMock(mock)

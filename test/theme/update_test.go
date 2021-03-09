@@ -16,7 +16,7 @@ import (
 
 func TestThemeUpdate(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -39,6 +39,7 @@ func TestThemeUpdate(t *testing.T) {
 	updatedByteData, _ := json.Marshal(updatedTheme["config"])
 
 	t.Run("invalid theme id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("theme_id", "invalid_id").
 			WithHeaders(headers).
@@ -48,6 +49,7 @@ func TestThemeUpdate(t *testing.T) {
 
 	t.Run("cannot decode theme", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("theme_id", 1).
 			WithHeaders(headers).
@@ -58,6 +60,7 @@ func TestThemeUpdate(t *testing.T) {
 
 	t.Run("Unprocessable theme", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.PUT(path).
 			WithPath("theme_id", 1).
 			WithHeaders(headers).
@@ -68,6 +71,7 @@ func TestThemeUpdate(t *testing.T) {
 	})
 
 	t.Run("theme record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.PUT(path).
@@ -80,7 +84,8 @@ func TestThemeUpdate(t *testing.T) {
 
 	t.Run("update theme", func(t *testing.T) {
 
-		themeSelectMock(mock)
+		test.CheckSpace(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 		mock.ExpectExec(`UPDATE \"bi_theme\"`).
@@ -91,7 +96,7 @@ func TestThemeUpdate(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, updatedTheme["name"], updatedByteData))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, updatedTheme["name"], updatedByteData, 1))
 
 		e.PUT(path).
 			WithPath("theme_id", 1).

@@ -3,6 +3,7 @@ package test
 import (
 	"database/sql/driver"
 	"log"
+	"regexp"
 	"testing"
 	"time"
 
@@ -57,4 +58,10 @@ func ExpectationsMet(t *testing.T, mock sqlmock.Sqlmock) {
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
+}
+
+func CheckSpace(mock sqlmock.Sqlmock) {
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_space"`)).
+		WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"organisation_id", "slug", "space_id"}).AddRow(1, "test-space", "1"))
 }

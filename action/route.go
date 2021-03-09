@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/factly/bindu-server/action/permission"
-	organisationReq "github.com/factly/bindu-server/action/permission/organisation"
-	spaceReq "github.com/factly/bindu-server/action/permission/space"
 	"github.com/factly/bindu-server/action/policy"
 	"github.com/factly/bindu-server/action/request"
 	"github.com/factly/bindu-server/action/role"
@@ -26,6 +24,8 @@ import (
 	"github.com/factly/bindu-server/action/chart"
 	"github.com/factly/bindu-server/action/medium"
 	"github.com/factly/bindu-server/action/organisation"
+	organisationRequest "github.com/factly/bindu-server/action/request/organisation"
+	spaceRequest "github.com/factly/bindu-server/action/request/space"
 	"github.com/factly/bindu-server/action/space"
 	"github.com/factly/bindu-server/action/tag"
 	"github.com/factly/bindu-server/action/theme"
@@ -58,7 +58,7 @@ func RegisterRoutes() *chi.Mux {
 		fmt.Println("Swagger @ http://localhost:7000/swagger/index.html")
 	}
 
-	r.With(middlewarex.GormRequestID(&config.DB), middlewarex.CheckUser, middlewarex.CheckSpace(0), util.GenerateOrganisation, middlewarex.CheckAccess("bindu", 0, util.GetOrganisation)).Group(func(r chi.Router) {
+	r.With(middlewarex.CheckUser, middlewarex.CheckSpace(0), util.GenerateOrganisation, middlewarex.CheckAccess("bindu", 0, util.GetOrganisation)).Group(func(r chi.Router) {
 		r.Mount("/categories", category.Router())
 		r.Mount("/charts", chart.Router())
 		r.Mount("/media", medium.Router())
@@ -74,8 +74,8 @@ func RegisterRoutes() *chi.Mux {
 	})
 
 	r.With(middlewarex.CheckUser).Group(func(r chi.Router) {
-		r.Mount("/permissions/organisations/request", organisationReq.OrgRequestRouter())
-		r.Mount("/permissions/spaces/request", spaceReq.SpaceRequestRouter())
+		r.Post("/requests/organisations", organisationRequest.Create)
+		r.Post("/requests/spaces", spaceRequest.Create)
 	})
 
 	sqlDB, _ := config.DB.DB()

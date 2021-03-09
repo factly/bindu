@@ -14,7 +14,7 @@ import (
 
 func TestChartDelete(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -24,6 +24,7 @@ func TestChartDelete(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid chart id", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.DELETE(path).
 			WithPath("chart_id", "invalid_id").
@@ -35,6 +36,7 @@ func TestChartDelete(t *testing.T) {
 
 	t.Run("chart record not found", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.DELETE(path).
@@ -45,7 +47,8 @@ func TestChartDelete(t *testing.T) {
 	})
 
 	t.Run("chart record deleted", func(t *testing.T) {
-		chartSelectMock(mock)
+		test.CheckSpace(mock)
+		SelectMock(mock)
 
 		mock.ExpectBegin()
 		mock.ExpectExec(deleteQuery).

@@ -3,8 +3,8 @@ package request
 import (
 	"net/http"
 
-	"github.com/factly/bindu-server/action/request/organisationPermission"
-	"github.com/factly/bindu-server/action/request/spacePermission"
+	"github.com/factly/bindu-server/action/request/organisation"
+	"github.com/factly/bindu-server/action/request/space"
 	"github.com/go-chi/chi"
 )
 
@@ -12,8 +12,8 @@ import (
 func Router() http.Handler {
 	r := chi.NewRouter()
 
-	r.Mount("/space-permissions", spacePermission.Router())
-	r.Mount("/organisation-permissions", organisationPermission.Router())
+	r.Mount("/spaces", space.Router())
+	r.Mount("/organisations", organisation.Router())
 
 	return r
 }

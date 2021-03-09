@@ -5,7 +5,6 @@ import (
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/middlewarex"
 	"github.com/go-chi/chi"
-	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type spacePermission struct {
@@ -13,15 +12,7 @@ type spacePermission struct {
 	Charts  int64 `json:"charts"`
 }
 
-type spacePermissionRequest struct {
-	Title       string         `json:"title" validate:"required"`
-	Description postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
-	Charts      int64          `json:"charts"`
-	SpaceID     int64          `json:"space_id" validate:"required"`
-}
-
 var userContext config.ContextKey = "space_perm_user"
-var requestUserContext config.ContextKey = "request_user"
 
 // Router - Group of currency router
 func Router() chi.Router {
@@ -37,14 +28,6 @@ func Router() chi.Router {
 		r.Put("/", update)
 		r.Delete("/", delete)
 	})
-
-	return r
-}
-
-// SpaceRequestRouter - Create endpoint for space permission request
-func SpaceRequestRouter() chi.Router {
-	r := chi.NewRouter()
-	r.Post("/", request)
 
 	return r
 }

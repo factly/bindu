@@ -50,7 +50,7 @@ func TestChartCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
 
-	test.MockServer()
+	test.MockServers()
 
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
@@ -61,6 +61,7 @@ func TestChartCreate(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("cannot decode chart", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.POST(basePath).
 			WithHeaders(headers).
@@ -71,6 +72,7 @@ func TestChartCreate(t *testing.T) {
 
 	t.Run("Unprocessable chart", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		e.POST(basePath).
 			WithHeaders(headers).
 			WithJSON(invalidData).
@@ -80,6 +82,7 @@ func TestChartCreate(t *testing.T) {
 	})
 
 	t.Run("create chart", func(t *testing.T) {
+		test.CheckSpace(mock)
 		mock.ExpectBegin()
 
 		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
@@ -116,6 +119,7 @@ func TestChartCreate(t *testing.T) {
 	})
 
 	t.Run("create chart with slug is empty", func(t *testing.T) {
+		test.CheckSpace(mock)
 		mock.ExpectBegin()
 
 		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
@@ -150,6 +154,7 @@ func TestChartCreate(t *testing.T) {
 	})
 
 	t.Run("when uploading returns error", func(t *testing.T) {
+		test.CheckSpace(mock)
 		minio.Upload = func(r *http.Request, image string) (string, error) {
 			return "", errors.New("some error")
 		}

@@ -15,7 +15,7 @@ import (
 func TestCategoryCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -25,6 +25,7 @@ func TestCategoryCreate(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("cannot decode theme", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.POST(basePath).
 			WithHeaders(headers).
@@ -34,6 +35,7 @@ func TestCategoryCreate(t *testing.T) {
 	})
 
 	t.Run("Unprocessable theme", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.POST(basePath).
 			WithHeaders(headers).
@@ -45,6 +47,7 @@ func TestCategoryCreate(t *testing.T) {
 
 	t.Run("create theme", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "bi_theme"`).
 			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["name"], byteData, 1).

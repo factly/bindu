@@ -14,7 +14,7 @@ import (
 func TestTagCreate(t *testing.T) {
 
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -24,6 +24,7 @@ func TestTagCreate(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("cannot decode tag", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.POST(basePath).
 			WithHeaders(headers).
@@ -33,6 +34,7 @@ func TestTagCreate(t *testing.T) {
 	})
 
 	t.Run("Unprocessable tag", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.POST(basePath).
 			WithHeaders(headers).
@@ -43,6 +45,7 @@ func TestTagCreate(t *testing.T) {
 	})
 
 	t.Run("create tag", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		slugCheckMock(mock)
 
@@ -58,6 +61,7 @@ func TestTagCreate(t *testing.T) {
 	})
 
 	t.Run("create tag with slug is empty", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		slugCheckMock(mock)
 
