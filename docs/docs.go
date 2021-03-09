@@ -261,7 +261,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -503,7 +505,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -745,7 +749,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -1083,7 +1089,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -1411,7 +1419,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -1809,7 +1819,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -1910,7 +1922,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -2083,7 +2097,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -2184,7 +2200,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -2367,7 +2385,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {}
+                    "200": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -2516,7 +2536,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {}
+                    "200": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -2749,7 +2771,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -2991,7 +3015,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -3112,6 +3138,9 @@ var doc = `{
                 },
                 "featured_medium_id": {
                     "type": "integer"
+                },
+                "is_public": {
+                    "type": "boolean"
                 },
                 "organisation_id": {
                     "type": "integer"
@@ -3260,6 +3289,9 @@ var doc = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "is_public": {
+                    "type": "boolean"
                 },
                 "medium": {
                     "$ref": "#/definitions/model.Medium"

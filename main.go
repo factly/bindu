@@ -1,15 +1,6 @@
 package main
 
-import (
-	"log"
-	"net/http"
-
-	"github.com/factly/bindu-server/util/minio"
-
-	"github.com/factly/bindu-server/action"
-	"github.com/factly/bindu-server/config"
-	"github.com/factly/bindu-server/model"
-)
+import "github.com/factly/bindu-server/cmd"
 
 // @title Bindu API
 // @version 1.0
@@ -25,26 +16,5 @@ import (
 // @host localhost:7000
 // @BasePath /
 func main() {
-	config.SetupVars()
-
-	// db setup
-	config.SetupDB()
-
-	model.Migration()
-
-	err := config.CreateSuperOrganisation()
-	if err != nil {
-		log.Println(err)
-	}
-
-	minio.SetupClient()
-
-	// register routes
-	r := action.RegisterRoutes()
-
-	err = http.ListenAndServe(":8000", r)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	cmd.Execute()
 }

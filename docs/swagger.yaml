@@ -36,6 +36,8 @@ definitions:
         type: string
       featured_medium_id:
         type: integer
+      is_public:
+        type: boolean
       organisation_id:
         type: integer
       published_date:
@@ -137,6 +139,8 @@ definitions:
         type: integer
       id:
         type: integer
+      is_public:
+        type: boolean
       medium:
         $ref: '#/definitions/model.Medium'
       published_date:
@@ -942,7 +946,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -1107,7 +1112,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -1272,7 +1278,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -1468,7 +1475,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -1662,7 +1670,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -2002,7 +2011,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -2100,7 +2110,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -2189,7 +2200,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -2287,7 +2299,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -2410,7 +2423,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200": {}
+        "200":
+          description: ""
       summary: Delete Role by ID
       tags:
       - Role
@@ -2510,7 +2524,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200": {}
+        "200":
+          description: ""
       summary: Delete space
       tags:
       - Space
@@ -2636,7 +2651,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -2801,7 +2817,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
