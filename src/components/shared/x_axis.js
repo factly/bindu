@@ -1,15 +1,22 @@
 import React from 'react';
 import { Input, Select, Form } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
-import { aggregateOptions } from '../../constants/x_axis';
+export const getAggregateOptions = async (form, setAggregateOptions) => {
+  try {
+    const schema = form.getFieldValue('$schema');
+    const res = await fetch(schema);
+    const jsonData = await res.json();
+    setAggregateOptions(jsonData.definitions.AggregateOp.enum);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-const { Option } = Select;
-
-function XAxis(props) {
-  const [fields, setFields] = React.useState([]);
-  React.useEffect(() => {
-    const url = props.form.getFieldValue(['data', 'url']);
-    const values = props.form.getFieldValue(['data', 'values']);
+export const getFields = (form, setFields) => {
+  const url = form.getFieldValue(['data', 'url']);
+  const values = form.getFieldValue(['data', 'values']);
+  if (url) {
     const ext = url.split('.').pop();
 
     let fetchdata;
@@ -36,11 +43,21 @@ function XAxis(props) {
           });
       };
     }
-    if (url) {
-      fetchdata(url);
-    } else if (values) {
-      setFields(Object.keys(values[0]));
-    }
+    fetchdata(url);
+  } else if (values) {
+    setFields(Object.keys(values[0]));
+  }
+};
+
+const { Option } = Select;
+
+function XAxis(props) {
+  const [fields, setFields] = React.useState([]);
+  const [aggregateOptions, setAggregateOptions] = React.useState([]);
+
+  React.useEffect(() => {
+    getFields(props.form, setFields);
+    getAggregateOptions(props.form, setAggregateOptions);
   }, []);
 
   const titleObj = props.properties.find((d) => d.prop === 'title');
@@ -71,12 +88,24 @@ function XAxis(props) {
         <Input placeholder="Label Color" type="color" />
       </Form.Item>
 
-      <Form.Item name={aggregateObj.path} label="Aggregate">
+      <Form.Item
+        name={aggregateObj.path}
+        label={
+          <div>
+            Aggregate{' '}
+            <InfoCircleOutlined
+              onClick={() =>
+                window.open('https://vega.github.io/vega-lite/docs/aggregate.html#ops', '_blank')
+              }
+            />
+          </div>
+        }
+      >
         <Select placeholder="Label Color" defaultValue={null}>
           <Select.Option value={null}>None</Select.Option>
           {aggregateOptions.map((option) => (
-            <Select.Option key={option.value} value={option.value}>
-              {option.name}
+            <Select.Option key={option} value={option}>
+              {option}
             </Select.Option>
           ))}
         </Select>
