@@ -51,7 +51,7 @@ function BasicLayout(props) {
       <Layout>
         <Header />
         <Content className="layout-content">
-          <Card bordered={false} className="wrap-children-content">
+          <Card key={selected.toString()} bordered={false} className="wrap-children-content">
             {children}
           </Card>
         </Content>

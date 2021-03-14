@@ -31,7 +31,7 @@ const routes = {
     Component: Home,
   },
   charts: {
-    path: '/charts',
+    path: '/charts/saved',
     Component: Charts,
     title: 'Charts',
     permission: {
@@ -40,7 +40,7 @@ const routes = {
     },
   },
   createChart: {
-    path: '/charts/create',
+    path: '/chart/:id',
     Component: CreateChart,
     title: 'Create Chart',
     permission: {

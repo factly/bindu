@@ -31,7 +31,7 @@ function TagList() {
   React.useEffect(() => {
     fetchTags();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  }, [dispatch,filters]);
 
   const fetchTags = () => {
     dispatch(getTags(filters));

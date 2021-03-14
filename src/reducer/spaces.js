@@ -28,7 +28,7 @@ export default function spaces(state = initialState, action = {}) {
       let space_details = {};
 
       action.payload.forEach((element) => {
-        element.spaces?.forEach((s) => {
+        element.spaces.forEach((s) => {
           space_details[s.id] = s;
         });
       });
@@ -45,7 +45,7 @@ export default function spaces(state = initialState, action = {}) {
       const setSpaceID = space_details[state.selected] ? state.selected : defaultSpace;
       localStorage.setItem('space', setSpaceID);
 
-      console.log({ pay: action.payload });
+
       return {
         ...state,
         orgs: action.payload.map((each) => {
