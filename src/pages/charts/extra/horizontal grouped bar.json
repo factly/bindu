@@ -1,26 +1,70 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-  "data": { "url": "data/population.json" },
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "data/population.json"
+  },
   "transform": [
-    { "filter": { "field": "year", "oneOf": [1950, 1960, 1970, 1980, 1990, 2000] } },
-    { "calculate": "datum.sex == 2 ? 'Female' : 'Male'", "as": "gender" }
+    {
+      "filter": {
+        "field": "year",
+        "oneOf": [
+          1950,
+          1960,
+          1970,
+          1980,
+          1990,
+          2000
+        ]
+      }
+    },
+    {
+      "calculate": "datum.sex == 2 ? 'Female' : 'Male'",
+      "as": "gender"
+    }
   ],
-  "width": { "step": 12 },
+  "width": {
+    "step": 12
+  },
   "mark": "bar",
   "encoding": {
-    "row": { "field": "year", "type": "ordinal", "spacing": 10 },
+    "row": {
+      "field": "year",
+      "type": "ordinal",
+      "spacing": 10
+    },
     "x": {
       "aggregate": "sum",
       "field": "people",
       "type": "quantitative",
-      "axis": { "title": "population", "grid": false }
+      "axis": {
+        "title": "population",
+        "grid": false
+      }
     },
-    "y": { "field": "gender", "type": "nominal", "axis": { "title": "" } },
+    "y": {
+      "field": "gender",
+      "type": "nominal",
+      "axis": {
+        "title": ""
+      }
+    },
     "color": {
       "field": "gender",
       "type": "nominal",
-      "scale": { "range": ["#675193", "#ca8861"] }
+      "scale": {
+        "range": [
+          "#675193",
+          "#ca8861"
+        ]
+      }
     }
   },
-  "config": { "view": { "stroke": "transparent" }, "axis": { "domainWidth": 1 } }
+  "config": {
+    "view": {
+      "stroke": "transparent"
+    },
+    "axis": {
+      "domainWidth": 1
+    }
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "Google's stock price over time.",
   "data": {
     "values": [
@@ -187,7 +187,12 @@
   },
   "width": 200,
   "height": 200,
-  "resolve": { "axis": { "x": "independent", "y": "shared" } },
+  "resolve": {
+    "axis": {
+      "x": "independent",
+      "y": "shared"
+    }
+  },
   "mark": {
     "type": "line",
     "opacity": 1,
@@ -223,8 +228,18 @@
       "field": "category",
       "type": "nominal",
       "scale": {
-        "domain": ["Col1", "Col2", "Col3", "Col4"],
-        "range": ["#1f77b4", "#EDAD08", "#73AF48", "#94346E"]
+        "domain": [
+          "Col1",
+          "Col2",
+          "Col3",
+          "Col4"
+        ],
+        "range": [
+          "#1f77b4",
+          "#EDAD08",
+          "#73AF48",
+          "#94346E"
+        ]
       },
       "legend": null
     }

@@ -1,11 +1,20 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-  "data": { "url": "https://vega.github.io/editor/data/population.json" },
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://vega.github.io/editor/data/population.json"
+  },
   "transform": [
-    { "filter": "datum.year == 2000" },
-    { "calculate": "datum.sex == 2 ? 'Female' : 'Male'", "as": "gender" }
+    {
+      "filter": "datum.year == 2000"
+    },
+    {
+      "calculate": "datum.sex == 2 ? 'Female' : 'Male'",
+      "as": "gender"
+    }
   ],
-  "width": { "step": 12 },
+  "width": {
+    "step": 12
+  },
   "mark": {
     "type": "bar",
     "cornerRadius": 1,
@@ -22,21 +31,35 @@
       "aggregate": "sum",
       "field": "people",
       "type": "quantitative",
-      "axis": { "title": "population", "grid": false }
+      "axis": {
+        "title": "population",
+        "grid": false
+      }
     },
     "x": {
       "field": "gender",
       "type": "nominal",
-      "axis": { "title": "" }
+      "axis": {
+        "title": ""
+      }
     },
     "color": {
       "field": "gender",
       "type": "nominal",
-      "scale": { "range": ["#675193", "#ca8861"] }
+      "scale": {
+        "range": [
+          "#675193",
+          "#ca8861"
+        ]
+      }
     }
   },
   "config": {
-    "view": { "stroke": "transparent" },
-    "axis": { "domainWidth": 1 }
+    "view": {
+      "stroke": "transparent"
+    },
+    "axis": {
+      "domainWidth": 1
+    }
   }
 }

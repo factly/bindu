@@ -1,5 +1,5 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "Google's stock price over time.",
   "data": {
     "url": "https://vega.github.io/editor/data/stocks.csv"
@@ -25,7 +25,10 @@
         "tooltip": true
       },
       "encoding": {
-        "strokeDash": { "field": "predicted", "type": "nominal" },
+        "strokeDash": {
+          "field": "predicted",
+          "type": "nominal"
+        },
         "x": {
           "field": "date",
           "type": "temporal",
@@ -46,7 +49,9 @@
           "field": "symbol",
           "type": "nominal",
           "scale": {
-            "range": ["#1f77b4"]
+            "range": [
+              "#1f77b4"
+            ]
           },
           "legend": {
             "title": "Time Series",
