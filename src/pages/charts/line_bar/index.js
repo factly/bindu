@@ -125,6 +125,14 @@ export const properties = [
         prop: 'label_color',
         path: ['layer', 0, 'encoding', 'x', 'axis', 'labelColor'],
       },
+      {
+        prop: 'aggregate',
+        path: ['layer', 0, 'encoding', 'x', 'aggregate'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'x', 'field'],
+      },
     ],
     Component: XAxis,
   },
@@ -146,6 +154,14 @@ export const properties = [
       {
         prop: 'label_color',
         path: ['layer', 0, 'encoding', 'y', 'axis', 'labelColor'],
+      },
+      {
+        prop: 'aggregate',
+        path: ['layer', 0, 'encoding', 'y', 'aggregate'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'y', 'field'],
       },
     ],
     Component: YAxis,
@@ -199,17 +215,17 @@ export const properties = [
     properties: [
       {
         prop: 'color',
-        path: ['layer', 1, 'encoding', 'color', 'value'],
+        path: ['layer', 2, 'encoding', 'color', 'value'],
       },
       {
         prop: 'font_size',
-        path: ['layer', 1, 'mark', 'fontSize'],
+        path: ['layer', 2, 'mark', 'fontSize'],
       },
       {
         prop: 'format',
-        path: ['layer', 1, 'encoding', 'text', 'format'],
+        path: ['layer', 2, 'encoding', 'text', 'format'],
       },
     ],
-    component: DataLabels,
+    Component: DataLabels,
   },
 ];

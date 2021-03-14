@@ -35,7 +35,7 @@ export const properties = [
         path: ['background'],
       },
     ],
-    component: ChartProperties,
+    Component: ChartProperties,
   },
   {
     name: 'Colors',
@@ -46,29 +46,29 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'scale', 'range'],
       },
     ],
-    component: Colors,
+    Component: Colors,
   },
   {
     name: 'Lines',
     properties: [
       {
         prop: 'strokeWidth',
-        path: ['layer', 1, 'mark', 'strokeWidth'],
+        path: ['layer', 0, 'mark', 'strokeWidth'],
       },
       {
         prop: 'opacity',
-        path: ['layer', 1, 'mark', 'opacity'],
+        path: ['layer', 0, 'mark', 'opacity'],
       },
       {
         prop: 'interpolate',
-        path: ['layer', 1, 'mark', 'interpolate'],
+        path: ['layer', 0, 'mark', 'interpolate'],
       },
       {
         prop: 'strokeDash',
-        path: ['layer', 1, 'mark', 'strokeDash'],
+        path: ['layer', 0, 'mark', 'strokeDash'],
       },
     ],
-    component: Lines,
+    Component: Lines,
   },
   {
     name: 'Dots',
@@ -78,7 +78,7 @@ export const properties = [
         path: ['layer', 0, 'mark'],
       },
     ],
-    component: Dots,
+    Component: Dots,
   },
   {
     name: 'X Axis',
@@ -99,8 +99,16 @@ export const properties = [
         prop: 'label_color',
         path: ['layer', 0, 'encoding', 'x', 'axis', 'labelColor'],
       },
+      {
+        prop: 'aggregate',
+        path: ['layer', 0, 'encoding', 'x', 'aggregate'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'x', 'field'],
+      },
     ],
-    component: XAxis,
+    Component: XAxis,
   },
   {
     name: 'Y Axis',
@@ -121,8 +129,16 @@ export const properties = [
         prop: 'label_color',
         path: ['layer', 0, 'encoding', 'y', 'axis', 'labelColor'],
       },
+      {
+        prop: 'aggregate',
+        path: ['layer', 0, 'encoding', 'y', 'aggregate'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'y', 'field'],
+      },
     ],
-    component: YAxis,
+    Component: YAxis,
   },
   {
     name: 'Legend',
@@ -148,7 +164,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'legend', 'orient'],
       },
     ],
-    component: Legend,
+    Component: Legend,
   },
   {
     name: 'Legend Label',
@@ -166,7 +182,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'legend', 'labelColor'],
       },
     ],
-    component: LegendLabel,
+    Component: LegendLabel,
   },
   {
     name: 'Data Labels',
@@ -184,6 +200,6 @@ export const properties = [
         path: ['layer', 1, 'encoding', 'text', 'format'],
       },
     ],
-    component: DataLabels,
+    Component: DataLabels,
   },
 ];

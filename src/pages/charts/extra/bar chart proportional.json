@@ -1,10 +1,21 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-  "data": { "url": "https://vega.github.io/editor/data/seattle-weather.csv" },
-  "padding": { "left": 20, "top": 5, "right": 30, "bottom": 5 },
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://vega.github.io/editor/data/seattle-weather.csv"
+  },
+  "padding": {
+    "left": 20,
+    "top": 5,
+    "right": 30,
+    "bottom": 5
+  },
   "width": "container",
   "height": "container",
-  "resolve": { "scale": { "color": "independent" } },
+  "resolve": {
+    "scale": {
+      "color": "independent"
+    }
+  },
   "background": "#ffffff",
   "layer": [
     {
@@ -19,13 +30,20 @@
           "timeUnit": "month",
           "field": "date",
           "type": "ordinal",
-          "axis": { "title": "Month of the year", "orient": "bottom" }
+          "axis": {
+            "title": "Month of the year",
+            "orient": "bottom"
+          }
         },
         "y": {
           "aggregate": "count",
           "type": "quantitative",
           "field": "weather",
-          "axis": { "title": "Count", "orient": "left", "labelExpr": "datum.value*100" },
+          "axis": {
+            "title": "Count",
+            "orient": "left",
+            "labelExpr": "datum.value*100"
+          },
           "stack": "normalize"
         },
         "opacity": {
@@ -35,7 +53,13 @@
           "field": "weather",
           "type": "nominal",
           "scale": {
-            "domain": ["sun", "fog", "drizzle", "rain", "snow"],
+            "domain": [
+              "sun",
+              "fog",
+              "drizzle",
+              "rain",
+              "snow"
+            ],
             "range": [
               "#1f77b4",
               "#ff7f0e",
