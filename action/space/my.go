@@ -45,21 +45,19 @@ func my(w http.ResponseWriter, r *http.Request) {
 
 	config.DB.Model(model.Space{}).Where("organisation_id IN (?)", allOrgIDs).Preload("Logo").Preload("LogoMobile").Preload("FavIcon").Preload("MobileIcon").Find(&allSpaces)
 
-	orgSpaceMap := make(map[int][]model.Space)
-
-	for _, space := range allSpaces {
-		if _, found := orgSpaceMap[space.OrganisationID]; !found {
-			orgSpaceMap[space.OrganisationID] = make([]model.Space, 0)
-		}
-		orgSpaceMap[space.OrganisationID] = append(orgSpaceMap[space.OrganisationID], space)
-	}
-
 	result := make([]orgWithSpace, 0)
 
 	for _, organisation := range orgList {
+		spaces := make([]model.Space, 0)
+		for _, space := range allSpaces {
+			if space.OrganisationID == int(space.OrganisationID) {
+				spaces = append(spaces, space)
+			}
+		}
+
 		os := orgWithSpace{
 			Organisation: organisation,
-			Spaces:       orgSpaceMap[int(organisation.ID)],
+			Spaces:       spaces,
 		}
 		result = append(result, os)
 	}
