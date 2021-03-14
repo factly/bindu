@@ -16,7 +16,7 @@ type Template struct {
 	MediumID   *uint          `gorm:"column:medium_id;default:NULL" json:"medium_id"`
 	Medium     *Medium        `gorm:"foreignKey:medium_id" json:"medium"`
 	SpaceID    uint           `gorm:"column:space_id" json:"space_id"`
-	Space      *Space         `json:"space,omitempty"`
+	Space      *Space         `gorm:"foreignKey:space_id" json:"space,omitempty"`
 }
 
 var templateUser config.ContextKey = "template_user"
