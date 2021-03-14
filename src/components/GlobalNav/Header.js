@@ -4,7 +4,7 @@ import { Layout } from 'antd';
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { toggleSider } from '../../actions/settings';
 import AccountMenu from './AccountMenu';
-import OrganisationSelector from '../OrganisationSelector';
+import SpaceSelector from './SpaceSelector';
 
 function Header() {
   const collapsed = useSelector((state) => state.settings.sider.collapsed);
@@ -19,7 +19,7 @@ function Header() {
           onClick={() => dispatch(toggleSider())}
         />
 
-        <OrganisationSelector />
+        <SpaceSelector />
 
         <AccountMenu />
       </div>

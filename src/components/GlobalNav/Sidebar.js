@@ -52,6 +52,9 @@ function Sidebar() {
         <Menu.Item key="4" icon={<AppstoreOutlined />}>
           <Link to={'/categories'}>Categories</Link>
         </Menu.Item>
+        <Menu.Item key="5" icon={<AppstoreOutlined />}>
+          <Link to={'/spaces'}>Spaces</Link>
+        </Menu.Item>
       </Menu>
     </Sider>
   );
