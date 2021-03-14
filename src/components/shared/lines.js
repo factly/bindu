@@ -13,7 +13,7 @@ function Lines(props) {
   return (
     <div className="property-container">
       <Form.Item name={strokeWidthObj.path} label="Width">
-        <Input type="number" />
+        <Input min={0} type="number" />
       </Form.Item>
 
       <Form.Item name={opacityObj.path} label="Opacity">
