@@ -98,6 +98,14 @@ export const properties = [
         prop: 'label_color',
         path: ['encoding', 'x', 'axis', 'labelColor'],
       },
+      {
+        prop: 'aggregate',
+        path: ['encoding', 'x', 'aggregate'],
+      },
+      {
+        prop: 'field',
+        path: ['encoding', 'x', 'field'],
+      },
     ],
     Component: XAxis,
   },
@@ -119,6 +127,14 @@ export const properties = [
       {
         prop: 'label_color',
         path: ['encoding', 'y', 'axis', 'labelColor'],
+      },
+      {
+        prop: 'aggregate',
+        path: ['encoding', 'y', 'aggregate'],
+      },
+      {
+        prop: 'field',
+        path: ['encoding', 'y', 'field'],
       },
     ],
     Component: YAxis,
