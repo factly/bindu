@@ -199,17 +199,17 @@ export const properties = [
     properties: [
       {
         prop: 'color',
-        path: ['layer', 1, 'encoding', 'color', 'value'],
+        path: ['layer', 2, 'encoding', 'color', 'value'],
       },
       {
         prop: 'font_size',
-        path: ['layer', 1, 'mark', 'fontSize'],
+        path: ['layer', 2, 'mark', 'fontSize'],
       },
       {
         prop: 'format',
-        path: ['layer', 1, 'encoding', 'text', 'format'],
+        path: ['layer', 2, 'encoding', 'text', 'format'],
       },
     ],
-    component: DataLabels,
+    Component: DataLabels,
   },
 ];

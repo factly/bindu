@@ -13,34 +13,171 @@ export const spec = Spec;
 export const properties = [
   {
     name: 'Chart Properties',
-    component: ChartProperties,
+    properties: [
+      {
+        prop: 'title',
+        path: ['title'],
+      },
+      {
+        prop: 'width',
+        path: ['width'],
+      },
+      {
+        prop: 'height',
+        path: ['height'],
+      },
+      {
+        prop: 'background',
+        path: ['background'],
+      },
+    ],
+    Component: ChartProperties,
   },
   {
     name: 'Colors',
-    component: Colors,
+    properties: [
+      {
+        prop: 'color',
+        type: 'array',
+        path: ['layer', 0, 'encoding', 'color', 'scale', 'range'],
+      },
+    ],
+    Component: Colors,
   },
   {
     name: 'Bars',
-    component: Bars,
+    properties: [
+      {
+        prop: 'opacity',
+        path: ['layer', 0, 'encoding', 'opacity', 'value'],
+      },
+      {
+        prop: 'corner_radius',
+        path: ['layer', 0, 'mark', 'cornerRadius'],
+      },
+    ],
+    Component: Bars,
   },
   {
     name: 'X Axis',
-    component: XAxis,
+    properties: [
+      {
+        prop: 'title',
+        path: ['layer', 0, 'encoding', 'x', 'axis', 'title'],
+      },
+      {
+        prop: 'orient',
+        path: ['layer', 0, 'encoding', 'x', 'axis', 'orient'],
+      },
+      {
+        prop: 'format',
+        path: ['layer', 0, 'encoding', 'x', 'axis', 'format'],
+      },
+      {
+        prop: 'label_color',
+        path: ['layer', 0, 'encoding', 'x', 'axis', 'labelColor'],
+      },
+      {
+        prop: 'aggregate',
+        path: ['layer', 0, 'encoding', 'x', 'aggregate'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'x', 'field'],
+      },
+    ],
+    Component: XAxis,
   },
   {
     name: 'Y Axis',
-    component: YAxis,
+    properties: [
+      {
+        prop: 'title',
+        path: ['layer', 0, 'encoding', 'y', 'axis', 'title'],
+      },
+      {
+        prop: 'orient',
+        path: ['layer', 0, 'encoding', 'y', 'axis', 'orient'],
+      },
+      {
+        prop: 'format',
+        path: ['layer', 0, 'encoding', 'y', 'axis', 'format'],
+      },
+      {
+        prop: 'label_color',
+        path: ['layer', 0, 'encoding', 'y', 'axis', 'labelColor'],
+      },
+      {
+        prop: 'aggregate',
+        path: ['layer', 0, 'encoding', 'y', 'aggregate'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'y', 'field'],
+      },
+    ],
+    Component: YAxis,
   },
   {
     name: 'Legend',
-    component: Legend,
+    properties: [
+      {
+        prop: 'title',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'title'],
+      },
+      {
+        prop: 'fill_color',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'fillColor'],
+      },
+      {
+        prop: 'symbol_type',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'symbolType'],
+      },
+      {
+        prop: 'symbol_size',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'symbolSize'],
+      },
+      {
+        prop: 'orient',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'orient'],
+      },
+    ],
+    Component: Legend,
   },
   {
     name: 'Legend Label',
-    component: LegendLabel,
+    properties: [
+      {
+        prop: 'label_align',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'labelAlign'],
+      },
+      {
+        prop: 'label_baseline',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'labelBaseline'],
+      },
+      {
+        prop: 'label_color',
+        path: ['layer', 0, 'encoding', 'color', 'legend', 'labelColor'],
+      },
+    ],
+    Component: LegendLabel,
   },
   {
     name: 'Data Labels',
-    component: DataLabels,
+    properties: [
+      {
+        prop: 'color',
+        path: ['layer', 1, 'encoding', 'color', 'value'],
+      },
+      {
+        prop: 'font_size',
+        path: ['layer', 1, 'mark', 'fontSize'],
+      },
+      {
+        prop: 'format',
+        path: ['layer', 1, 'encoding', 'text', 'format'],
+      },
+    ],
+    Component: DataLabels,
   },
 ];
