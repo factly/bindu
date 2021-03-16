@@ -13,7 +13,7 @@ import (
 
 func TestChartDetails(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -23,6 +23,7 @@ func TestChartDetails(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid chart id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.GET(path).
 			WithPath("chart_id", "invalid_id").
 			WithHeaders(headers).
@@ -31,6 +32,7 @@ func TestChartDetails(t *testing.T) {
 	})
 
 	t.Run("chart record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.GET(path).
@@ -41,8 +43,9 @@ func TestChartDetails(t *testing.T) {
 	})
 
 	t.Run("get chart by id", func(t *testing.T) {
+		test.CheckSpace(mock)
 
-		chartSelectMock(mock)
+		SelectMock(mock)
 		chartPreloadMock(mock)
 
 		e.GET(path).

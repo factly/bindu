@@ -16,6 +16,8 @@ import (
 func TestCategoryList(t *testing.T) {
 	mock := test.SetupMockDB()
 
+	test.MockServers()
+
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -30,7 +32,7 @@ func TestCategoryList(t *testing.T) {
 	}
 
 	t.Run("get empty list of categories", func(t *testing.T) {
-
+		test.CheckSpace(mock)
 		categoryCountQuery(mock, 0)
 
 		mock.ExpectQuery(selectQuery).
@@ -49,12 +51,13 @@ func TestCategoryList(t *testing.T) {
 
 	t.Run("get non-empty list of categories", func(t *testing.T) {
 
+		test.CheckSpace(mock)
 		categoryCountQuery(mock, len(categorylist))
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, categorylist[0]["name"], categorylist[0]["slug"]).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, categorylist[1]["name"], categorylist[1]["slug"]))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, categorylist[0]["name"], categorylist[0]["slug"], 1).
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, categorylist[1]["name"], categorylist[1]["slug"], 1))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -73,11 +76,12 @@ func TestCategoryList(t *testing.T) {
 	})
 
 	t.Run("get categories with pagination", func(t *testing.T) {
+		test.CheckSpace(mock)
 		categoryCountQuery(mock, len(categorylist))
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, categorylist[1]["name"], categorylist[1]["slug"]))
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, categorylist[1]["name"], categorylist[1]["slug"], 1))
 
 		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{

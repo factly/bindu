@@ -14,7 +14,7 @@ import (
 
 func TestTagDelete(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -24,6 +24,7 @@ func TestTagDelete(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("invalid tag id", func(t *testing.T) {
+		test.CheckSpace(mock)
 		e.DELETE(path).
 			WithPath("tag_id", "invalid_id").
 			WithHeaders(headers).
@@ -33,6 +34,7 @@ func TestTagDelete(t *testing.T) {
 	})
 
 	t.Run("tag record not found", func(t *testing.T) {
+		test.CheckSpace(mock)
 		recordNotFoundMock(mock)
 
 		e.DELETE(path).
@@ -43,7 +45,8 @@ func TestTagDelete(t *testing.T) {
 	})
 
 	t.Run("check tag associated with other entity", func(t *testing.T) {
-		tagSelectMock(mock)
+		test.CheckSpace(mock)
+		SelectMock(mock)
 
 		tagChartExpect(mock, 1)
 
@@ -55,7 +58,8 @@ func TestTagDelete(t *testing.T) {
 	})
 
 	t.Run("tag record deleted", func(t *testing.T) {
-		tagSelectMock(mock)
+		test.CheckSpace(mock)
+		SelectMock(mock)
 
 		tagChartExpect(mock, 0)
 

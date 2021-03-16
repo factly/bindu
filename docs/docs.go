@@ -952,61 +952,6 @@ var doc = `{
                 }
             }
         },
-        "/permissions/organisations/request": {
-            "post": {
-                "description": "Create organisation permission request",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Organisation_Permissions"
-                ],
-                "summary": "Create organisation permission request",
-                "operationId": "add-org-permission-request",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Space ID",
-                        "name": "X-Space",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Request Object",
-                        "name": "Request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/organisation.organisationPermissionRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/model.OrganisationPermissionRequest"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/permissions/organisations/{permission_id}": {
             "put": {
                 "description": "Update Organisation permission by ID",
@@ -1143,7 +1088,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/space.paging"
+                                "$ref": "#/definitions/github.com_factly_bindu-server_action_permission_space.paging"
                             }
                         }
                     }
@@ -1235,61 +1180,6 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.SpacePermission"
-                        }
-                    }
-                }
-            }
-        },
-        "/permissions/spaces/request": {
-            "post": {
-                "description": "Create space permission request",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Space_Permissions"
-                ],
-                "summary": "Create space permission request",
-                "operationId": "add-space-permission-request",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Space ID",
-                        "name": "X-Space",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Request Object",
-                        "name": "Request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/space.spacePermissionRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/model.SpacePermissionRequest"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
                         }
                     }
                 }
@@ -1659,7 +1549,7 @@ var doc = `{
                 }
             }
         },
-        "/requests/organisation-permissions": {
+        "/requests/organisations": {
             "get": {
                 "description": "Get all organisation permissions requests",
                 "produces": [
@@ -1698,14 +1588,67 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/organisationPermission.paging"
+                                "$ref": "#/definitions/organisation.paging"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create organisation permission request",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organisation_Permissions_Request"
+                ],
+                "summary": "Create organisation permission request",
+                "operationId": "add-org-permission-request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Request Object",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/organisation.organisationPermissionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.OrganisationPermissionRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
                             }
                         }
                     }
                 }
             }
         },
-        "/requests/organisation-permissions/my": {
+        "/requests/organisations/my": {
             "get": {
                 "description": "Get all my organisation permissions requests",
                 "produces": [
@@ -1738,14 +1681,14 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/organisationPermission.paging"
+                                "$ref": "#/definitions/organisation.paging"
                             }
                         }
                     }
                 }
             }
         },
-        "/requests/organisation-permissions/{request_id}": {
+        "/requests/organisations/{request_id}": {
             "get": {
                 "description": "Get organisation permissions requests detail",
                 "produces": [
@@ -1834,7 +1777,7 @@ var doc = `{
                 }
             }
         },
-        "/requests/organisation-permissions/{request_id}/approve": {
+        "/requests/organisations/{request_id}/approve": {
             "post": {
                 "description": "approve organisation permission",
                 "produces": [
@@ -1887,7 +1830,7 @@ var doc = `{
                 }
             }
         },
-        "/requests/organisation-permissions/{request_id}/reject": {
+        "/requests/organisations/{request_id}/reject": {
             "post": {
                 "description": "reject organisation permission",
                 "produces": [
@@ -1937,7 +1880,7 @@ var doc = `{
                 }
             }
         },
-        "/requests/space-permissions": {
+        "/requests/spaces": {
             "get": {
                 "description": "Get all space permissions requests",
                 "produces": [
@@ -1976,14 +1919,67 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/spacePermission.paging"
+                                "$ref": "#/definitions/github.com_factly_bindu-server_action_request_space.paging"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create space permission request",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space_Permissions_Request"
+                ],
+                "summary": "Create space permission request",
+                "operationId": "add-space-permission-request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Request Object",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/space.spacePermissionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.SpacePermissionRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
                             }
                         }
                     }
                 }
             }
         },
-        "/requests/space-permissions/my": {
+        "/requests/spaces/my": {
             "get": {
                 "description": "Get all my space permissions requests",
                 "produces": [
@@ -2016,14 +2012,14 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/spacePermission.paging"
+                                "$ref": "#/definitions/github.com_factly_bindu-server_action_request_space.paging"
                             }
                         }
                     }
                 }
             }
         },
-        "/requests/space-permissions/{request_id}": {
+        "/requests/spaces/{request_id}": {
             "get": {
                 "description": "Get space permissions requests detail",
                 "produces": [
@@ -2112,7 +2108,7 @@ var doc = `{
                 }
             }
         },
-        "/requests/space-permissions/{request_id}/approve": {
+        "/requests/spaces/{request_id}/approve": {
             "post": {
                 "description": "approve space permission",
                 "produces": [
@@ -2165,7 +2161,7 @@ var doc = `{
                 }
             }
         },
-        "/requests/space-permissions/{request_id}/reject": {
+        "/requests/spaces/{request_id}/reject": {
             "post": {
                 "description": "reject space permission",
                 "produces": [
@@ -3168,6 +3164,34 @@ var doc = `{
                 }
             }
         },
+        "github.com_factly_bindu-server_action_permission_space.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/space.spaceWithPermissions"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github.com_factly_bindu-server_action_request_space.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SpacePermissionRequest"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "medium.medium": {
             "type": "object",
             "required": [
@@ -3964,20 +3988,6 @@ var doc = `{
                 }
             }
         },
-        "organisationPermission.paging": {
-            "type": "object",
-            "properties": {
-                "nodes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.OrganisationPermissionRequest"
-                    }
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
         "policy.paging": {
             "type": "object",
             "properties": {
@@ -4086,20 +4096,6 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_by_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "space.paging": {
-            "type": "object",
-            "properties": {
-                "nodes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/space.spaceWithPermissions"
-                    }
-                },
-                "total": {
                     "type": "integer"
                 }
             }
@@ -4267,20 +4263,6 @@ var doc = `{
                 },
                 "verification_codes": {
                     "type": "string"
-                }
-            }
-        },
-        "spacePermission.paging": {
-            "type": "object",
-            "properties": {
-                "nodes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.SpacePermissionRequest"
-                    }
-                },
-                "total": {
-                    "type": "integer"
                 }
             }
         },

@@ -17,7 +17,7 @@ var orgList = []map[string]interface{}{{
 	"id":         1,
 	"deleted_at": nil,
 	"title":      "test org",
-	"slug":       "tesing",
+	"slug":       "test-org",
 	"permission": map[string]interface{}{
 		"id":         1,
 		"deleted_at": nil,
@@ -26,15 +26,15 @@ var orgList = []map[string]interface{}{{
 }
 
 var headers = map[string]string{
-	"X-Organisation": "1",
-	"X-User":         "1",
+	"X-Space": "1",
+	"X-User":  "1",
 }
 
 func TestOrganisationList(t *testing.T) {
 	test.SetEnv()
-	_ = test.SetupMockDB()
+	mock := test.SetupMockDB()
 	defer gock.Disable()
-	test.MockServer()
+	test.MockServers()
 	defer gock.DisableNetworking()
 
 	testServer := httptest.NewServer(action.RegisterRoutes())
@@ -46,6 +46,7 @@ func TestOrganisationList(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 
 	t.Run("get empty list of organisations", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		e.GET(basePath).
 			WithHeaders(headers).

@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -131,7 +132,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		SpaceID: uint(sID),
 	}
 
-	tx := config.DB.Begin()
+	tx := config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 
 	err = tx.Model(&model.Medium{}).Create(&medium).Error
 

@@ -15,7 +15,7 @@ import (
 
 func TestTagList(t *testing.T) {
 	mock := test.SetupMockDB()
-
+	test.MockServers()
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	gock.New(testServer.URL).EnableNetworking().Persist()
 	defer gock.DisableNetworking()
@@ -30,7 +30,7 @@ func TestTagList(t *testing.T) {
 	}
 
 	t.Run("get empty list of tags", func(t *testing.T) {
-
+		test.CheckSpace(mock)
 		tagCountQuery(mock, 0)
 
 		mock.ExpectQuery(selectQuery).
@@ -48,13 +48,14 @@ func TestTagList(t *testing.T) {
 	})
 
 	t.Run("get non-empty list of tags", func(t *testing.T) {
+		test.CheckSpace(mock)
 
 		tagCountQuery(mock, len(taglist))
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, taglist[0]["name"], taglist[0]["slug"]).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, taglist[1]["name"], taglist[1]["slug"]))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, taglist[0]["name"], taglist[0]["slug"], 1).
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, taglist[1]["name"], taglist[1]["slug"], 1))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -73,11 +74,12 @@ func TestTagList(t *testing.T) {
 	})
 
 	t.Run("get tags with pagination", func(t *testing.T) {
+		test.CheckSpace(mock)
 		tagCountQuery(mock, len(taglist))
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, taglist[1]["name"], taglist[1]["slug"]))
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, taglist[1]["name"], taglist[1]["slug"], 1))
 
 		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{
