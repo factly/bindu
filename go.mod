@@ -16,6 +16,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/minio/minio-go/v7 v7.0.5
+	github.com/spf13/cobra v1.1.3
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
