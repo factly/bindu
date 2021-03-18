@@ -3,7 +3,6 @@ package chart
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -23,18 +22,16 @@ import (
 // @Success 200
 // @Router /charts/visualization/{chart_id} [get]
 func Visualize(w http.ResponseWriter, r *http.Request) {
-	chartID := chi.URLParam(r, "chart_id")
-	id, err := strconv.Atoi(chartID)
-
-	if err != nil {
+	id := chi.URLParam(r, "chart_id")
+	if id == "" {
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
 
 	result := &model.Chart{}
-	result.ID = uint(id)
+	result.ID = id
 
-	err = config.DB.Model(&model.Chart{}).Where(&model.Chart{
+	err := config.DB.Model(&model.Chart{}).Where(&model.Chart{
 		IsPublic: true,
 	}).Where("published_date IS NOT NULL").Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result).Error
 

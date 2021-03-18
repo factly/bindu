@@ -2,7 +2,6 @@ package chart
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -27,11 +26,8 @@ import (
 // @Router  /charts/{chart_id} [delete]
 func delete(w http.ResponseWriter, r *http.Request) {
 
-	chartID := chi.URLParam(r, "chart_id")
-	id, err := strconv.Atoi(chartID)
-
-	if err != nil {
-		loggerx.Error(err)
+	id := chi.URLParam(r, "chart_id")
+	if id == "" {
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
@@ -44,8 +40,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Chart{}
-
-	result.ID = uint(id)
+	result.ID = id
 
 	// check record exists or not
 	err = config.DB.Where(&model.Chart{
