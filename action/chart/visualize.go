@@ -8,8 +8,8 @@ import (
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
+	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
-	"github.com/opentracing/opentracing-go/log"
 )
 
 // Visualize - Get chart by id
@@ -36,6 +36,7 @@ func Visualize(w http.ResponseWriter, r *http.Request) {
 	}).Where("published_date IS NOT NULL").Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result).Error
 
 	if err != nil {
+		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
 		return
 	}
@@ -50,7 +51,7 @@ func Visualize(w http.ResponseWriter, r *http.Request) {
 		"spec":  jsonSpecString,
 	})
 	if err != nil {
-		log.Error(err)
+		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}

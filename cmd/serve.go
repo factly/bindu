@@ -13,7 +13,9 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/minio"
+	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	"github.com/spf13/cobra"
 )
@@ -48,8 +50,16 @@ func ServeCharts() {
 
 	r := chi.NewRouter()
 
+	r.Use(middleware.RequestID)
+	r.Use(loggerx.Init())
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Heartbeat("/ping"))
+
 	r.Use(cors.AllowAll().Handler)
+
 	r.Get("/charts/visualization/{chart_id}", chart.Visualize)
+	r.Get("/charts/{chart_id}", chart.Spec)
 
 	workDir, _ := os.Getwd()
 	filesDir := http.Dir(filepath.Join(workDir, "web/"))
