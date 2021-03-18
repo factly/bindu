@@ -381,6 +381,33 @@ var doc = `{
                 }
             }
         },
+        "/charts/visualization/{chart_id}": {
+            "get": {
+                "description": "Get chart by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chart"
+                ],
+                "summary": "Show a chart by id",
+                "operationId": "get-chart-visualization-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chart ID",
+                        "name": "chart_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/charts/{chart_id}": {
             "get": {
                 "description": "Get chart by ID",
@@ -2782,6 +2809,250 @@ var doc = `{
                 }
             }
         },
+        "/templates": {
+            "get": {
+                "description": "Get all templates",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Template"
+                ],
+                "summary": "Show all templates",
+                "operationId": "get-all-templates",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/template.paging"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create template",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Template"
+                ],
+                "summary": "Create template",
+                "operationId": "add-template",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Template Object",
+                        "name": "Template",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/template.template"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Template"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/templates/{template_id}": {
+            "get": {
+                "description": "Get template by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Template"
+                ],
+                "summary": "Show a template by id",
+                "operationId": "get-template-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Template ID",
+                        "name": "template_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Template"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update template by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Template"
+                ],
+                "summary": "Update a template by id",
+                "operationId": "update-template-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Template ID",
+                        "name": "template_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Template",
+                        "name": "Template",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/template.template"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Template"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete template by ID",
+                "tags": [
+                    "Template"
+                ],
+                "summary": "Delete a template",
+                "operationId": "delete-template-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Template ID",
+                        "name": "template_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/themes": {
             "get": {
                 "description": "Get all themes",
@@ -3764,6 +4035,53 @@ var doc = `{
                 }
             }
         },
+        "model.Template": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "medium": {
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "medium_id": {
+                    "type": "integer"
+                },
+                "properties": {
+                    "type": "string"
+                },
+                "schema": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "space": {
+                    "$ref": "#/definitions/model.Space"
+                },
+                "space_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Theme": {
             "type": "object",
             "required": [
@@ -3904,41 +4222,6 @@ var doc = `{
                 }
             }
         },
-        "organisation.orgWithPermissions": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "created_by_id": {
-                    "type": "integer"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "permission": {
-                    "$ref": "#/definitions/model.OrganisationPermission"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "updated_by_id": {
-                    "type": "integer"
-                }
-            }
-        },
         "organisation.organisationPermission": {
             "type": "object",
             "required": [
@@ -3980,7 +4263,7 @@ var doc = `{
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/organisation.orgWithPermissions"
+                        "$ref": "#/definitions/model.Organisation"
                     }
                 },
                 "total": {
@@ -4293,6 +4576,43 @@ var doc = `{
                     "type": "string"
                 },
                 "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "template.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Template"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "template.template": {
+            "type": "object",
+            "properties": {
+                "medium_id": {
+                    "type": "integer"
+                },
+                "properties": {
+                    "type": "string"
+                },
+                "schema": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "space_id": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }
