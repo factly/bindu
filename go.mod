@@ -20,6 +20,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
+	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/http-swagger v0.0.0-20200308142732-58ac5e232fba
 	github.com/swaggo/swag v1.6.7
 	golang.org/x/tools v0.0.0-20200827163409-021d7c6f1ec3 // indirect

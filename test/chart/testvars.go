@@ -166,9 +166,9 @@ func recordNotFoundMock(mock sqlmock.Sqlmock) {
 }
 func SelectMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
-		WithArgs(1, 1).
+		WithArgs(1, "1").
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
+			AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
 				data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
 }
 
@@ -176,9 +176,9 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	description, _ := json.Marshal(chart["description"])
 	config, _ := json.Marshal(chart["config"])
 	mock.ExpectQuery(selectQuery).
-		WithArgs(1, 1).
+		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, 1, 1, chart["title"], chart["slug"], description,
+			AddRow("1", time.Now(), time.Now(), nil, 1, 1, chart["title"], chart["slug"], description,
 				chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], time.Time{}, 1))
 
 	chartPreloadMock(mock)
@@ -194,21 +194,21 @@ func chartTagUpdate(mock sqlmock.Sqlmock, err error) {
 			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
 			WillReturnError(err)
 		mock.ExpectExec(`INSERT INTO "bi_chart_tag"`).
-			WithArgs(1, 1).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnError(err)
 		mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_tag"`)).
-			WithArgs(1, 1).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnError(err)
 	} else {
 		mock.ExpectQuery(`INSERT INTO "bi_tag"`).
 			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 		mock.ExpectExec(`INSERT INTO "bi_chart_tag"`).
-			WithArgs(1, 1).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnResult(sqlmock.NewResult(0, 1))
 
 		mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_tag"`)).
-			WithArgs(1, 1).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 	}
 }
@@ -223,22 +223,22 @@ func chartCategoryUpdate(mock sqlmock.Sqlmock, err error) {
 			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
 			WillReturnError(err)
 		mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
-			WithArgs(1, 1).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnError(err)
 
 		mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_category"`)).
-			WithArgs(1, 1).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnError(err)
 	} else {
 		mock.ExpectQuery(`INSERT INTO "bi_category"`).
 			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 		mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
-			WithArgs(1, 1).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnResult(sqlmock.NewResult(0, 1))
 
 		mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "bi_chart_category"`)).
-			WithArgs(1, 1).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 	}
 }
@@ -248,13 +248,13 @@ func chartUpdateMock(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	config, _ := json.Marshal(chart["config"])
 
 	mock.ExpectExec(`UPDATE \"bi_chart\"`).
-		WithArgs(true, 1).
+		WithArgs(true, "1").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mediumQueryMock(mock)
 	themeQueryMock(mock)
 	mock.ExpectExec(`UPDATE \"bi_chart\"`).
-		WithArgs(test.AnyTime{}, 1, chart["title"], chart["slug"], description, chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], 1).
+		WithArgs(test.AnyTime{}, 1, chart["title"], chart["slug"], description, chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], "1").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 }
 
@@ -269,22 +269,22 @@ func chartInsertMock(mock sqlmock.Sqlmock) {
 			AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, theme["name"], byteThemeData))
 
 	mock.ExpectQuery(`INSERT INTO "bi_chart"`).
-		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
+		WithArgs(sqlmock.AnyArg(), test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
 			data["data_url"], byteConfigData, data["status"], data["is_public"], data["theme_id"], test.AnyTime{}, 1, data["featured_medium_id"]).
-		WillReturnRows(sqlmock.NewRows([]string{"featured_medium_id", "id"}).AddRow(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"featured_medium_id"}).AddRow(1))
 
 	mock.ExpectQuery(`INSERT INTO "bi_tag"`).
 		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectExec(`INSERT INTO "bi_chart_tag"`).
-		WithArgs(1, 1).
+		WithArgs(sqlmock.AnyArg(), 1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	mock.ExpectQuery(`INSERT INTO "bi_category"`).
 		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
-		WithArgs(1, 1).
+		WithArgs(sqlmock.AnyArg(), 1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 }
 
@@ -292,7 +292,7 @@ func chartPreloadMock(mock sqlmock.Sqlmock, args ...driver.Value) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_chart_category"`)).
 		WithArgs(args...).
 		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"category_id", "chart_id"}...)).
-			AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, 1))
+			AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, "1"))
 
 	categoryQueryMock(mock)
 
@@ -301,7 +301,7 @@ func chartPreloadMock(mock sqlmock.Sqlmock, args ...driver.Value) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "bi_chart_tag"`)).
 		WithArgs(args...).
 		WillReturnRows(sqlmock.NewRows(append([]string{"id", "created_at", "updated_at", "deleted_at", "name", "slug"}, []string{"tag_id", "chart_id"}...)).
-			AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, 1))
+			AddRow(1, time.Now(), time.Now(), nil, "title1", "slug1", 1, "1"))
 
 	tagQueryMock(mock)
 
