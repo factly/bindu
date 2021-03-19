@@ -48,18 +48,6 @@ var templateList = []map[string]interface{}{
 	},
 }
 
-var dataWithoutSlug = map[string]interface{}{
-	"title":      "test title",
-	"slug":       "",
-	"schema":     nilJsonb(),
-	"properties": nilJsonb(),
-	"medium_id":  1,
-}
-
-var invalidData = map[string]interface{}{
-	"name": "ab",
-}
-
 var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "title", "slug", "schema", "properties", "medium_id", "space_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_template"`)
