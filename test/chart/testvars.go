@@ -270,8 +270,8 @@ func chartInsertMock(mock sqlmock.Sqlmock) {
 
 	mock.ExpectQuery(`INSERT INTO "bi_chart"`).
 		WithArgs(sqlmock.AnyArg(), test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
-			data["data_url"], byteConfigData, data["status"], data["is_public"], data["theme_id"], test.AnyTime{}, 1, data["featured_medium_id"]).
-		WillReturnRows(sqlmock.NewRows([]string{"featured_medium_id"}).AddRow(1))
+			data["data_url"], byteConfigData, data["status"], data["is_public"], data["theme_id"], 1, data["featured_medium_id"]).
+		WillReturnRows(sqlmock.NewRows([]string{"published_date", "featured_medium_id"}))
 
 	mock.ExpectQuery(`INSERT INTO "bi_tag"`).
 		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
