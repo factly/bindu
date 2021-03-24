@@ -42,8 +42,8 @@ function Chart({ data = {}, onSubmit }) {
     if (data.id) {
       form.setFieldsValue({
         ...data.config,
-        categories: data.categories,
-        tags: data.tags,
+        categories: data.categories.map((category) => category.id),
+        tags: data.tags.map((tag) => tag.id),
       });
       setChartName(data.title);
     }
