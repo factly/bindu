@@ -166,7 +166,7 @@ function Chart({ data = {}, onSubmit }) {
 
   return (
     <>
-      <Form form={form}>
+      <Form form={form} layout="vertical">
         <Card
           title={titleComponent}
           extra={actionsList}
