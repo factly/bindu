@@ -52,13 +52,13 @@ function OptionComponent(props) {
   }, [templateId]);
 
   useEffect(() => {
-    form.setFieldsValue(component.schema);
+    form.setFieldsValue(component?.schema);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [component]);
 
   const { form } = props;
 
-  return (
+  return !component ? null : (
     <>
       <Collapse className="option-item-collapse">
         {component.properties.map((d, i) => {

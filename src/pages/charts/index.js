@@ -18,9 +18,11 @@ import {
 import UppyUploader from '../../components/uppy';
 import { b64toBlob } from '../../utils/file';
 import { addChart } from '../../actions/charts';
+import { useParams } from 'react-router';
 
 function Chart({ data = {}, onSubmit }) {
   const dispatch = useDispatch();
+  const { templateId } = useParams();
   const [form] = Form.useForm();
 
   const [showModal, setShowModal] = useState(false);
@@ -76,6 +78,7 @@ function Chart({ data = {}, onSubmit }) {
       featured_medium: imageBlob,
       category_ids: categories,
       tag_ids: tags,
+      template_id: Number(templateId),
     });
   };
 

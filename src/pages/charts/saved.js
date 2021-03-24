@@ -16,7 +16,6 @@ function SavedCharts() {
   React.useEffect(() => {
     dispatch(getCharts());
   }, []);
-
   return loading ? null : (
     <List
       grid={{ gutter: 16, column: 5 }}
@@ -24,7 +23,7 @@ function SavedCharts() {
       renderItem={(chart, index) => {
         return (
           <List.Item>
-            <Link key={index} to={`/charts/${chart.id}/edit`}>
+            <Link key={index} to={`/charts/${chart.template_id}/edit/${chart.id}`}>
               <Card
                 hoverable
                 cover={
