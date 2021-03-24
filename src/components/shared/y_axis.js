@@ -1,5 +1,6 @@
 import React from 'react';
 import { Input, Select, Form } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 import { getAggregateOptions, getFields } from './x_axis';
 
