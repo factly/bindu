@@ -7,21 +7,21 @@ import EditChart from './index';
 
 function EditCharts() {
   const history = useHistory();
-  const { id } = useParams();
+  const { chartId } = useParams();
 
   const dispatch = useDispatch();
 
   const { chart, loading } = useSelector((state) => {
     return {
-      chart: state.charts.details[id] ? state.charts.details[id] : null,
+      chart: state.charts.details[chartId] ? state.charts.details[chartId] : null,
       loading: state.charts.loading,
     };
   });
 
   React.useEffect(() => {
-    dispatch(getChart(id));
+    dispatch(getChart(chartId));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [chartId]);
 
   if (loading) return null;
 

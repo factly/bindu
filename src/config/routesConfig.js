@@ -62,7 +62,7 @@ const routes = {
     },
   },
   createChart: {
-    path: '/chart/:id',
+    path: '/chart/:templateId',
     Component: CreateChart,
     title: 'Create Chart',
     permission: {
@@ -71,7 +71,7 @@ const routes = {
     },
   },
   editChart: {
-    path: '/charts/:id/edit',
+    path: '/charts/:templateId/edit/:chartId',
     Component: EditChart,
     title: 'Edit Chart',
     permission: {
