@@ -45,7 +45,6 @@ export default function spaces(state = initialState, action = {}) {
       const setSpaceID = space_details[state.selected] ? state.selected : defaultSpace;
       localStorage.setItem('space', setSpaceID);
 
-
       return {
         ...state,
         orgs: action.payload.map((each) => {

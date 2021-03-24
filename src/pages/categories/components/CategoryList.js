@@ -32,7 +32,7 @@ function CategoryList() {
   React.useEffect(() => {
     fetchCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch,filters]);
+  }, [dispatch, filters]);
 
   const fetchCategories = () => {
     dispatch(getCategories(filters));
