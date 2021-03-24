@@ -11,6 +11,10 @@ import Charts from '../pages/charts/saved.js';
 import EditChart from '../pages/charts/EditCharts.js';
 import CreateChart from '../pages/charts/CreateChart.js';
 
+// Templates
+import CreateTemplate from '../pages/templates/CreateTemplate.js';
+import EditTemplate from '../pages/templates/EditTemplate.js';
+
 // Spaces
 import Spaces from '../pages/spaces/index.js';
 import CreateSpace from '../pages/spaces/CreateSpace';
@@ -22,13 +26,31 @@ import CreateTag from '../pages/tags/CreateTag';
 import EditTag from '../pages/tags/EditTag';
 
 const routes = {
+  home: {
+    path: '/',
+    Component: Home,
+  },
   templates: {
     path: '/templates',
     Component: Templates,
   },
-  home: {
-    path: '/',
-    Component: Home,
+  createTemplate: {
+    path: '/templates/create',
+    Component: CreateTemplate,
+    title: 'Create Template',
+    permission: {
+      resource: 'charts',
+      action: 'create',
+    },
+  },
+  editTemplate: {
+    path: '/templates/:templateId/edit',
+    Component: EditTemplate,
+    title: 'Edit Template',
+    permission: {
+      resource: 'templates',
+      action: 'update',
+    },
   },
   charts: {
     path: '/charts/saved',
