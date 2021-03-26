@@ -36,7 +36,9 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
     "vega": "^5.13.0",
-    "vega-lite": "^4.13.0"
+    "vega-lite": "^4.13.0",
+    "@types/d3": "5.7.2",
+    "d3": "5.15.0"
   },
   "engines": {
     "node": ">=8.9.0"
