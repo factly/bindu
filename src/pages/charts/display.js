@@ -45,7 +45,7 @@ function Chart({ spec, setView }) {
   };
 
   const renderChart = () => {
-    switch (mode) {
+    switch (spec.mode) {
       case 'vega':
         return renderVega();
       case 'vega-lite':

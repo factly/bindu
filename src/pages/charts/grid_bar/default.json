@@ -1,5 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "mode": "vega-lite",
   "data": {
     "values": [
       {
@@ -239,18 +240,8 @@
       "field": "category",
       "type": "nominal",
       "scale": {
-        "domain": [
-          "Col1",
-          "Col2",
-          "Col3",
-          "Col4"
-        ],
-        "range": [
-          "#1f77b4",
-          "#EDAD08",
-          "#73AF48",
-          "#94346E"
-        ]
+        "domain": ["Col1", "Col2", "Col3", "Col4"],
+        "range": ["#1f77b4", "#EDAD08", "#73AF48", "#94346E"]
       },
       "legend": null
     }

@@ -1,5 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "mode": "vega-lite",
   "data": {
     "url": "https://vega.github.io/editor/data/seattle-weather.csv"
   },
@@ -53,13 +54,7 @@
           "field": "weather",
           "type": "nominal",
           "scale": {
-            "domain": [
-              "sun",
-              "fog",
-              "drizzle",
-              "rain",
-              "snow"
-            ],
+            "domain": ["sun", "fog", "drizzle", "rain", "snow"],
             "range": [
               "#1f77b4",
               "#ff7f0e",

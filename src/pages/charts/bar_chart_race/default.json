@@ -1,5 +1,6 @@
 {
   "type": "bar-chart-race",
+  "mode": "custom",
   "width": 1200,
   "height": 800,
   "padding": {

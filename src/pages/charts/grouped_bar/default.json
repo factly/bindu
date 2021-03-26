@@ -1,5 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "mode": "vega-lite",
   "data": {
     "url": "https://vega.github.io/editor/data/population.json"
   },
@@ -47,10 +48,7 @@
       "field": "gender",
       "type": "nominal",
       "scale": {
-        "range": [
-          "#675193",
-          "#ca8861"
-        ]
+        "range": ["#675193", "#ca8861"]
       }
     }
   },
