@@ -42,9 +42,7 @@
           "field": "symbol",
           "type": "nominal",
           "scale": {
-            "range": [
-              "#1f77b4"
-            ]
+            "range": ["#1f77b4"]
           },
           "legend": {
             "title": "Time Series",

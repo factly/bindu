@@ -32,7 +32,7 @@ export const properties = [
         path: ['background'],
       },
     ],
-    Component: ChartProperties,
+    Component: 'ChartProperties',
   },
   {
     name: 'Colors',
@@ -43,7 +43,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'scale', 'range'],
       },
     ],
-    Component: Colors,
+    Component: 'Colors',
   },
   {
     name: 'Bars',
@@ -57,7 +57,7 @@ export const properties = [
         path: ['layer', 0, 'mark', 'cornerRadius'],
       },
     ],
-    Component: Bars,
+    Component: 'Bars',
   },
   {
     name: 'X Axis',
@@ -86,8 +86,16 @@ export const properties = [
         prop: 'field',
         path: ['layer', 0, 'encoding', 'x', 'field'],
       },
+      {
+        prop: 'sort',
+        path: ['layer', 0, 'encoding', 'x', 'sort'],
+      },
+      {
+        prop: 'type',
+        path: ['layer', 0, 'encoding', 'x', 'type'],
+      },
     ],
-    Component: XAxis,
+    Component: 'XAxis',
   },
   {
     name: 'Y Axis',
@@ -116,8 +124,16 @@ export const properties = [
         prop: 'field',
         path: ['layer', 0, 'encoding', 'y', 'field'],
       },
+      {
+        prop: 'sort',
+        path: ['layer', 0, 'encoding', 'y', 'sort'],
+      },
+      {
+        prop: 'type',
+        path: ['layer', 0, 'encoding', 'y', 'type'],
+      },
     ],
-    Component: YAxis,
+    Component: 'YAxis',
   },
   {
     name: 'Legend',
@@ -143,7 +159,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'legend', 'orient'],
       },
     ],
-    Component: Legend,
+    Component: 'Legend',
   },
   {
     name: 'Legend Label',
@@ -161,7 +177,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'legend', 'labelColor'],
       },
     ],
-    Component: LegendLabel,
+    Component: 'LegendLabel',
   },
   {
     name: 'Data Labels',
@@ -179,6 +195,6 @@ export const properties = [
         path: ['layer', 1, 'encoding', 'text', 'format'],
       },
     ],
-    Component: DataLabels,
+    Component: 'DataLabels',
   },
 ];
