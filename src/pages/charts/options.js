@@ -15,6 +15,10 @@ import PieDataLabels from '../../components/shared/pie_data_labels.js';
 import Segment from '../../components/shared/segment.js';
 import XAxis from '../../components/shared/x_axis.js';
 import YAxis from '../../components/shared/y_axis.js';
+import TreeMap from '../../components/shared/tree_map.js';
+import RegionsLayer from '../../components/shared/regions_layer.js';
+import GraticuleLayer from '../../components/shared/graticule.js';
+import ZoomLayer from '../../components/shared/zoom.js';
 
 import Categories from '../../components/categories';
 import Tags from '../../components/tags';
@@ -37,6 +41,10 @@ const PropertiesComponentMap = {
   Bars,
   Lines,
   PieDataLabels,
+  TreeMap,
+  RegionsLayer,
+  GraticuleLayer,
+  ZoomLayer,
 };
 
 function OptionComponent(props) {
