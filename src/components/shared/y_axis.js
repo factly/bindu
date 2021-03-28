@@ -1,6 +1,7 @@
 import React from 'react';
 import { Input, Select, Form } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
+import _ from 'lodash';
 
 import {
   getAggregateOptions,
