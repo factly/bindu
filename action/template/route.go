@@ -14,7 +14,7 @@ type template struct {
 	Slug       string         `json:"slug"`
 	Schema     postgres.Jsonb `json:"schema"  swaggertype:"primitive,string"`
 	Properties postgres.Jsonb `json:"properties"  swaggertype:"primitive,string"`
-	MediumID   *uint          `json:"medium_id"`
+	MediumID   uint           `json:"medium_id"`
 	SpaceID    uint           `json:"space_id"`
 }
 

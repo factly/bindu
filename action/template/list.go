@@ -5,6 +5,9 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
+	"github.com/factly/x/errorx"
+	"github.com/factly/x/loggerx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
 )
@@ -29,12 +32,21 @@ type paging struct {
 // @Router /templates [get]
 func list(w http.ResponseWriter, r *http.Request) {
 
+	sID, err := middlewarex.GetSpace(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
 	result := paging{}
 	result.Nodes = make([]model.Template, 0)
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	config.DB.Model(&model.Template{}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
+	config.DB.Model(&model.Template{}).Where(&model.Template{
+		SpaceID: uint(sID),
+	}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
 
 	renderx.JSON(w, http.StatusOK, result)
 }

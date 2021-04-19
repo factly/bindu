@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/factly/bindu-server/util/minio"
+	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 
@@ -157,6 +159,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Chart{
+		ID:               strings.ReplaceAll(uuid.New().String(), "-", ""),
 		Title:            chart.Title,
 		Slug:             slugx.Approve(&config.DB, chartSlug, sID, tableName),
 		DataURL:          chart.DataURL,

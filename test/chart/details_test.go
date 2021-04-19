@@ -22,15 +22,6 @@ func TestChartDetails(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
-	t.Run("invalid chart id", func(t *testing.T) {
-		test.CheckSpace(mock)
-		e.GET(path).
-			WithPath("chart_id", "invalid_id").
-			WithHeaders(headers).
-			Expect().
-			Status(http.StatusBadRequest)
-	})
-
 	t.Run("chart record not found", func(t *testing.T) {
 		test.CheckSpace(mock)
 		recordNotFoundMock(mock)

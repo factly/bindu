@@ -453,6 +453,37 @@ definitions:
       updated_by_id:
         type: integer
     type: object
+  model.Template:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      medium:
+        $ref: '#/definitions/model.Medium'
+      medium_id:
+        type: integer
+      properties:
+        type: string
+      schema:
+        type: string
+      slug:
+        type: string
+      space:
+        $ref: '#/definitions/model.Space'
+      space_id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
   model.Theme:
     properties:
       config:
@@ -545,29 +576,6 @@ definitions:
       updated_by_id:
         type: integer
     type: object
-  organisation.orgWithPermissions:
-    properties:
-      created_at:
-        type: string
-      created_by_id:
-        type: integer
-      deleted_at:
-        type: string
-      description:
-        type: string
-      id:
-        type: integer
-      permission:
-        $ref: '#/definitions/model.OrganisationPermission'
-      slug:
-        type: string
-      title:
-        type: string
-      updated_at:
-        type: string
-      updated_by_id:
-        type: integer
-    type: object
   organisation.organisationPermission:
     properties:
       organisation_id:
@@ -595,7 +603,7 @@ definitions:
     properties:
       nodes:
         items:
-          $ref: '#/definitions/organisation.orgWithPermissions'
+          $ref: '#/definitions/model.Organisation'
         type: array
       total:
         type: integer
@@ -802,6 +810,30 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  template.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Template'
+        type: array
+      total:
+        type: integer
+    type: object
+  template.template:
+    properties:
+      medium_id:
+        type: integer
+      properties:
+        type: string
+      schema:
+        type: string
+      slug:
+        type: string
+      space_id:
+        type: integer
+      title:
+        type: string
     type: object
   theme.paging:
     properties:
@@ -1175,6 +1207,24 @@ paths:
           schema:
             $ref: '#/definitions/model.Chart'
       summary: Update a chart by id
+      tags:
+      - Chart
+  /charts/visualization/{chart_id}:
+    get:
+      description: Get chart by ID
+      operationId: get-chart-visualization-by-id
+      parameters:
+      - description: Chart ID
+        in: path
+        name: chart_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      summary: Show a chart by id
       tags:
       - Chart
   /media:
@@ -2714,6 +2764,172 @@ paths:
       summary: Update a tag by id
       tags:
       - Tag
+  /templates:
+    get:
+      description: Get all templates
+      operationId: get-all-templates
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/template.paging'
+            type: array
+      summary: Show all templates
+      tags:
+      - Template
+    post:
+      description: Create template
+      operationId: add-template
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Template Object
+        in: body
+        name: Template
+        required: true
+        schema:
+          $ref: '#/definitions/template.template'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Template'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create template
+      tags:
+      - Template
+  /templates/{template_id}:
+    delete:
+      description: Delete template by ID
+      operationId: delete-template-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Template ID
+        in: path
+        name: template_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete a template
+      tags:
+      - Template
+    get:
+      description: Get template by ID
+      operationId: get-template-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Template ID
+        in: path
+        name: template_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Template'
+      summary: Show a template by id
+      tags:
+      - Template
+    put:
+      description: Update template by ID
+      operationId: update-template-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Template ID
+        in: path
+        name: template_id
+        required: true
+        type: string
+      - description: Template
+        in: body
+        name: Template
+        schema:
+          $ref: '#/definitions/template.template'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Template'
+      summary: Update a template by id
+      tags:
+      - Template
   /themes:
     get:
       description: Get all themes
