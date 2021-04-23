@@ -1,14 +1,18 @@
 import React from 'react';
 import { Input, Select, Form } from 'antd';
-
-const { Option } = Select;
+import { getInterpolateOptions } from './area_lines';
 
 function Lines(props) {
-  // const { strokeWidth, opacity, interpolate, strokeDash} = spec.layer[0].mark;
+  const [interpolateOptions, setInterpolateOptions] = React.useState([]);
+
   const strokeWidthObj = props.properties.find((d) => d.prop === 'strokeWidth');
   const opacityObj = props.properties.find((d) => d.prop === 'opacity');
   const interpolateObj = props.properties.find((d) => d.prop === 'interpolate');
   const strokeDashObj = props.properties.find((d) => d.prop === 'strokeDash');
+
+  React.useEffect(() => {
+    getInterpolateOptions(props.form, setInterpolateOptions);
+  }, []);
 
   return (
     <div className="property-container">
@@ -22,11 +26,11 @@ function Lines(props) {
 
       <Form.Item name={interpolateObj.path} label="Line Curve">
         <Select>
-          <Option value="linear">Linear</Option>
-          <Option value="linear-closed">Linear Closed</Option>
-          <Option value="step">Step</Option>
-          <Option value="basis">Basis</Option>
-          <Option value="monotone">Monotone</Option>
+          {interpolateOptions.map((option) => (
+            <Select.Option key={option} value={option}>
+              {option}
+            </Select.Option>
+          ))}
         </Select>
       </Form.Item>
 

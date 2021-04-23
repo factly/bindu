@@ -3,11 +3,25 @@ import { InputNumber, Select, Checkbox, Form } from 'antd';
 
 import _ from 'lodash';
 
-const { Option } = Select;
+export const getInterpolateOptions = async (form, setInterpolateOptions) => {
+  try {
+    const schema = form.getFieldValue('$schema');
+    const res = await fetch(schema);
+    const jsonData = await res.json();
+    setInterpolateOptions(jsonData.definitions.Interpolate.enum);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 function Lines(props) {
   const { form } = props;
   const [enable, setEnable] = React.useState(false);
+  const [interpolateOptions, setInterpolateOptions] = React.useState([]);
+
+  React.useEffect(() => {
+    getInterpolateOptions(props.form, setInterpolateOptions);
+  }, []);
 
   const markObj = props.properties.find((d) => d.prop === 'mark');
 
@@ -46,11 +60,11 @@ function Lines(props) {
             label="Line Curve"
           >
             <Select>
-              <Option value="linear">Linear</Option>
-              <Option value="linear-closed">Linear Closed</Option>
-              <Option value="step">Step</Option>
-              <Option value="basis">Basis</Option>
-              <Option value="monotone">Monotone</Option>
+              {interpolateOptions.map((option) => (
+                <Select.Option key={option} value={option}>
+                  {option}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
 
