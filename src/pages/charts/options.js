@@ -51,13 +51,14 @@ function OptionComponent(props) {
   const dispatch = useDispatch();
 
   let { templateId } = useParams();
-  templateId = parseInt(templateId);
-  const component = useSelector(({ templates }) => templates.details[templateId]);
+
+  const tID = templateId ? parseInt(templateId, 10) : props.templateId;
+  const component = useSelector(({ templates }) => templates.details[tID]);
 
   useEffect(() => {
-    dispatch(getTemplate(templateId));
+    dispatch(getTemplate(tID));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId]);
+  }, []);
 
   useEffect(() => {
     form.setFieldsValue(component?.schema);

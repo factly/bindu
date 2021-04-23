@@ -169,7 +169,7 @@ function Chart({ data = {}, onSubmit }) {
 
   return (
     <>
-      <Form form={form} layout="vertical">
+      <Form form={form} layout="horizontal">
         <Card
           title={titleComponent}
           extra={actionsList}
@@ -187,7 +187,7 @@ function Chart({ data = {}, onSubmit }) {
             </Form.Item>
           </div>
           <div className="option-container" style={{ right: showOptions ? '0' : '-400px' }}>
-            <ChartOption form={form} />
+            <ChartOption form={form} templateId={data ? data.template_id : 0} />
           </div>
         </Card>
       </Form>

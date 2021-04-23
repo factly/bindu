@@ -23,7 +23,7 @@ function SavedCharts() {
       renderItem={(chart, index) => {
         return (
           <List.Item>
-            <Link key={index} to={`/charts/${chart.template_id}/edit/${chart.id}`}>
+            <Link key={index} to={`/charts/${chart.id}/edit`}>
               <Card
                 hoverable
                 cover={
