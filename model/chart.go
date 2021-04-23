@@ -21,6 +21,8 @@ type Chart struct {
 	IsPublic         bool           `gorm:"column:is_public" json:"is_public"`
 	FeaturedMediumID *uint          `gorm:"column:featured_medium_id;default:NULL" json:"featured_medium_id"`
 	Medium           *Medium        `gorm:"foreignKey:featured_medium_id" json:"medium"`
+	TemplateID       uint           `gorm:"column:template_id" json:"template_id"`
+	Template         *Template      `gorm:"foreignKey:template_id;default:NULL" json:"template"`
 	ThemeID          *uint          `gorm:"column:theme_id" json:"theme_id"`
 	Theme            *Theme         `gorm:"foreignKey:theme_id;default:NULL" json:"theme"`
 	PublishedDate    time.Time      `json:"published_date"`
