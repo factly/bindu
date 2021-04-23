@@ -1,5 +1,5 @@
 import defaultSettings from '../config/proSettings';
-import { TOGGLE_SIDER } from '../constants/settings';
+import { TOGGLE_SIDER, COLLAPSE_SIDER } from '../constants/settings';
 
 const initialState = {
   ...defaultSettings,
@@ -16,6 +16,15 @@ export default function settings(state = initialState, action = {}) {
         ...{
           sider: {
             collapsed: !state.sider.collapsed,
+          },
+        },
+      };
+    case COLLAPSE_SIDER:
+      return {
+        ...state,
+        ...{
+          sider: {
+            collapsed: true,
           },
         },
       };

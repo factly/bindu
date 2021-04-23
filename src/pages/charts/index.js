@@ -19,6 +19,7 @@ import UppyUploader from '../../components/uppy';
 import { b64toBlob } from '../../utils/file';
 import { addChart } from '../../actions/charts';
 import { useParams } from 'react-router';
+import { collapseSider } from '../../actions/settings.js';
 
 function Chart({ data = {}, onSubmit }) {
   const dispatch = useDispatch();
@@ -37,6 +38,9 @@ function Chart({ data = {}, onSubmit }) {
     _.set(values, ['data', 'url'], dataDetails.url.raw);
     form.setFieldsValue(values);
   };
+  React.useEffect(() => {
+    dispatch(collapseSider());
+  }, []);
 
   React.useEffect(() => {
     if (data.id) {
