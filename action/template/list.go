@@ -34,7 +34,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	config.DB.Model(&model.Template{}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
+	config.DB.Preload("Medium").Model(&model.Template{}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
 
 	renderx.JSON(w, http.StatusOK, result)
 }

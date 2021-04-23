@@ -77,8 +77,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 	tx := config.DB.Begin()
 
 	mediumID := &template.MediumID
-	result.MediumID = template.MediumID
-	if *template.MediumID == 0 {
+	result.MediumID = &template.MediumID
+	if template.MediumID == 0 {
 		err = tx.Model(&result).Updates(map[string]interface{}{"medium_id": nil}).Error
 		mediumID = nil
 		if err != nil {
@@ -121,8 +121,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Slug:       templateSlug,
 		Schema:     template.Schema,
 		Properties: template.Properties,
-		MediumID:   *mediumID,
-	}).First(&result)
+		MediumID:   mediumID,
+	}).Preload("Medium").First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)
 }
