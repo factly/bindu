@@ -1,12 +1,13 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { addChart } from '../../actions/charts';
 import CreateChart from './index';
 
 function CreateCharts() {
   const history = useHistory();
+  const { templateId } = useParams();
 
   const dispatch = useDispatch();
 
@@ -14,6 +15,7 @@ function CreateCharts() {
     dispatch(
       addChart({
         ...values,
+        template_id: parseInt(templateId, 10),
       }),
     ).then(() => {
       history.push('/charts/saved');

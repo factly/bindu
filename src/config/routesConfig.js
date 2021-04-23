@@ -71,7 +71,7 @@ const routes = {
     },
   },
   editChart: {
-    path: '/charts/:templateId/edit/:chartId',
+    path: '/charts/:chartId/edit',
     Component: EditChart,
     title: 'Edit Chart',
     permission: {

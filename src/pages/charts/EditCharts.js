@@ -13,7 +13,9 @@ function EditCharts() {
 
   const { chart, loading } = useSelector((state) => {
     return {
-      chart: state.charts.details[chartId] ? state.charts.details[chartId] : null,
+      chart: state.charts.details[parseInt(chartId, 10)]
+        ? state.charts.details[parseInt(chartId, 10)]
+        : null,
       loading: state.charts.loading,
     };
   });
