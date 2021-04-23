@@ -1,11 +1,12 @@
 import React from 'react';
-import { Button, Form, Input, Space } from 'antd';
+import { Button, Form, Input, Select, Space } from 'antd';
 import { maker, checker } from '../../../utils/slug';
 import ReactJson from 'react-json-view';
 
 import MediaSelector from '../../../components/MediaSelector';
 
 import * as Bar from '../../charts/bar';
+import Categories from '../../../components/categories';
 
 const layout = {
   labelCol: {
@@ -33,9 +34,7 @@ const JSONEditor = ({ value, onChange }) => {
   );
 };
 
-const TemplateForm = ({ onSubmit, data = {} }) => {
-  const [form] = Form.useForm();
-
+const TemplateForm = ({ onSubmit, data = {}, form }) => {
   const onReset = () => {
     form.resetFields();
   };
@@ -46,17 +45,19 @@ const TemplateForm = ({ onSubmit, data = {} }) => {
     });
   };
 
+  const onFinish = (values) => {
+    const { categories, ...rest } = values;
+    onSubmit({ ...rest, category_id: categories });
+    onReset();
+  };
+
   return (
     <Form
       {...layout}
       form={form}
       initialValues={{ ...data }}
       name="create-chart"
-      onValuesChange={({ values }) => console.log({ values })}
-      onFinish={(values) => {
-        onSubmit(values);
-        onReset();
-      }}
+      onFinish={onFinish}
     >
       <Form.Item
         name="title"
@@ -88,6 +89,7 @@ const TemplateForm = ({ onSubmit, data = {} }) => {
       >
         <Input />
       </Form.Item>
+      <Categories form={form} required label="Category" />
       <Form.Item name="schema" label="Spec" initialValue={Bar.spec}>
         <JSONEditor />
       </Form.Item>

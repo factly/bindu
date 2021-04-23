@@ -84,7 +84,7 @@ function OptionComponent(props) {
           <Tags form={form} />
         </Panel>
         <Panel className="option-item-panel" header={'Categories'} key={'categories'}>
-          <Categories form={form} />
+          <Categories form={form} multiple />
         </Panel>
       </Collapse>
     </>
