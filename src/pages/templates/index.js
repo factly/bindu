@@ -36,7 +36,13 @@ function Templates() {
         <List.Item>
           <Card
             hoverable
-            cover={<img alt="example" src={template.icon} />}
+            cover={
+              <img
+                alt="example"
+                src={template.medium ? template.medium.url.proxy : null}
+                height={200}
+              />
+            }
             actions={[
               <Link to={'/templates/' + template.id + '/edit'}>
                 <EditOutlined key="edit" />

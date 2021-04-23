@@ -107,7 +107,7 @@ class UppyUploader {
         upload['url']['raw'] = successful.uploadURL;
 
         axios
-          .post(MEDIA_API, [upload])
+          .post(MEDIA_API, upload)
           .then((res) => {
             this.data = res.data.nodes[0];
             this.nodes.wrapper.children[0].style.display = 'none';
