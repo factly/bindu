@@ -11,7 +11,7 @@ type Template struct {
 	config.Base
 	Title      string         `json:"title"`
 	Slug       string         `json:"slug"`
-	Schema     postgres.Jsonb `gorm:"column:schema" json:"schema" sql:"jsonb" swaggertype:"primitive,string"`
+	Spec       postgres.Jsonb `gorm:"column:spec" json:"spec" sql:"jsonb" swaggertype:"primitive,string"`
 	Properties postgres.Jsonb `gorm:"column:properties" json:"properties" sql:"jsonb" swaggertype:"primitive,string"`
 	MediumID   *uint          `gorm:"column:medium_id;default:NULL" json:"medium_id"`
 	Medium     *Medium        `gorm:"foreignKey:medium_id" json:"medium"`
