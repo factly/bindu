@@ -169,6 +169,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		IsPublic:         chart.IsPublic,
 		FeaturedMediumID: &medium.ID,
 		ThemeID:          themeID,
+		TemplateID:       chart.TemplateID,
 		PublishedDate:    chart.PublishedDate,
 		SpaceID:          uint(sID),
 	}

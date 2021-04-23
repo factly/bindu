@@ -21,6 +21,7 @@ type chart struct {
 	FeaturedMedium   string         `json:"featured_medium"`
 	FeaturedMediumID uint           `json:"featured_medium_id"`
 	ThemeID          uint           `json:"theme_id"`
+	TemplateID       uint           `json:"template_id"`
 	PublishedDate    time.Time      `json:"published_date"`
 	OrganisationID   uint           `json:"organisation_id"`
 	CategoryIDs      []uint         `json:"category_ids"`
