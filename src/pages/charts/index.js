@@ -67,7 +67,12 @@ function Chart({ data = {}, onSubmit }) {
   const downloadImage = async (e) => {
     const ext = e.key;
     const data = await view?.toImageURL(ext, 1);
-    const blob = b64toBlob(data.split(',')[1], 'image/' + ext);
+    let blob;
+    if (ext === 'svg') {
+      blob = data;
+    } else {
+      blob = b64toBlob(data.split(',')[1], 'image/' + ext);
+    }
     saveAs(blob, `${chartName}.${ext}`);
   };
 
