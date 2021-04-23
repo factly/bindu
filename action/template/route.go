@@ -12,7 +12,7 @@ import (
 type template struct {
 	Title      string         `json:"title"`
 	Slug       string         `json:"slug"`
-	Schema     postgres.Jsonb `json:"schema"  swaggertype:"primitive,string"`
+	Spec       postgres.Jsonb `json:"spec"  swaggertype:"primitive,string"`
 	Properties postgres.Jsonb `json:"properties"  swaggertype:"primitive,string"`
 	MediumID   uint           `json:"medium_id"`
 	SpaceID    uint           `json:"space_id"`
