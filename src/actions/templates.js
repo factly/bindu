@@ -59,6 +59,7 @@ export const addTemplate = (data) => {
       .post(TEMPLATES_API, data)
       .then(() => {
         dispatch(resetTemplates());
+        dispatch(getTemplates());
         dispatch(addSuccessNotification('Template added'));
       })
       .catch((error) => {
@@ -93,6 +94,7 @@ export const deleteTemplate = (id) => {
       .delete(TEMPLATES_API + '/' + id)
       .then(() => {
         dispatch(resetTemplates());
+        dispatch(getTemplates());
         dispatch(addSuccessNotification('Template deleted'));
       })
       .catch((error) => {
