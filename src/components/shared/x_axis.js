@@ -135,6 +135,16 @@ function XAxis(props) {
         <Input placeholder="Title" type="text" />
       </Form.Item>
 
+      <Form.Item name={fieldObj.path} label="Field">
+        <Select placeholder="Label Color">
+          {fields.map((field) => (
+            <Select.Option key={field} value={field}>
+              {field}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+
       <Form.Item name={orientObj.path} label="Position">
         <Select>
           <Option value="top">Top</Option>
@@ -148,39 +158,6 @@ function XAxis(props) {
 
       <Form.Item name={labelColorObj.path} label="Label Color">
         <Input placeholder="Label Color" type="color" />
-      </Form.Item>
-
-      <Form.Item
-        name={aggregateObj.path}
-        label={
-          <div>
-            Aggregate{' '}
-            <InfoCircleOutlined
-              onClick={() =>
-                window.open('https://vega.github.io/vega-lite/docs/aggregate.html#ops', '_blank')
-              }
-            />
-          </div>
-        }
-      >
-        <Select placeholder="Label Color" defaultValue={null}>
-          <Select.Option value={null}>None</Select.Option>
-          {aggregateOptions.map((option) => (
-            <Select.Option key={option} value={option}>
-              {option}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
-
-      <Form.Item name={fieldObj.path} label="Field">
-        <Select placeholder="Label Color">
-          {fields.map((field) => (
-            <Select.Option key={field} value={field}>
-              {field}
-            </Select.Option>
-          ))}
-        </Select>
       </Form.Item>
 
       <Form.Item
@@ -199,6 +176,29 @@ function XAxis(props) {
         <Select showSearch placeholder="Type" defaultValue={null}>
           <Select.Option value={null}>None</Select.Option>
           {typeOptions.map((option) => (
+            <Select.Option key={option} value={option}>
+              {option}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+
+      <Form.Item
+        name={aggregateObj.path}
+        label={
+          <div>
+            Aggregate{' '}
+            <InfoCircleOutlined
+              onClick={() =>
+                window.open('https://vega.github.io/vega-lite/docs/aggregate.html#ops', '_blank')
+              }
+            />
+          </div>
+        }
+      >
+        <Select placeholder="Label Color" defaultValue={null}>
+          <Select.Option value={null}>None</Select.Option>
+          {aggregateOptions.map((option) => (
             <Select.Option key={option} value={option}>
               {option}
             </Select.Option>
