@@ -17,7 +17,6 @@ import {
 
 import UppyUploader from '../../components/uppy';
 import { b64toBlob } from '../../utils/file';
-import { addChart } from '../../actions/charts';
 import { useParams } from 'react-router';
 import { collapseSider } from '../../actions/settings.js';
 
@@ -43,7 +42,7 @@ function Chart({ data = {}, onSubmit }) {
   }, []);
 
   React.useEffect(() => {
-    if (data.id) {
+    if (data && data.id) {
       form.setFieldsValue({
         ...data.config,
         categories: data.categories.map((category) => category.id),
