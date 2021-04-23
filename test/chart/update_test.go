@@ -93,14 +93,6 @@ func TestChartUpdate(t *testing.T) {
 		"published_date":     time.Time{},
 	}
 
-	t.Run("invalid chart id", func(t *testing.T) {
-		test.CheckSpace(mock)
-		e.PUT(path).
-			WithPath("chart_id", "invalid_id").
-			WithHeaders(headers).
-			Expect().
-			Status(http.StatusBadRequest)
-	})
 	t.Run("cannot decode chart", func(t *testing.T) {
 
 		test.CheckSpace(mock)
@@ -264,17 +256,17 @@ func TestChartUpdate(t *testing.T) {
 
 		themeQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(nil, test.AnyTime{}, 1).
+			WithArgs(nil, test.AnyTime{}, "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		themeQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(true, 1).
+			WithArgs(true, "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		themeQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["theme_id"], 1).
+			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["theme_id"], "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)
@@ -312,17 +304,17 @@ func TestChartUpdate(t *testing.T) {
 
 		mediumQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(nil, test.AnyTime{}, 1).
+			WithArgs(nil, test.AnyTime{}, "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		mediumQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(true, 1).
+			WithArgs(true, "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		mediumQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], 1).
+			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)

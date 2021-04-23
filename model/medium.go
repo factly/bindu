@@ -1,8 +1,12 @@
 package model
 
 import (
+	"encoding/json"
+	"net/url"
+
 	"github.com/factly/bindu-server/config"
 	"github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -18,9 +22,8 @@ type Medium struct {
 	AltText     string         `gorm:"column:alt_text" json:"alt_text"`
 	FileSize    int64          `gorm:"column:file_size" json:"file_size"`
 	URL         postgres.Jsonb `gorm:"column:url" json:"url" swaggertype:"primitive,string"`
-
-	Dimensions string `gorm:"column:dimensions" json:"dimensions"`
-	SpaceID    uint   `gorm:"column:space_id" json:"space_id"`
+	Dimensions  string         `gorm:"column:dimensions" json:"dimensions"`
+	SpaceID     uint           `gorm:"column:space_id" json:"space_id"`
 }
 
 var mediumUser config.ContextKey = "medium_user"
@@ -37,5 +40,41 @@ func (media *Medium) BeforeCreate(tx *gorm.DB) error {
 
 	media.CreatedByID = uint(uID)
 	media.UpdatedByID = uint(uID)
+	return nil
+}
+
+// AfterCreate hook
+func (media *Medium) AfterCreate(tx *gorm.DB) (err error) {
+	resurl := map[string]interface{}{}
+	if viper.IsSet("imageproxy_url") && media.URL.RawMessage != nil {
+		_ = json.Unmarshal(media.URL.RawMessage, &resurl)
+		if rawURL, found := resurl["raw"]; found {
+			urlObj, _ := url.Parse(rawURL.(string))
+			resurl["proxy"] = viper.GetString("imageproxy_url") + urlObj.Path
+
+			rawBArr, _ := json.Marshal(resurl)
+			media.URL = postgres.Jsonb{
+				RawMessage: rawBArr,
+			}
+		}
+	}
+	return nil
+}
+
+// AfterFind hook
+func (media *Medium) AfterFind(tx *gorm.DB) (err error) {
+	resurl := map[string]interface{}{}
+	if viper.IsSet("imageproxy_url") && media.URL.RawMessage != nil {
+		_ = json.Unmarshal(media.URL.RawMessage, &resurl)
+		if rawURL, found := resurl["raw"]; found {
+			urlObj, _ := url.Parse(rawURL.(string))
+			resurl["proxy"] = viper.GetString("imageproxy_url") + urlObj.Path
+
+			rawBArr, _ := json.Marshal(resurl)
+			media.URL = postgres.Jsonb{
+				RawMessage: rawBArr,
+			}
+		}
+	}
 	return nil
 }
