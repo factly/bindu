@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -35,11 +34,8 @@ import (
 // @Success 200 {object} model.Chart
 // @Router /charts/{chart_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
-	chartID := chi.URLParam(r, "chart_id")
-	id, err := strconv.Atoi(chartID)
-
-	if err != nil {
-		loggerx.Error(err)
+	id := chi.URLParam(r, "chart_id")
+	if id == "" {
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
@@ -74,7 +70,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Chart{}
-	result.ID = uint(id)
+	result.ID = id
 
 	// check record exists or not
 	err = config.DB.Where(&model.Chart{
@@ -197,7 +193,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	tx.Model(&result).Select("IsPublic").Updates(model.Chart{IsPublic: chart.IsPublic})
 	err = tx.Model(&result).Omit("Tags", "Categories").Updates(model.Chart{
-		Base:             config.Base{UpdatedByID: uint(uID)},
+		UpdatedByID:      uint(uID),
 		Title:            chart.Title,
 		Slug:             chartSlug,
 		DataURL:          chart.DataURL,

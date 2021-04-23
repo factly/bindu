@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Import Vega & Vega-Lite (does not have to be from CDN) -->
+        <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
+        <!-- Import vega-embed -->
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+        <title>{{.chart.Title}}</title>
+</head>
+<body>
+        <h1>{{.chart.Title}}</h1>
+        <h3>
+        {{if .chart.Medium}}
+        {{$urlMap := unmar .chart.Medium.URL}}
+        <img class="featured_image" src="{{if $urlMap.proxy}} {{$urlMap.proxy}} {{else}} {{$urlMap.raw}} {{end}}"> 
+        <link rel="icon" href="{{if $urlMap.proxy}} {{$urlMap.proxy}} {{else}} {{$urlMap.raw}} {{end}}" />
+        {{end}}
+        </h3>
+        <p><b>Published Date: </b> {{dateFmt .chart.PublishedDate}}</p>
+        {{$desc := unmar .chart.Description}}
+        <h2>Description</h2>
+        {{template "description" $desc}}
+
+            <p><b>Tags: </b></p>
+            <ul>
+            {{range .chart.Tags}}
+                <li>{{.Name}} - {{.Description}}</li>
+            {{end}}
+            </ul>
+
+            <p><b>Categories: </b></p>
+            <ul>
+            {{range .chart.Categories}}
+                <li>{{.Name}} - {{.Description}}</li>
+            {{end}}
+            </ul>
+        
+        <div id="vis"></div>
+
+        <script type="text/javascript">
+                var spec = JSON.parse("{{.spec}}");
+                vegaEmbed('#vis', spec).then(function(result) {
+                // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+                }).catch(console.error);
+        </script>
+</body>
+</html>

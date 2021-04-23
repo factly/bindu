@@ -74,6 +74,17 @@ func update(w http.ResponseWriter, r *http.Request) {
 	result := &model.Template{}
 	result.ID = uint(id)
 
+	// check record exists or not
+	err = config.DB.Where(&model.Template{
+		SpaceID: uint(sID),
+	}).First(&result).Error
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
+		return
+	}
+
 	tx := config.DB.Begin()
 
 	mediumID := &template.MediumID
@@ -87,17 +98,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 			errorx.Render(w, errorx.Parser(errorx.DBError()))
 			return
 		}
-	}
-
-	// check record exists or not
-	err = tx.Where(&model.Template{
-		SpaceID: uint(sID),
-	}).First(&result).Error
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
-		return
 	}
 
 	// Get table name
@@ -123,6 +123,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Properties: template.Properties,
 		MediumID:   mediumID,
 	}).Preload("Medium").First(&result)
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, result)
 }
