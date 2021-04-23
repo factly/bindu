@@ -1,7 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Form } from 'antd';
 
 import TemplateForm from './components/TemplateForm';
 import Display from '../charts/display';
@@ -10,14 +9,9 @@ import { collapseSider } from '../../actions/settings';
 
 function CreateTemplate() {
   const [spec, setSpec] = React.useState({});
-  const [form] = Form.useForm();
 
   const history = useHistory();
   const dispatch = useDispatch();
-
-  React.useEffect(() => {
-    setSpec(form.getFieldValue('schema'));
-  }, [form]);
 
   React.useEffect(() => {
     dispatch(collapseSider());
@@ -27,13 +21,24 @@ function CreateTemplate() {
     dispatch(addTemplate(values)).then(() => history.push('/templates'));
   };
 
+  const onChange = (values) => {
+    if (values.schema) {
+      try {
+        const spec = JSON.parse(values.schema);
+        setSpec(spec);
+      } catch {
+        console.log('Spec is not JSON');
+      }
+    }
+  };
+
   return (
     <div style={{ display: 'flex', height: '80vh' }}>
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
         <Display spec={spec} />
       </div>
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
-        <TemplateForm form={form} onSubmit={onCreate} />
+        <TemplateForm onSubmit={onCreate} onChange={onChange} />
       </div>
     </div>
   );

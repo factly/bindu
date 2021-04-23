@@ -5,7 +5,6 @@ import ReactJson from 'react-json-view';
 
 import MediaSelector from '../../../components/MediaSelector';
 
-import * as Bar from '../../charts/bar';
 import Categories from '../../../components/categories';
 
 const layout = {
@@ -34,7 +33,18 @@ const JSONEditor = ({ value, onChange }) => {
   );
 };
 
-const TemplateForm = ({ onSubmit, data = {}, form }) => {
+const jsonChecker = (value) => {
+  try {
+    JSON.parse(value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
+  const [form] = Form.useForm();
+
   const onReset = () => {
     form.resetFields();
   };
@@ -46,8 +56,13 @@ const TemplateForm = ({ onSubmit, data = {}, form }) => {
   };
 
   const onFinish = (values) => {
-    const { categories, ...rest } = values;
-    onSubmit({ ...rest, category_id: categories });
+    const { categories, schema, properties, ...rest } = values;
+    onSubmit({
+      ...rest,
+      schema: JSON.parse(schema),
+      properties: JSON.parse(properties),
+      category_id: categories,
+    });
     onReset();
   };
 
@@ -56,6 +71,7 @@ const TemplateForm = ({ onSubmit, data = {}, form }) => {
       {...layout}
       form={form}
       initialValues={{ ...data }}
+      onValuesChange={onChange}
       name="create-chart"
       onFinish={onFinish}
     >
@@ -90,11 +106,33 @@ const TemplateForm = ({ onSubmit, data = {}, form }) => {
         <Input />
       </Form.Item>
       <Categories form={form} required label="Category" />
-      <Form.Item name="schema" label="Spec" initialValue={Bar.spec}>
-        <JSONEditor />
+      <Form.Item
+        name="schema"
+        label="Spec"
+        rules={[
+          {
+            required: true,
+            message: 'Please add spec!',
+          },
+          {
+            pattern: jsonChecker,
+            message: 'Please enter valid json object!',
+          },
+        ]}
+      >
+        <Input.TextArea />
       </Form.Item>
-      <Form.Item name="properties" label="Properties" initialValue={Bar.properties}>
-        <JSONEditor />
+      <Form.Item
+        name="properties"
+        label="Properties"
+        rules={[
+          {
+            required: true,
+            message: 'Please add properties!',
+          },
+        ]}
+      >
+        <Input.TextArea />
       </Form.Item>
       <Form.Item label="Featured Image" name="medium_id">
         <MediaSelector />
