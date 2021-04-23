@@ -88,6 +88,10 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'x', 'axis', 'title'],
       },
       {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'x', 'field'],
+      },
+      {
         prop: 'orient',
         path: ['layer', 0, 'encoding', 'x', 'axis', 'orient'],
       },
@@ -100,20 +104,16 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'x', 'axis', 'labelColor'],
       },
       {
+        prop: 'type',
+        path: ['layer', 0, 'encoding', 'x', 'type'],
+      },
+      {
         prop: 'aggregate',
         path: ['layer', 0, 'encoding', 'x', 'aggregate'],
       },
       {
-        prop: 'field',
-        path: ['layer', 0, 'encoding', 'x', 'field'],
-      },
-      {
         prop: 'sort',
         path: ['layer', 0, 'encoding', 'x', 'sort'],
-      },
-      {
-        prop: 'type',
-        path: ['layer', 0, 'encoding', 'x', 'type'],
       },
     ],
     Component: 'XAxis',
@@ -124,6 +124,10 @@ export const properties = [
       {
         prop: 'title',
         path: ['layer', 0, 'encoding', 'y', 'axis', 'title'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'y', 'field'],
       },
       {
         prop: 'orient',
@@ -138,20 +142,16 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'y', 'axis', 'labelColor'],
       },
       {
+        prop: 'type',
+        path: ['layer', 0, 'encoding', 'y', 'type'],
+      },
+      {
         prop: 'aggregate',
         path: ['layer', 0, 'encoding', 'y', 'aggregate'],
       },
       {
-        prop: 'field',
-        path: ['layer', 0, 'encoding', 'y', 'field'],
-      },
-      {
         prop: 'sort',
         path: ['layer', 0, 'encoding', 'y', 'sort'],
-      },
-      {
-        prop: 'type',
-        path: ['layer', 0, 'encoding', 'y', 'type'],
       },
     ],
     Component: 'YAxis',
