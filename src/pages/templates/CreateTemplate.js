@@ -22,9 +22,9 @@ function CreateTemplate() {
   };
 
   const onChange = (values) => {
-    if (values.schema) {
+    if (values.spec) {
       try {
-        const spec = JSON.parse(values.schema);
+        const spec = JSON.parse(values.spec);
         setSpec(spec);
       } catch {
         console.log('Spec is not JSON');

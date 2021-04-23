@@ -61,7 +61,7 @@ function OptionComponent(props) {
   }, []);
 
   useEffect(() => {
-    form.setFieldsValue(component?.schema);
+    form.setFieldsValue(component?.spec);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [component]);
 

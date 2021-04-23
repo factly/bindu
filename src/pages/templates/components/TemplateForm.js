@@ -56,10 +56,10 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
   };
 
   const onFinish = (values) => {
-    const { categories, schema, properties, ...rest } = values;
+    const { categories, spec, properties, ...rest } = values;
     onSubmit({
       ...rest,
-      schema: JSON.parse(schema),
+      spec: JSON.parse(spec),
       properties: JSON.parse(properties),
       category_id: categories,
     });
@@ -107,7 +107,7 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
       </Form.Item>
       <Categories form={form} required label="Category" />
       <Form.Item
-        name="schema"
+        name="spec"
         label="Spec"
         rules={[
           {
