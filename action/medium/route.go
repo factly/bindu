@@ -11,14 +11,13 @@ import (
 type medium struct {
 	Name        string         `json:"name" validate:"required"`
 	Slug        string         `json:"slug"`
-	Type        string         `json:"type" validate:"required"`
-	Title       string         `json:"title"`
+	Type        string         `json:"type" `
 	Description string         `json:"description"`
 	Caption     string         `json:"caption"`
 	AltText     string         `json:"alt_text"`
-	FileSize    int64          `json:"file_size" validate:"required"`
+	FileSize    int64          `json:"file_size" `
 	URL         postgres.Jsonb `json:"url" swaggertype:"primitive,string"`
-	Dimensions  string         `json:"dimensions" validate:"required"`
+	Dimensions  string         `json:"dimensions" `
 }
 
 var userContext config.ContextKey = "medium_user"

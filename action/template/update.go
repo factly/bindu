@@ -122,7 +122,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Schema:     template.Schema,
 		Properties: template.Properties,
 		MediumID:   mediumID,
-	}).First(&result)
+	}).Preload("Medium").First(&result)
 
 	tx.Commit()
 

@@ -76,16 +76,21 @@ func create(w http.ResponseWriter, r *http.Request) {
 		templateSlug = slugx.Make(template.Title)
 	}
 
+	mediumID := &template.MediumID
+	if template.MediumID == 0 {
+		mediumID = nil
+	}
+
 	result := &model.Template{
 		Title:      template.Title,
 		Slug:       slugx.Approve(&config.DB, templateSlug, sID, tableName),
 		Schema:     template.Schema,
 		Properties: template.Properties,
 		SpaceID:    uint(sID),
-		MediumID:   &template.MediumID,
+		MediumID:   mediumID,
 	}
 
-	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Template{}).Create(&result).Error
+	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Template{}).Preload("Medium").Create(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)

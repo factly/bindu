@@ -104,7 +104,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Base:        config.Base{UpdatedByID: uint(uID)},
 		Name:        medium.Name,
 		Slug:        mediumSlug,
-		Title:       medium.Title,
 		Type:        medium.Type,
 		Description: medium.Description,
 		AltText:     medium.AltText,
