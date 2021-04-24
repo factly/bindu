@@ -174,7 +174,6 @@ function XAxis(props) {
         }
       >
         <Select showSearch placeholder="Type" defaultValue={null}>
-          <Select.Option value={null}>None</Select.Option>
           {typeOptions.map((option) => (
             <Select.Option key={option} value={option}>
               {option}
