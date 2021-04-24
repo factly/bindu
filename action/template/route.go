@@ -24,7 +24,7 @@ var userContext config.ContextKey = "template_user"
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-	app := "templates"
+	app := "bindu"
 
 	r.Get("/", list)
 	r.With(middlewarex.CheckSuperOrganisation(app, util.GetOrganisation)).Post("/", create)
