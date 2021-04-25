@@ -181,7 +181,7 @@ function Chart({ data = {}, onSubmit }) {
         <Card
           title={titleComponent}
           extra={actionsList}
-          bodyStyle={{ overflow: 'hidden', display: 'flex', padding: '0px', height: '70vh' }}
+          bodyStyle={{ overflow: 'hidden', display: 'flex', padding: '0px', height: '80vh' }}
         >
           <div className="display-container" style={{ width: '100%' }}>
             <Form.Item shouldUpdate={true}>
