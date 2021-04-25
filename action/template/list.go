@@ -5,14 +5,12 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
-	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
 )
 
-// list response
-type paging struct {
-	Total int64            `json:"total"`
-	Nodes []model.Template `json:"nodes"`
+type categoryTemplate struct {
+	model.Category
+	Templates []model.Template `json:"templates"`
 }
 
 // list - Get all templates
@@ -29,12 +27,29 @@ type paging struct {
 // @Router /templates [get]
 func list(w http.ResponseWriter, r *http.Request) {
 
-	result := paging{}
-	result.Nodes = make([]model.Template, 0)
+	result := make([]categoryTemplate, 0)
+	templates := make([]model.Template, 0)
 
-	offset, limit := paginationx.Parse(r.URL.Query())
+	config.DB.Preload("Medium").Preload("Category").Model(&model.Template{}).Order("id desc").Find(&templates)
 
-	config.DB.Preload("Medium").Model(&model.Template{}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
+	for _, template := range templates {
+		exists := false
+		for index, category := range result {
+			if category.ID == template.CategoryID {
+				exists = true
+				category.Templates = append(category.Templates, template)
+				result[index] = category
+				break
+			}
+		}
+		if exists == false {
+			category := categoryTemplate{
+				Category: template.Category,
+			}
+			category.Templates = append(category.Templates, template)
+			result = append(result, category)
+		}
+	}
 
 	renderx.JSON(w, http.StatusOK, result)
 }
