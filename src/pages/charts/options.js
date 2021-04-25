@@ -8,6 +8,7 @@ import ChartProperties from '../../components/shared/chart_properties.js';
 import Colors from '../../components/shared/colors.js';
 import DataLabels from '../../components/shared/data_labels.js';
 import Dots from '../../components/shared/dots.js';
+import Facet from '../../components/shared/facet.js';
 import Legend from '../../components/shared/legend.js';
 import Lines from '../../components/shared/lines.js';
 import LegendLabel from '../../components/shared/legend_label.js';
@@ -38,6 +39,7 @@ const PropertiesComponentMap = {
   Legend,
   LegendLabel,
   Segment,
+  Facet,
   Bars,
   Lines,
   PieDataLabels,
