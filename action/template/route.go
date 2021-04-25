@@ -12,8 +12,9 @@ import (
 type template struct {
 	Title      string         `json:"title"`
 	Slug       string         `json:"slug"`
-	Schema     postgres.Jsonb `json:"schema"  swaggertype:"primitive,string"`
+	Spec       postgres.Jsonb `json:"spec"  swaggertype:"primitive,string"`
 	Properties postgres.Jsonb `json:"properties"  swaggertype:"primitive,string"`
+	CategoryID uint           `json:"category_id"`
 	MediumID   uint           `json:"medium_id"`
 	SpaceID    uint           `json:"space_id"`
 }
@@ -24,7 +25,7 @@ var userContext config.ContextKey = "template_user"
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-	app := "templates"
+	app := "bindu"
 
 	r.Get("/", list)
 	r.With(middlewarex.CheckSuperOrganisation(app, util.GetOrganisation)).Post("/", create)

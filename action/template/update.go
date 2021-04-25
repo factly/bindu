@@ -119,10 +119,11 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Base:       config.Base{UpdatedByID: uint(uID)},
 		Title:      template.Title,
 		Slug:       templateSlug,
-		Schema:     template.Schema,
+		Spec:       template.Spec,
 		Properties: template.Properties,
 		MediumID:   mediumID,
-	}).Preload("Medium").First(&result)
+		CategoryID: template.CategoryID,
+	}).Preload("Medium").Preload("Category").First(&result)
 
 	tx.Commit()
 

@@ -22,7 +22,7 @@ type chart struct {
 	FeaturedMediumID uint           `json:"featured_medium_id"`
 	ThemeID          uint           `json:"theme_id"`
 	TemplateID       uint           `json:"template_id"`
-	PublishedDate    time.Time      `json:"published_date"`
+	PublishedDate    *time.Time     `json:"published_date"`
 	OrganisationID   uint           `json:"organisation_id"`
 	CategoryIDs      []uint         `json:"category_ids"`
 	TagIDs           []uint         `json:"tag_ids"`

@@ -30,7 +30,7 @@ type Chart struct {
 	Template         *Template       `gorm:"foreignKey:template_id;default:NULL" json:"template"`
 	ThemeID          *uint           `gorm:"column:theme_id" json:"theme_id"`
 	Theme            *Theme          `gorm:"foreignKey:theme_id;default:NULL" json:"theme"`
-	PublishedDate    time.Time       `gorm:"column:published_date;default:NULL" json:"published_date"`
+	PublishedDate    *time.Time      `gorm:"column:published_date" sql:"DEFAULT:NULL" json:"published_date"`
 	SpaceID          uint            `gorm:"column:space_id" json:"space_id"`
 	Space            *Space          `json:"space,omitempty"`
 	Tags             []Tag           `gorm:"many2many:chart_tag;" json:"tags"`

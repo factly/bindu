@@ -84,13 +84,14 @@ func create(w http.ResponseWriter, r *http.Request) {
 	result := &model.Template{
 		Title:      template.Title,
 		Slug:       slugx.Approve(&config.DB, templateSlug, sID, tableName),
-		Schema:     template.Schema,
+		Spec:       template.Spec,
 		Properties: template.Properties,
 		SpaceID:    uint(sID),
 		MediumID:   mediumID,
+		CategoryID: template.CategoryID,
 	}
 
-	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Template{}).Preload("Medium").Create(&result).Error
+	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Template{}).Preload("Medium").Preload("Category").Create(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)
