@@ -14,10 +14,10 @@ function Dimensions(props) {
       </Form.Item>
 
       <Form.Item name={widthObj.path} label="Width">
-        <InputNumber placeholder="width" />
+        <InputNumber placeholder="width" min={0} />
       </Form.Item>
       <Form.Item name={heightObj.path} label="Height">
-        <InputNumber placeholder="height" />
+        <InputNumber placeholder="height" min={0} />
       </Form.Item>
       <Form.Item name={backgroundObj.path} label="Background">
         <Input type="color" />

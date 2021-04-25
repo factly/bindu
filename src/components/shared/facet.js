@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Select, Form } from 'antd';
+import { InputNumber, Select, Form } from 'antd';
 
 const getResolveOptions = async (form, setResolveOptions) => {
   try {
@@ -27,11 +27,11 @@ function Facet(props) {
   return (
     <div className="property-container">
       <Form.Item name={columnsObj.path} label="Columns">
-        <Input placeholder="columns" min={0} type="number" />
+        <InputNumber placeholder="columns" min={1} />
       </Form.Item>
 
       <Form.Item name={spacingObj.path} label="Spacing">
-        <Input placeholder="columns" min={0} type="number" />
+        <InputNumber placeholder="spacing" min={0} />
       </Form.Item>
       {xaxisObj ? (
         <Form.Item name={xaxisObj.path} label="X Axis">

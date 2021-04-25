@@ -48,7 +48,7 @@ function Legend(props) {
       </Form.Item>
 
       <Form.Item name={symbolSizeObj.path} label="Symbol Size">
-        <InputNumber placeholder="Symbol Size" />
+        <InputNumber placeholder="Symbol Size" min={0} />
       </Form.Item>
     </div>
   );
