@@ -7,6 +7,7 @@ import {
   RESET_TEMPLATES,
   TEMPLATES_API,
 } from '../constants/templates';
+import { addCategoriesList } from './categories';
 import { addErrorNotification, addSuccessNotification } from './notification';
 
 export const getTemplates = (query) => {
@@ -17,10 +18,10 @@ export const getTemplates = (query) => {
         params: query,
       })
       .then((response) => {
-        dispatch(addTemplatesList(response.data.nodes));
+        dispatch(addTemplates(response.data));
         dispatch(
           addTemplatesRequest({
-            data: response.data.nodes.map((item) => item.id),
+            data: response.data.map((item) => item.id),
             query: query,
             total: response.data.total,
           }),
@@ -101,6 +102,18 @@ export const deleteTemplate = (id) => {
         dispatch(addErrorNotification(error.message));
       });
   };
+};
+
+export const addTemplates = (nodes) => (dispatch) => {
+  const templates = [];
+  const categories = [];
+  nodes.forEach((node) => {
+    templates.push(...node.templates);
+    categories.push({ ...node, template_ids: node.templates.map((template) => template.id) });
+  });
+  console.log({ templates, categories });
+  dispatch(addTemplatesList(templates));
+  dispatch(addCategoriesList(categories));
 };
 
 export const loadingTemplates = () => ({

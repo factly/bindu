@@ -1,21 +1,18 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { List, Card, Popconfirm, Button } from 'antd';
+import { List, Card, Popconfirm, Button, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { deleteTemplate, getTemplates } from '../../actions/templates';
 
 const { Meta } = Card;
+const { Title } = Typography;
 
-function Templates() {
+function TemplatesGroup({ ids = [], category = {} }) {
   const dispatch = useDispatch();
-  const templates = useSelector((state) => Object.values(state.templates.details));
-
-  useEffect(() => {
-    dispatch(getTemplates());
-  }, []);
+  const templates = useSelector(({ templates }) => ids.map((id) => templates.details[id]));
 
   const handleDelete = (id) => {
     dispatch(deleteTemplate(id));
@@ -23,14 +20,16 @@ function Templates() {
 
   return (
     <List
-      header={
-        <Link to={'/templates/create'}>
-          <Button type="primary" icon={<PlusOutlined />} size={'large'}>
-            Add new
-          </Button>
-        </Link>
-      }
-      grid={{ gutter: 16, column: 5 }}
+      header={<Title level={2}>{category.name}</Title>}
+      grid={{
+        gutter: 16,
+        xs: 1,
+        sm: 2,
+        md: 4,
+        lg: 4,
+        xl: 6,
+        xxl: 3,
+      }}
       dataSource={templates}
       renderItem={(template) => (
         <List.Item>
@@ -60,6 +59,35 @@ function Templates() {
             <Link to={'/chart/' + template.id}>
               <Meta title={template.title} />
             </Link>
+          </Card>
+        </List.Item>
+      )}
+    />
+  );
+}
+
+function Templates() {
+  const dispatch = useDispatch();
+  const categories = useSelector((state) => Object.values(state.categories.details));
+
+  useEffect(() => {
+    dispatch(getTemplates());
+  }, []);
+
+  return (
+    <List
+      header={
+        <Link to={'/templates/create'}>
+          <Button type="primary" icon={<PlusOutlined />} size={'large'}>
+            Add new
+          </Button>
+        </Link>
+      }
+      dataSource={categories}
+      renderItem={(category) => (
+        <List.Item>
+          <Card>
+            <TemplatesGroup ids={category.template_ids} category={category} />
           </Card>
         </List.Item>
       )}
