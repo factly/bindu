@@ -11,8 +11,7 @@
       {
         "prop": "width",
         "path": [
-          "width",
-          "step"
+          "width"
         ]
       },
       {

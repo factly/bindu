@@ -13,9 +13,7 @@
       "as": "gender"
     }
   ],
-  "width": {
-    "step": 12
-  },
+  "width": 40,
   "mark": {
     "type": "bar",
     "cornerRadius": 1,
@@ -48,7 +46,10 @@
       "field": "gender",
       "type": "nominal",
       "scale": {
-        "range": ["#675193", "#ca8861"]
+        "range": [
+          "#675193",
+          "#ca8861"
+        ]
       }
     }
   },
