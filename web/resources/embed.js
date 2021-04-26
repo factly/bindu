@@ -1,4 +1,4 @@
-let binduChartsURL = 'http://localhost:7002/charts/';
+let binduChartsURL = 'http://127.0.0.1:4455/.factly/bindu/visual/charts/';
 let embedElements = document.getElementsByClassName('factly-embed');
 
 var scripts = [

@@ -17,7 +17,6 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -71,8 +70,6 @@ func ServeCharts() {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
-
-	r.Use(cors.AllowAll().Handler)
 
 	r.Get("/charts/visualization/{chart_id}", chart.Visualize)
 	r.Get("/charts/{chart_id}", chart.Spec)
