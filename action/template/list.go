@@ -42,7 +42,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
-		if exists == false {
+		if !exists {
 			category := categoryTemplate{
 				Category: template.Category,
 			}
