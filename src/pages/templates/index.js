@@ -20,15 +20,16 @@ function TemplatesGroup({ ids = [], category = {} }) {
 
   return (
     <List
+      style={{ width: '100%' }}
       header={<Title level={2}>{category.name}</Title>}
       grid={{
         gutter: 16,
         xs: 1,
         sm: 2,
         md: 4,
-        lg: 4,
+        lg: 6,
         xl: 6,
-        xxl: 3,
+        xxl: 6,
       }}
       dataSource={templates}
       renderItem={(template) => (
@@ -85,10 +86,8 @@ function Templates() {
       }
       dataSource={categories}
       renderItem={(category) => (
-        <List.Item>
-          <Card>
-            <TemplatesGroup ids={category.template_ids} category={category} />
-          </Card>
+        <List.Item style={{ width: '100%' }}>
+          <TemplatesGroup ids={category.template_ids} category={category} />
         </List.Item>
       )}
     />
