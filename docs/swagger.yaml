@@ -50,6 +50,8 @@ definitions:
         items:
           type: integer
         type: array
+      template_id:
+        type: integer
       theme_id:
         type: integer
       title:
@@ -91,17 +93,12 @@ definitions:
         type: string
       slug:
         type: string
-      title:
-        type: string
       type:
         type: string
       url:
         type: string
     required:
-    - dimensions
-    - file_size
     - name
-    - type
     type: object
   model.Category:
     properties:
@@ -156,7 +153,7 @@ definitions:
       featured_medium_id:
         type: integer
       id:
-        type: integer
+        type: string
       is_public:
         type: boolean
       medium:
@@ -175,6 +172,10 @@ definitions:
         items:
           $ref: '#/definitions/model.Tag'
         type: array
+      template:
+        $ref: '#/definitions/model.Template'
+      template_id:
+        type: integer
       theme:
         $ref: '#/definitions/model.Theme'
       theme_id:
@@ -455,6 +456,10 @@ definitions:
     type: object
   model.Template:
     properties:
+      category:
+        $ref: '#/definitions/model.Category'
+      category_id:
+        type: integer
       created_at:
         type: string
       created_by_id:
@@ -469,14 +474,14 @@ definitions:
         type: integer
       properties:
         type: string
-      schema:
-        type: string
       slug:
         type: string
       space:
         $ref: '#/definitions/model.Space'
       space_id:
         type: integer
+      spec:
+        type: string
       title:
         type: string
       updated_at:
@@ -811,27 +816,56 @@ definitions:
     required:
     - name
     type: object
-  template.paging:
+  template.categoryTemplate:
     properties:
-      nodes:
+      charts:
+        items:
+          $ref: '#/definitions/model.Chart'
+        type: array
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      slug:
+        type: string
+      space:
+        $ref: '#/definitions/model.Space'
+      space_id:
+        type: integer
+      templates:
         items:
           $ref: '#/definitions/model.Template'
         type: array
-      total:
+      updated_at:
+        type: string
+      updated_by_id:
         type: integer
+    required:
+    - name
+    - slug
     type: object
   template.template:
     properties:
+      category_id:
+        type: integer
       medium_id:
         type: integer
       properties:
-        type: string
-      schema:
         type: string
       slug:
         type: string
       space_id:
         type: integer
+      spec:
+        type: string
       title:
         type: string
     type: object
@@ -1147,8 +1181,8 @@ paths:
       tags:
       - Chart
     get:
-      description: Get chart by ID
-      operationId: get-chart-by-id
+      description: Get spec chart by ID
+      operationId: get-chart-spec-by-id
       parameters:
       - description: User ID
         in: header
@@ -1172,7 +1206,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Chart'
-      summary: Show a chart by id
+      summary: Show a spec chart by id
       tags:
       - Chart
     put:
@@ -2794,7 +2828,9 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/template.paging'
+              items:
+                $ref: '#/definitions/template.categoryTemplate'
+              type: array
             type: array
       summary: Show all templates
       tags:

@@ -410,15 +410,15 @@ var doc = `{
         },
         "/charts/{chart_id}": {
             "get": {
-                "description": "Get chart by ID",
+                "description": "Get spec chart by ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Chart"
                 ],
-                "summary": "Show a chart by id",
-                "operationId": "get-chart-by-id",
+                "summary": "Show a spec chart by id",
+                "operationId": "get-chart-spec-by-id",
                 "parameters": [
                     {
                         "type": "string",
@@ -2854,7 +2854,10 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/template.paging"
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/template.categoryTemplate"
+                                }
                             }
                         }
                     }
@@ -3427,6 +3430,9 @@ var doc = `{
                         "type": "integer"
                     }
                 },
+                "template_id": {
+                    "type": "integer"
+                },
                 "theme_id": {
                     "type": "integer"
                 },
@@ -3466,10 +3472,7 @@ var doc = `{
         "medium.medium": {
             "type": "object",
             "required": [
-                "dimensions",
-                "file_size",
-                "name",
-                "type"
+                "name"
             ],
             "properties": {
                 "alt_text": {
@@ -3491,9 +3494,6 @@ var doc = `{
                     "type": "string"
                 },
                 "slug": {
-                    "type": "string"
-                },
-                "title": {
                     "type": "string"
                 },
                 "type": {
@@ -3583,7 +3583,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "is_public": {
                     "type": "boolean"
@@ -3611,6 +3611,12 @@ var doc = `{
                     "items": {
                         "$ref": "#/definitions/model.Tag"
                     }
+                },
+                "template": {
+                    "$ref": "#/definitions/model.Template"
+                },
+                "template_id": {
+                    "type": "integer"
                 },
                 "theme": {
                     "$ref": "#/definitions/model.Theme"
@@ -4038,6 +4044,12 @@ var doc = `{
         "model.Template": {
             "type": "object",
             "properties": {
+                "category": {
+                    "$ref": "#/definitions/model.Category"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -4059,9 +4071,6 @@ var doc = `{
                 "properties": {
                     "type": "string"
                 },
-                "schema": {
-                    "type": "string"
-                },
                 "slug": {
                     "type": "string"
                 },
@@ -4070,6 +4079,9 @@ var doc = `{
                 },
                 "space_id": {
                     "type": "integer"
+                },
+                "spec": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -4580,16 +4592,56 @@ var doc = `{
                 }
             }
         },
-        "template.paging": {
+        "template.categoryTemplate": {
             "type": "object",
+            "required": [
+                "name",
+                "slug"
+            ],
             "properties": {
-                "nodes": {
+                "charts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Chart"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "space": {
+                    "$ref": "#/definitions/model.Space"
+                },
+                "space_id": {
+                    "type": "integer"
+                },
+                "templates": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Template"
                     }
                 },
-                "total": {
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by_id": {
                     "type": "integer"
                 }
             }
@@ -4597,13 +4649,13 @@ var doc = `{
         "template.template": {
             "type": "object",
             "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
                 "medium_id": {
                     "type": "integer"
                 },
                 "properties": {
-                    "type": "string"
-                },
-                "schema": {
                     "type": "string"
                 },
                 "slug": {
@@ -4611,6 +4663,9 @@ var doc = `{
                 },
                 "space_id": {
                     "type": "integer"
+                },
+                "spec": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"

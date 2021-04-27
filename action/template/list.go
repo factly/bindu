@@ -23,7 +23,7 @@ type categoryTemplate struct {
 // @Param X-Space header string true "Space ID"
 // @Param limit query string false "limit per page"
 // @Param page query string false "page number"
-// @Success 200 {array} paging
+// @Success 200 {array} []categoryTemplate
 // @Router /templates [get]
 func list(w http.ResponseWriter, r *http.Request) {
 
