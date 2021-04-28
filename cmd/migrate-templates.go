@@ -26,6 +26,7 @@ var (
 		"X-Space": viper.GetString("migration_space"),
 		"X-User":  viper.GetString("migration_user"),
 	}
+	BinduURL string = "http://localhost:8000"
 )
 
 func init() {
@@ -40,6 +41,7 @@ func init() {
 		"X-Space": fmt.Sprint(viper.GetInt("migration_space")),
 		"X-User":  fmt.Sprint(viper.GetInt("migration_user")),
 	}
+	BinduURL = viper.GetString("bindu_url")
 }
 
 var migrateTemplatesCmd = &cobra.Command{
@@ -76,7 +78,7 @@ func MigrateTemplate() error {
 				Name: category_name,
 			}
 
-			resp, err := requestx.Request("POST", "http://localhost:8000/categories", category, headers)
+			resp, err := requestx.Request("POST", BinduURL+"/categories", category, headers)
 			if err != nil {
 				return err
 			}
@@ -151,7 +153,7 @@ func MigrateTemplate() error {
 					"slug":        strings.ToLower(chart_name),
 				}
 
-				resp, err := requestx.Request("POST", "http://localhost:8000/templates", templateBody, headers)
+				resp, err := requestx.Request("POST", BinduURL+"/templates", templateBody, headers)
 				if err != nil {
 					return err
 				}
@@ -164,7 +166,7 @@ func MigrateTemplate() error {
 			}
 		}
 	} else {
-		fmt.Println("migrations done...")
+		fmt.Println("Templates migrations done...")
 	}
 
 	return nil
@@ -184,7 +186,7 @@ func CreateMedium(path, chartName, filename string) (uint, error) {
 		"file_size": info.Size,
 	}
 
-	resp, err := requestx.Request("POST", "http://localhost:8000/media", mediumBody, headers)
+	resp, err := requestx.Request("POST", BinduURL+"/media", mediumBody, headers)
 	if err != nil {
 		return 0, err
 	}
@@ -202,7 +204,7 @@ func CreateMedium(path, chartName, filename string) (uint, error) {
 
 func CategoriesMigrated(categoryNames []string) (map[string]uint, bool) {
 
-	resp, err := requestx.Request("GET", "http://localhost:8000/categories", nil, headers)
+	resp, err := requestx.Request("GET", BinduURL+"/categories", nil, headers)
 	if err != nil {
 		return nil, false
 	}
