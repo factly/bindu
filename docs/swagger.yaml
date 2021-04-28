@@ -1181,8 +1181,8 @@ paths:
       tags:
       - Chart
     get:
-      description: Get spec chart by ID
-      operationId: get-chart-spec-by-id
+      description: Get chart by ID
+      operationId: get-chart-by-id
       parameters:
       - description: User ID
         in: header
@@ -1206,7 +1206,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Chart'
-      summary: Show a spec chart by id
+      summary: Show a chart by id
       tags:
       - Chart
     put:

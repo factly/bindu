@@ -67,106 +67,104 @@ func MigrateTemplate() error {
 		categories_paths = append(categories_paths, fmt.Sprint(TemplatesPath, "/", each.Name()))
 	}
 
-	fmt.Println("CATEGORIES PATH:", categories_paths)
-	fmt.Println("CATEGORIES:", categories)
+	_, migrated := CategoriesMigrated(categories)
 
-	if err != nil {
-		return err
-	}
-
-	category_map := make(map[string]uint)
-
-	for _, category_name := range categories {
-		category := model.Category{
-			Name: category_name,
-		}
-
-		resp, err := requestx.Request("POST", "http://localhost:8000/categories", category, headers)
-		if err != nil {
-			return err
-		}
-
-		if resp.StatusCode != http.StatusCreated {
-			return errors.New("could not create category " + category_name)
-		}
-		defer resp.Body.Close()
-
-		respCategory := model.Category{}
-		if err := json.NewDecoder(resp.Body).Decode(&respCategory); err != nil {
-			return err
-		}
-
-		category_map[respCategory.Name] = respCategory.ID
-	}
-
-	for _, cat_path := range categories_paths {
-		files, err := ioutil.ReadDir(cat_path)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("Processing files in " + cat_path)
-
-		for _, file := range files {
-			filepath := fmt.Sprint(cat_path, "/", file.Name())
-			category_name := strings.Split(cat_path, "/")[2]
-			chart_name := file.Name()
-			fmt.Println("Processing ", filepath)
-
-			// fetching properties
-			var properties []map[string]interface{}
-			propertiesFile, err := os.Open(fmt.Sprint(filepath, "/properties.json"))
-			if err != nil {
-				return err
-			}
-			defer propertiesFile.Close()
-
-			bytes, _ := ioutil.ReadAll(propertiesFile)
-			err = json.Unmarshal(bytes, &properties)
-			if err != nil {
-				return err
+	if !migrated {
+		category_map := make(map[string]uint)
+		for _, category_name := range categories {
+			category := model.Category{
+				Name: category_name,
 			}
 
-			// fetching spec
-			var spec map[string]interface{}
-			specFile, err := os.Open(fmt.Sprint(filepath, "/spec.json"))
-			if err != nil {
-				return err
-			}
-			defer specFile.Close()
-
-			bytes, _ = ioutil.ReadAll(specFile)
-			err = json.Unmarshal(bytes, &spec)
-			if err != nil {
-				return err
-			}
-
-			mediumID, err := CreateMedium(filepath, fmt.Sprint(chart_name, ".png"), "thumbnail.png")
-			if err != nil {
-				return err
-			}
-			fmt.Println(`created medium`, chart_name)
-
-			templateBody := map[string]interface{}{
-				"category_id": category_map[category_name],
-				"medium_id":   mediumID,
-				"properties":  properties,
-				"spec":        spec,
-				"title":       chart_name,
-				"slug":        strings.ToLower(chart_name),
-			}
-
-			resp, err := requestx.Request("POST", "http://localhost:8000/templates", templateBody, headers)
+			resp, err := requestx.Request("POST", "http://localhost:8000/categories", category, headers)
 			if err != nil {
 				return err
 			}
 
 			if resp.StatusCode != http.StatusCreated {
-				return errors.New(`cannot create template ` + chart_name)
-			} else {
-				fmt.Println("template " + chart_name + " created")
+				return errors.New("could not create category " + category_name)
+			}
+			defer resp.Body.Close()
+
+			respCategory := model.Category{}
+			if err := json.NewDecoder(resp.Body).Decode(&respCategory); err != nil {
+				return err
+			}
+
+			category_map[respCategory.Name] = respCategory.ID
+		}
+
+		for _, cat_path := range categories_paths {
+			files, err := ioutil.ReadDir(cat_path)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Processing files in " + cat_path)
+
+			for _, file := range files {
+				filepath := fmt.Sprint(cat_path, "/", file.Name())
+				category_name := strings.Split(cat_path, "/")[2]
+				chart_name := file.Name()
+				fmt.Println("Processing ", filepath)
+
+				// fetching properties
+				var properties []map[string]interface{}
+				propertiesFile, err := os.Open(fmt.Sprint(filepath, "/properties.json"))
+				if err != nil {
+					return err
+				}
+				defer propertiesFile.Close()
+
+				bytes, _ := ioutil.ReadAll(propertiesFile)
+				err = json.Unmarshal(bytes, &properties)
+				if err != nil {
+					return err
+				}
+
+				// fetching spec
+				var spec map[string]interface{}
+				specFile, err := os.Open(fmt.Sprint(filepath, "/spec.json"))
+				if err != nil {
+					return err
+				}
+				defer specFile.Close()
+
+				bytes, _ = ioutil.ReadAll(specFile)
+				err = json.Unmarshal(bytes, &spec)
+				if err != nil {
+					return err
+				}
+
+				mediumID, err := CreateMedium(filepath, fmt.Sprint(chart_name, ".png"), "thumbnail.png")
+				if err != nil {
+					return err
+				}
+				fmt.Println(`created medium`, chart_name)
+
+				templateBody := map[string]interface{}{
+					"category_id": category_map[category_name],
+					"medium_id":   mediumID,
+					"properties":  properties,
+					"spec":        spec,
+					"title":       chart_name,
+					"slug":        strings.ToLower(chart_name),
+				}
+
+				resp, err := requestx.Request("POST", "http://localhost:8000/templates", templateBody, headers)
+				if err != nil {
+					return err
+				}
+
+				if resp.StatusCode != http.StatusCreated {
+					return errors.New(`cannot create template ` + chart_name)
+				} else {
+					fmt.Println("template " + chart_name + " created")
+				}
 			}
 		}
+	} else {
+		fmt.Println("migrations done...")
 	}
 
 	return nil
@@ -200,4 +198,37 @@ func CreateMedium(path, chartName, filename string) (uint, error) {
 	}
 
 	return respMedium.ID, nil
+}
+
+func CategoriesMigrated(categoryNames []string) (map[string]uint, bool) {
+
+	resp, err := requestx.Request("GET", "http://localhost:8000/categories", nil, headers)
+	if err != nil {
+		return nil, false
+	}
+
+	type catPage struct {
+		Nodes []model.Category `json:"nodes,omitempty"`
+		Total int              `json:"total,omitempty"`
+	}
+
+	categoriesPaiganation := catPage{}
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&categoriesPaiganation); err != nil {
+		return nil, false
+	}
+
+	categories := categoriesPaiganation.Nodes
+	categoryMap := make(map[string]uint)
+	for _, cat := range categories {
+		categoryMap[cat.Name] = cat.ID
+	}
+
+	for _, category := range categoryNames {
+		if _, found := categoryMap[category]; !found {
+			return nil, false
+		}
+	}
+	return categoryMap, true
 }
