@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dlmiddlecote/sqlstats"
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/action/chart"
 	"github.com/factly/bindu-server/config"
@@ -16,8 +17,10 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -34,6 +37,18 @@ var serveCmd = &cobra.Command{
 		config.SetupDB()
 		// register routes
 		r := action.RegisterRoutes()
+
+		go func() {
+			promRouter := chi.NewRouter()
+
+			sqlDB, _ := config.DB.DB()
+			collector := sqlstats.NewStatsCollector(viper.GetString("database_name"), sqlDB)
+
+			prometheus.MustRegister(collector)
+
+			promRouter.Mount("/metrics", promhttp.Handler())
+			log.Fatal(http.ListenAndServe(":8001", promRouter))
+		}()
 
 		go ServeCharts()
 
@@ -56,17 +71,15 @@ func ServeCharts() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
 
-	r.Use(cors.AllowAll().Handler)
-
 	r.Get("/charts/visualization/{chart_id}", chart.Visualize)
 	r.Get("/charts/{chart_id}", chart.Spec)
 
 	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "web/"))
+	filesDir := http.Dir(filepath.Join(workDir, "web/resources/"))
 
 	FileServer(r, "/", filesDir)
 
-	err := http.ListenAndServe(":8001", r)
+	err := http.ListenAndServe(":8002", r)
 	if err != nil {
 		log.Fatal(err)
 	}
