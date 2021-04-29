@@ -61,7 +61,7 @@ function Chart({ spec, setView = () => {} }) {
     renderChart();
   }, [spec]);
 
-  return <div id="chart" ref={refContainer}></div>;
+  return <div style={{ height: 'inherit', overflow: 'auto' }} ref={refContainer}></div>;
 }
 
 export default Chart;
