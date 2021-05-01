@@ -2,12 +2,13 @@ import React, { useState, useRef } from 'react';
 import './data_viewer.css';
 import { VariableSizeGrid as Grid } from 'react-window';
 import classNames from 'classnames';
-import { Table } from 'antd';
+import { Button, Input, InputNumber, Table } from 'antd';
 import { useDispatch } from 'react-redux';
 
 function DataViewer(props) {
-  const { columns, scroll } = props;
+  const { columns, scroll, onDataChange } = props;
   const [tableWidth, setTableWidth] = useState(scroll.x);
+  const [isEditable, setIsEditable] = useState(false);
   const mergedColumns = columns.map((column) => {
     if (column.width) {
       return column;
@@ -56,31 +57,49 @@ function DataViewer(props) {
           onScroll({ scrollLeft });
         }}
       >
-        {({ columnIndex, rowIndex, style }) => (
-          <div
-            className={classNames('virtual-table-cell', {
-              'virtual-table-cell-last': columnIndex === mergedColumns.length - 1,
-            })}
-            style={style}
-          >
-            {rawData[rowIndex][mergedColumns[columnIndex].dataIndex]}
-          </div>
-        )}
+        {({ columnIndex, rowIndex, style }) => {
+          const value = rawData[rowIndex][mergedColumns[columnIndex].dataIndex];
+          let InputComponent = Input;
+          let onChange = (event) =>
+            onDataChange(rowIndex, mergedColumns[columnIndex].dataIndex, event.target.value);
+          if (typeof value === 'number') {
+            InputComponent = InputNumber;
+            onChange = (value) =>
+              onDataChange(rowIndex, mergedColumns[columnIndex].dataIndex, value);
+          }
+          return (
+            <div
+              className={classNames('virtual-table-cell', {
+                'virtual-table-cell-last': columnIndex === mergedColumns.length - 1,
+              })}
+              style={style}
+            >
+              {isEditable ? <InputComponent value={value} onChange={onChange} /> : value}
+            </div>
+          );
+        }}
       </Grid>
     );
   };
 
   return (
-    <Table
-      {...props}
-      className="virtual-table"
-      columns={mergedColumns}
-      pagination={false}
-      showHeader={true}
-      components={{
-        body: renderVirtualList,
-      }}
-    />
+    <>
+      {!isEditable ? (
+        <Button onClick={() => setIsEditable(true)}>Edit Data</Button>
+      ) : (
+        <Button onClick={() => setIsEditable(false)}>Done</Button>
+      )}
+      <Table
+        {...props}
+        className="virtual-table"
+        columns={mergedColumns}
+        pagination={false}
+        showHeader={true}
+        components={{
+          body: renderVirtualList,
+        }}
+      />
+    </>
   );
 }
 

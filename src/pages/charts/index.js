@@ -75,10 +75,13 @@ function Chart({ data = {}, onSubmit }) {
 
   const onDataUpload = (dataDetails) => {
     let values = form.getFieldValue();
+
+    // Keep only one of values and url. If url exists, then remove values.
     _.unset(values, ['data', 'values']);
     _.set(values, ['data', 'url'], dataDetails.url.raw);
     form.setFieldsValue(values);
   };
+
   React.useEffect(() => {
     dispatch(collapseSider());
     onValuesChange();
@@ -94,6 +97,10 @@ function Chart({ data = {}, onSubmit }) {
       setChartName(data.title);
     }
   }, [data]);
+
+  React.useEffect(() => {
+    setSpec(form.getFieldValue());
+  }, [form.getFieldValue()]);
 
   const downloadSampleData = () => {
     const url = form.getFieldValue(['data', 'url']);
@@ -119,12 +126,26 @@ function Chart({ data = {}, onSubmit }) {
   };
 
   const saveChart = async () => {
-    const { tags, categories, ...values } = form.getFieldValue();
+    // If spec contains values, remove it and push it to minio. Then, set url of that file in spec
+    const formData = form.getFieldValue();
+    let url = formData.data.url;
+
+    if (formData.data.values) {
+      // TODO: make a json file out of values
+      if (formData.data.url) {
+        // TODO: replace file in minio at location `data.url`
+      } else {
+        // TODO: upload file to minio
+      }
+      // TODO: send uploaded file url in api
+    }
+
+    const { tags, categories, ...values } = formData;
     const imageBlob = await view?.toImageURL('png', 1);
 
     onSubmit({
       title: chartName,
-      data_url: values.data.url,
+      data_url: url,
       config: values,
       featured_medium: imageBlob,
       category_ids: categories,
@@ -135,6 +156,23 @@ function Chart({ data = {}, onSubmit }) {
 
   const onValuesChange = () => {
     setSpec(form.getFieldValue());
+  };
+
+  const onDataChange = (rowIndex, columnIndex, newValue) => {
+    const updatedValues = [...values];
+    try {
+      updatedValues[rowIndex][columnIndex] = values[rowIndex][columnIndex].constructor(newValue);
+      setValues(updatedValues);
+
+      let formData = form.getFieldValue();
+      // removing `data.url` from spec so that vega only considers the data that was udpated by user which will be in `data.values`
+      _.unset(formData, ['data', 'url']);
+      _.set(formData, ['data', 'values'], updatedValues);
+      form.setFieldsValue(formData);
+      console.log({ formData });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const IconSize = 20;
@@ -247,6 +285,7 @@ function Chart({ data = {}, onSubmit }) {
         <DataViewer
           columns={columns}
           dataSource={values}
+          onDataChange={onDataChange}
           scroll={{
             y: height - 55,
             x: width,
