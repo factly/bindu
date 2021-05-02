@@ -37,11 +37,19 @@ function DataLabels(props) {
       {enable ? (
         <React.Fragment>
           <Form.Item name={['layer', 1, 'mark', 'fontSize']} label="Size">
-            <InputNumber />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+              min={0}
+            />
           </Form.Item>
 
           <Form.Item name={['layer', 1, 'mark', 'radius']} label="Position( from center)">
-            <InputNumber />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+              min={0}
+            />
           </Form.Item>
         </React.Fragment>
       ) : null}

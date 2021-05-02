@@ -46,7 +46,11 @@ function DataLabels(props) {
           </Form.Item>
 
           <Form.Item name={fontSizeObj.path} label="Size">
-            <InputNumber min={0} />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+              min={0}
+            />
           </Form.Item>
 
           <Form.Item name={formatObj.path} label="Format">

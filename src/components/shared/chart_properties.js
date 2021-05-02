@@ -14,10 +14,20 @@ function Dimensions(props) {
       </Form.Item>
 
       <Form.Item name={widthObj.path} label="Width">
-        <InputNumber placeholder="width" min={0} />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          placeholder="width"
+          min={0}
+        />
       </Form.Item>
       <Form.Item name={heightObj.path} label="Height">
-        <InputNumber placeholder="height" min={0} />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          placeholder="height"
+          min={0}
+        />
       </Form.Item>
       <Form.Item name={backgroundObj.path} label="Background">
         <Input type="color" />

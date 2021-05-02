@@ -21,7 +21,11 @@ function TreeMap(props) {
       </Form.Item>
 
       <Form.Item name={aspectRatioObj.path} label="Aspect Ratio">
-        <InputNumber placeholder="Aspect Ratio" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          placeholder="Aspect Ratio"
+        />
       </Form.Item>
     </div>
   );
