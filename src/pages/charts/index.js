@@ -7,7 +7,7 @@ import './index.css';
 import _ from 'lodash';
 import SplitPane from 'react-split-pane';
 
-import { Card, Tooltip, Button, Input, Form, Modal, Dropdown, Menu } from 'antd';
+import { Card, Tooltip, Button, Input, Form, Modal, Dropdown, Menu, Popover } from 'antd';
 import {
   SaveOutlined,
   SettingOutlined,
@@ -139,7 +139,7 @@ function Chart({ data = {}, onSubmit }) {
     saveAs(blob, `${chartName}.${ext}`);
   };
 
-  const saveChart = async () => {
+  const saveChart = async (e) => {
     // If spec contains values, remove it and push it to minio. Then, set url of that file in spec
     const formData = form.getFieldValue();
     let url = formData.data.url;
@@ -182,6 +182,9 @@ function Chart({ data = {}, onSubmit }) {
       category_ids: categories,
       tag_ids: tags,
       template_id: data.id ? data.template_id : Number(templateId),
+      status: e.key,
+      is_public: e.key === 'publish',
+      published_date: e.key === 'publish' ? new Date() : null,
     });
   };
 
@@ -205,7 +208,7 @@ function Chart({ data = {}, onSubmit }) {
   };
 
   const IconSize = 20;
-  const actions = [
+  let actions = [
     {
       name: 'Customize',
       Component: (
@@ -217,7 +220,22 @@ function Chart({ data = {}, onSubmit }) {
     },
     {
       name: 'Save',
-      Component: <SaveOutlined style={{ fontSize: IconSize }} onClick={saveChart} />,
+      Component: (
+        <Dropdown
+          overlay={
+            <div style={{ boxShadow: '0px 0px 6px 1px #999' }}>
+              <Menu onClick={saveChart}>
+                <Menu.Item key="draft">Draft</Menu.Item>
+                <Menu.Item key="publish">Publish</Menu.Item>
+              </Menu>
+            </div>
+          }
+        >
+          <Button type="text" style={{ marginBottom: 5 }} onClick={() => setShowOptions(false)}>
+            <SaveOutlined style={{ fontSize: IconSize }} />
+          </Button>
+        </Dropdown>
+      ),
     },
     {
       name: 'Upload',
@@ -257,6 +275,31 @@ function Chart({ data = {}, onSubmit }) {
       ),
     },
   ];
+
+  if (data.id) {
+    actions = [
+      {
+        name: '',
+        Component: (
+          <Popover
+            content={
+              <div style={{ width: 300, height: 200 }}>
+                <Input value={window.BINDU_CHART_VISUALIZATION_URL + '/' + data.id} />
+                <Input.TextArea
+                  value={`<div class="factly-embed" data-src=${data.id}>
+                  <script src="http://localhost:7002/resources/embed.js"></script></div>`}
+                />
+              </div>
+            }
+            title="Title"
+          >
+            <Button style={{ marginBottom: 5 }}>Export</Button>
+          </Popover>
+        ),
+      },
+      ...actions,
+    ];
+  }
 
   const actionsList = (
     <div className="extra-actions-container">
