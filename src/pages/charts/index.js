@@ -72,6 +72,7 @@ function Chart({ data = {}, onSubmit }) {
   const [values, setValues] = useState([]);
   const [columns, setColumns] = useState([]);
   const space_slug = useSelector((state) => state.spaces.details[state.spaces.selected]?.slug);
+  const template = useSelector(({ templates }) => templates.details[templateId]);
   const splitContainer = React.useRef(null);
 
   const onDataUpload = (dataDetails) => {
@@ -99,7 +100,7 @@ function Chart({ data = {}, onSubmit }) {
   React.useEffect(() => {
     dispatch(collapseSider());
     onValuesChange();
-  }, []);
+  }, [template]);
 
   React.useEffect(() => {
     if (data && data.id) {
