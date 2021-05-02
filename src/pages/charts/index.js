@@ -7,7 +7,18 @@ import './index.css';
 import _ from 'lodash';
 import SplitPane from 'react-split-pane';
 
-import { Card, Tooltip, Button, Input, Form, Modal, Dropdown, Menu, Popover } from 'antd';
+import {
+  Card,
+  Tooltip,
+  Button,
+  Input,
+  Form,
+  Modal,
+  Dropdown,
+  Menu,
+  Popover,
+  Typography,
+} from 'antd';
 import {
   SaveOutlined,
   SettingOutlined,
@@ -284,15 +295,38 @@ function Chart({ data = {}, onSubmit }) {
         Component: (
           <Popover
             content={
-              <div style={{ width: 300, height: 200 }}>
-                <Input value={window.BINDU_CHART_VISUALIZATION_URL + '/' + data.id} />
-                <Input.TextArea
-                  value={`<div class="factly-embed" data-src=${data.id}>
-                  <script src="http://localhost:7002/resources/embed.js"></script></div>`}
-                />
+              <div style={{ width: 300, height: 'auto' }}>
+                <Typography.Link
+                  ellipsis
+                  href={window.BINDU_CHART_VISUALIZATION_URL + '/' + data.id}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: 'block',
+                  }}
+                >
+                  {window.BINDU_CHART_VISUALIZATION_URL + '/' + data.id}
+                </Typography.Link>
+                <br />
+                <Typography.Text strong>Embed:</Typography.Text>
+                <Typography.Text
+                  copyable
+                  ellipsis={{ rows: 1 }}
+                  style={{
+                    border: '1px solid',
+                    padding: 4,
+                    overflow: 'auto',
+                    width: '100%',
+                  }}
+                >
+                  {`<div class="factly-embed" data-src=${data.id}><script src="http://localhost:7002/resources/embed.js"></script></div>`}
+                </Typography.Text>
               </div>
             }
-            title="Title"
+            title="Export and publish"
+            trigger="click"
           >
             <Button style={{ marginBottom: 5 }}>Export</Button>
           </Popover>
