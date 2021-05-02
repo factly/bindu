@@ -1,24 +1,93 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { List, Card } from 'antd';
+import { List, Card, Popconfirm, Button, Typography } from 'antd';
 import { Link } from 'react-router-dom';
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+
+import { deleteTemplate, getTemplates } from '../../actions/templates';
 
 const { Meta } = Card;
-function Templates() {
-  const templates = useSelector((state) => state.templates);
-  const { options } = templates;
+const { Title } = Typography;
+
+function TemplatesGroup({ ids = [], category = {} }) {
+  const dispatch = useDispatch();
+  const templates = useSelector(({ templates }) => ids.map((id) => templates.details[id]));
+
+  const handleDelete = (id) => {
+    dispatch(deleteTemplate(id));
+  };
+
   return (
     <List
-      grid={{ gutter: 16, column: 5 }}
-      dataSource={options}
-      renderItem={(d, i) => (
+      style={{ width: '100%' }}
+      header={<Title level={2}>{category.name}</Title>}
+      grid={{
+        gutter: 16,
+        xs: 1,
+        sm: 2,
+        md: 4,
+        lg: 6,
+        xl: 6,
+        xxl: 6,
+      }}
+      dataSource={templates}
+      renderItem={(template) => (
         <List.Item>
-          <Link key={i} to={'/chart/' + i}>
-            <Card hoverable cover={<img alt="example" src={d.icon} />}>
-              <Meta title={d.name} />
-            </Card>
-          </Link>
+          <Card
+            hoverable
+            cover={
+              <img
+                alt="example"
+                src={template.medium ? template.medium.url.proxy : null}
+                height={200}
+              />
+            }
+            actions={[
+              <Link to={'/templates/' + template.id + '/edit'}>
+                <EditOutlined key="edit" />
+              </Link>,
+              <Popconfirm
+                title="Are you sure to delete this template?"
+                onConfirm={() => handleDelete(template.id)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <DeleteOutlined key="ellipsis" />
+              </Popconfirm>,
+            ]}
+          >
+            <Link to={'/chart/' + template.id}>
+              <Meta title={template.title} />
+            </Link>
+          </Card>
+        </List.Item>
+      )}
+    />
+  );
+}
+
+function Templates() {
+  const dispatch = useDispatch();
+  const categories = useSelector((state) => Object.values(state.categories.details));
+
+  useEffect(() => {
+    dispatch(getTemplates());
+  }, []);
+
+  return (
+    <List
+      header={
+        <Link to={'/templates/create'}>
+          <Button type="primary" icon={<PlusOutlined />} size={'large'}>
+            Add new
+          </Button>
+        </Link>
+      }
+      dataSource={categories}
+      renderItem={(category) => (
+        <List.Item style={{ width: '100%' }}>
+          <TemplatesGroup ids={category.template_ids} category={category} />
         </List.Item>
       )}
     />

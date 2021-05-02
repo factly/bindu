@@ -48,7 +48,12 @@ function Legend(props) {
       </Form.Item>
 
       <Form.Item name={symbolSizeObj.path} label="Symbol Size">
-        <InputNumber placeholder="Symbol Size" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          placeholder="Symbol Size"
+          min={0}
+        />
       </Form.Item>
     </div>
   );

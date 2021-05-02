@@ -31,7 +31,7 @@ export const properties = [
         path: ['background'],
       },
     ],
-    Component: ChartProperties,
+    Component: 'ChartProperties',
   },
   {
     name: 'Colors',
@@ -42,7 +42,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'value'],
       },
     ],
-    Component: Colors,
+    Component: 'Colors',
   },
   {
     name: 'Line',
@@ -52,7 +52,7 @@ export const properties = [
         path: ['layer', 0, 'mark'],
       },
     ],
-    Component: Line,
+    Component: 'Line',
   },
   {
     name: 'Dots',
@@ -62,7 +62,7 @@ export const properties = [
         path: ['layer', 0, 'mark'],
       },
     ],
-    Component: Dots,
+    Component: 'Dots',
   },
   {
     name: 'X Axis',
@@ -70,6 +70,10 @@ export const properties = [
       {
         prop: 'title',
         path: ['layer', 0, 'encoding', 'x', 'axis', 'title'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'x', 'field'],
       },
       {
         prop: 'orient',
@@ -84,15 +88,19 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'x', 'axis', 'labelColor'],
       },
       {
+        prop: 'type',
+        path: ['layer', 0, 'encoding', 'x', 'type'],
+      },
+      {
         prop: 'aggregate',
         path: ['layer', 0, 'encoding', 'x', 'aggregate'],
       },
       {
-        prop: 'field',
-        path: ['layer', 0, 'encoding', 'x', 'field'],
+        prop: 'sort',
+        path: ['layer', 0, 'encoding', 'x', 'sort'],
       },
     ],
-    Component: XAxis,
+    Component: 'XAxis',
   },
   {
     name: 'Y Axis',
@@ -100,6 +108,10 @@ export const properties = [
       {
         prop: 'title',
         path: ['layer', 0, 'encoding', 'y', 'axis', 'title'],
+      },
+      {
+        prop: 'field',
+        path: ['layer', 0, 'encoding', 'y', 'field'],
       },
       {
         prop: 'orient',
@@ -114,15 +126,19 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'y', 'axis', 'labelColor'],
       },
       {
+        prop: 'type',
+        path: ['layer', 0, 'encoding', 'y', 'type'],
+      },
+      {
         prop: 'aggregate',
         path: ['layer', 0, 'encoding', 'y', 'aggregate'],
       },
       {
-        prop: 'field',
-        path: ['layer', 0, 'encoding', 'y', 'field'],
+        prop: 'sort',
+        path: ['layer', 0, 'encoding', 'y', 'sort'],
       },
     ],
-    Component: YAxis,
+    Component: 'YAxis',
   },
   {
     name: 'Data Labels',
@@ -140,6 +156,6 @@ export const properties = [
         path: ['layer', 1, 'encoding', 'text', 'format'],
       },
     ],
-    Component: DataLabels,
+    Component: 'DataLabels',
   },
 ];

@@ -4,7 +4,7 @@ import Legend from '../../../components/shared/legend.js';
 import LegendLabel from '../../../components/shared/legend_label.js';
 
 import Segment from '../../../components/shared/segment.js';
-import DataLabels from '../../../components/shared/pie_data_labels.js';
+import PieDataLabels from '../../../components/shared/pie_data_labels.js';
 
 import Spec from './default.json';
 
@@ -31,7 +31,7 @@ export const properties = [
         path: ['background'],
       },
     ],
-    Component: ChartProperties,
+    Component: 'ChartProperties',
   },
   {
     name: 'Colors',
@@ -42,7 +42,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'scale', 'range'],
       },
     ],
-    Component: Colors,
+    Component: 'Colors',
   },
   {
     name: 'Segment',
@@ -64,7 +64,7 @@ export const properties = [
         path: ['layer', 0, 'mark', 'outerRadius'],
       },
     ],
-    Component: Segment,
+    Component: 'Segment',
   },
   {
     name: 'Legend',
@@ -90,7 +90,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'legend', 'orient'],
       },
     ],
-    Component: Legend,
+    Component: 'Legend',
   },
   {
     name: 'Legend Label',
@@ -108,7 +108,7 @@ export const properties = [
         path: ['layer', 0, 'encoding', 'color', 'legend', 'labelColor'],
       },
     ],
-    Component: LegendLabel,
+    Component: 'LegendLabel',
   },
   {
     name: 'Data Labels',
@@ -126,6 +126,6 @@ export const properties = [
         path: ['layer', 1, 'encoding', 'text', 'format'],
       },
     ],
-    Component: DataLabels,
+    Component: 'PieDataLabels',
   },
 ];

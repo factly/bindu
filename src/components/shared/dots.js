@@ -54,7 +54,12 @@ function Dots(props) {
             initialValue={40}
             label="Symbol Size"
           >
-            <InputNumber placeholder="Symbol Size" />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+              min={0}
+              placeholder="Symbol Size"
+            />
           </Form.Item>
 
           <Form.Item

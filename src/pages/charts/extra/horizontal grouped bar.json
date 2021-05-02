@@ -1,5 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "mode": "vega-lite",
   "data": {
     "url": "data/population.json"
   },
@@ -7,14 +8,7 @@
     {
       "filter": {
         "field": "year",
-        "oneOf": [
-          1950,
-          1960,
-          1970,
-          1980,
-          1990,
-          2000
-        ]
+        "oneOf": [1950, 1960, 1970, 1980, 1990, 2000]
       }
     },
     {
@@ -52,10 +46,7 @@
       "field": "gender",
       "type": "nominal",
       "scale": {
-        "range": [
-          "#675193",
-          "#ca8861"
-        ]
+        "range": ["#675193", "#ca8861"]
       }
     }
   },

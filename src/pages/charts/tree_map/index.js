@@ -1,0 +1,42 @@
+import Spec from './default.json';
+
+export const spec = Spec;
+
+export const properties = [
+  {
+    name: 'Chart Properties',
+    properties: [
+      {
+        prop: 'title',
+        path: ['title'],
+      },
+      {
+        prop: 'width',
+        path: ['width'],
+      },
+      {
+        prop: 'height',
+        path: ['height'],
+      },
+      {
+        prop: 'background',
+        path: ['background'],
+      },
+    ],
+    Component: 'ChartProperties',
+  },
+  {
+    name: 'Tree Map',
+    properties: [
+      {
+        prop: 'layout',
+        path: ['data', 0, 'transform', 1, 'method'],
+      },
+      {
+        prop: 'aspect_ratio',
+        path: ['data', 0, 'transform', 1, 'ratio'],
+      },
+    ],
+    Component: 'TreeMap',
+  },
+];

@@ -14,7 +14,7 @@ export const getCharts = (query) => {
     dispatch(loadingCharts());
     return axios
       .get(CHARTS_API, {
-        params: query,
+        params: { limit: 20 },
       })
       .then((response) => {
         dispatch(addChartsList(response.data.nodes));

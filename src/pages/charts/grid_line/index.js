@@ -32,7 +32,7 @@ export const properties = [
         path: ['background'],
       },
     ],
-    Component: ChartProperties,
+    Component: 'ChartProperties',
   },
   {
     name: 'Colors',
@@ -43,7 +43,7 @@ export const properties = [
         path: ['encoding', 'color', 'scale', 'range'],
       },
     ],
-    Component: Colors,
+    Component: 'Colors',
   },
   {
     name: 'Grid',
@@ -65,7 +65,7 @@ export const properties = [
         path: ['resolve', 'axis', 'y'],
       },
     ],
-    Component: Facet,
+    Component: 'Facet',
   },
   {
     name: 'Lines',
@@ -87,7 +87,7 @@ export const properties = [
         path: ['mark', 'strokeDash'],
       },
     ],
-    Component: Lines,
+    Component: 'Lines',
   },
   {
     name: 'Dots',
@@ -97,7 +97,7 @@ export const properties = [
         path: ['mark'],
       },
     ],
-    Component: Dots,
+    Component: 'Dots',
   },
   {
     name: 'X Axis',
@@ -105,6 +105,10 @@ export const properties = [
       {
         prop: 'title',
         path: ['encoding', 'x', 'axis', 'title'],
+      },
+      {
+        prop: 'field',
+        path: ['encoding', 'x', 'field'],
       },
       {
         prop: 'orient',
@@ -119,15 +123,19 @@ export const properties = [
         path: ['encoding', 'x', 'axis', 'labelColor'],
       },
       {
+        prop: 'type',
+        path: ['encoding', 'x', 'type'],
+      },
+      {
         prop: 'aggregate',
         path: ['encoding', 'x', 'aggregate'],
       },
       {
-        prop: 'field',
-        path: ['encoding', 'x', 'field'],
+        prop: 'sort',
+        path: ['encoding', 'x', 'sort'],
       },
     ],
-    Component: XAxis,
+    Component: 'XAxis',
   },
   {
     name: 'Y Axis',
@@ -135,6 +143,10 @@ export const properties = [
       {
         prop: 'title',
         path: ['encoding', 'y', 'axis', 'title'],
+      },
+      {
+        prop: 'field',
+        path: ['encoding', 'y', 'field'],
       },
       {
         prop: 'orient',
@@ -149,14 +161,18 @@ export const properties = [
         path: ['encoding', 'y', 'axis', 'labelColor'],
       },
       {
+        prop: 'type',
+        path: ['encoding', 'y', 'type'],
+      },
+      {
         prop: 'aggregate',
         path: ['encoding', 'y', 'aggregate'],
       },
       {
-        prop: 'field',
-        path: ['encoding', 'y', 'field'],
+        prop: 'sort',
+        path: ['encoding', 'y', 'sort'],
       },
     ],
-    Component: YAxis,
+    Component: 'YAxis',
   },
 ];

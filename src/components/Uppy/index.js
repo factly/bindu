@@ -18,6 +18,8 @@ function UppyUploader({ onUpload }) {
     id: 'uppy-media',
     meta: { type: 'avatar' },
     restrictions: {
+      maxNumberOfFiles: 1,
+      minNumberOfFiles: 1,
       allowedFileTypes: ['image/*'],
     },
     autoProceed: false,
@@ -65,26 +67,21 @@ function UppyUploader({ onUpload }) {
     });
 
   uppy.on('complete', (result) => {
-    const uploadList = result.successful.map((successful) => {
-      const upload = {};
+    const successful = result.successful[0];
+    const upload = {};
+    upload['alt_text'] = successful.meta.caption;
+    upload['caption'] = successful.meta.caption;
+    upload['description'] = successful.meta.caption;
+    upload['dimensions'] = '100x100';
+    upload['file_size'] = successful.size;
+    upload['name'] = successful.file_name;
+    upload['slug'] = successful.response.body.key;
+    upload['title'] = successful.meta.caption ? successful.meta.caption : ' ';
+    upload['type'] = successful.meta.type;
+    upload['url'] = {};
+    upload['url']['raw'] = successful.uploadURL;
 
-      upload['alt_text'] = successful.meta.alt_text
-        ? successful.meta.alt_text
-        : successful.file_name;
-      upload['caption'] = successful.meta.caption;
-      upload['description'] = successful.meta.caption;
-      upload['dimensions'] = '100x100';
-      upload['file_size'] = successful.size;
-      upload['name'] = successful.file_name;
-      upload['slug'] = successful.file_name;
-      upload['title'] = successful.meta.caption ? successful.meta.caption : '';
-      upload['type'] = successful.meta.type;
-      upload['url'] = {};
-      upload['url']['raw'] = successful.uploadURL;
-      return upload;
-    });
-
-    onUpload(uploadList);
+    onUpload(upload);
   });
   return (
     <Dashboard

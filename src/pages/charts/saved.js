@@ -16,7 +16,6 @@ function SavedCharts() {
   React.useEffect(() => {
     dispatch(getCharts());
   }, []);
-
   return loading ? null : (
     <List
       grid={{ gutter: 16, column: 5 }}

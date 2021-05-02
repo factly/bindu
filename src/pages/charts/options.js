@@ -2,114 +2,80 @@ import React, { useEffect } from 'react';
 import { Collapse } from 'antd';
 import { useParams } from 'react-router-dom';
 
+import Line from '../../components/shared/area_lines.js';
+import Bars from '../../components/shared/bars.js';
+import ChartProperties from '../../components/shared/chart_properties.js';
+import Colors from '../../components/shared/colors.js';
+import DataLabels from '../../components/shared/data_labels.js';
+import Dots from '../../components/shared/dots.js';
+import Facet from '../../components/shared/facet.js';
+import Legend from '../../components/shared/legend.js';
+import Lines from '../../components/shared/lines.js';
+import LegendLabel from '../../components/shared/legend_label.js';
+import PieDataLabels from '../../components/shared/pie_data_labels.js';
+import Segment from '../../components/shared/segment.js';
+import XAxis from '../../components/shared/x_axis.js';
+import YAxis from '../../components/shared/y_axis.js';
+import TreeMap from '../../components/shared/tree_map.js';
+import RegionsLayer from '../../components/shared/regions_layer.js';
+import GraticuleLayer from '../../components/shared/graticule.js';
+import ZoomLayer from '../../components/shared/zoom.js';
+
 import Categories from '../../components/categories';
 import Tags from '../../components/tags';
-import * as Area from './area/index.js';
-import * as StackedArea from './stacked_area/index.js';
-import * as StackedAreaProportional from './stacked_area_proportional/index.js';
-import * as Bar from './bar/index.js';
-import * as GridBar from './grid_bar/index.js';
-import * as HorizontalBar from './horizontal_bar/index.js';
-import * as HorizontalStackBar from './horizontal_stacked_bar/index.js';
-import * as StackedBar from './stacked_bar/index.js';
-import * as GroupedBar from './grouped_bar/index.js';
-import * as Line from './line/index.js';
-import * as GridLine from './grid_line/index.js';
-import * as LineProjected from './line_projected/index.js';
-import * as Pie from './pie/index.js';
-import * as GridPie from './grid_pie/index.js';
-import * as GroupedLine from './grouped_line/index.js';
-import * as LineBar from './line_bar/index.js';
-import * as DivergingBar from './diverging_bar/index.js';
-import * as Donut from './donut/index.js';
-import * as GroupedBarProportional from './grouped_bar_proportional/index.js';
-import * as HorizontalGroupedBarProportional from './horizontal_grouped_bar_proportional/index.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTemplate } from '../../actions/templates';
 
 const { Panel } = Collapse;
 
-function OptionComponent(props) {
-  const { form } = props;
+const PropertiesComponentMap = {
+  ChartProperties,
+  Colors,
+  XAxis,
+  YAxis,
+  DataLabels,
+  Dots,
+  Line,
+  Legend,
+  LegendLabel,
+  Segment,
+  Facet,
+  Bars,
+  Lines,
+  PieDataLabels,
+  TreeMap,
+  RegionsLayer,
+  GraticuleLayer,
+  ZoomLayer,
+};
 
-  let { id } = useParams();
-  id = parseInt(id);
-  let component;
+function OptionComponent(props) {
+  const dispatch = useDispatch();
+
+  let { templateId } = useParams();
+  if (!templateId) templateId = props.templateId;
+  const component = useSelector(({ templates }) => templates.details[templateId]);
 
   useEffect(() => {
-    form.setFieldsValue(component.spec);
-  }, [id, component]);
+    if (templateId) dispatch(getTemplate(parseInt(templateId, 10)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  switch (id) {
-    case 0:
-      component = Area;
-      break;
-    case 1:
-      component = StackedArea;
-      break;
-    case 2:
-      component = StackedAreaProportional;
-      break;
-    case 3:
-      component = Bar;
-      break;
-    case 4:
-      component = HorizontalBar;
-      break;
-    case 5:
-      component = HorizontalStackBar;
-      break;
-    case 6:
-      component = StackedBar;
-      break;
-    case 7:
-      component = GroupedLine;
-      break;
-    case 8:
-      component = Line;
-      break;
-    case 9:
-      component = LineProjected;
-      break;
-    case 10:
-      component = Pie;
-      break;
-    case 11:
-      component = Donut;
-      break;
-    case 12:
-      component = LineBar;
-      break;
-    case 13:
-      component = DivergingBar;
-      break;
-    case 14:
-      component = GroupedBarProportional;
-      break;
-    case 15:
-      component = HorizontalGroupedBarProportional;
-      break;
-    case 16:
-      component = GridPie;
-      break;
-    case 17:
-      component = GridBar;
-      break;
-    case 18:
-      component = GridLine;
-      break;
-    case 19:
-      component = GroupedBar;
-      break;
-    default:
-      return null;
-  }
+  useEffect(() => {
+    if (!props.isEdit) form.setFieldsValue(component?.spec);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [component]);
 
-  return (
+  const { form } = props;
+
+  return !component ? null : (
     <>
       <Collapse className="option-item-collapse">
         {component.properties.map((d, i) => {
+          const PropertiesComponent = PropertiesComponentMap[d.Component];
           return (
             <Panel className="option-item-panel" header={d.name} key={i}>
-              <d.Component properties={d.properties} form={form} />
+              <PropertiesComponent properties={d.properties} form={form} />
             </Panel>
           );
         })}
@@ -120,7 +86,7 @@ function OptionComponent(props) {
           <Tags form={form} />
         </Panel>
         <Panel className="option-item-panel" header={'Categories'} key={'categories'}>
-          <Categories form={form} />
+          <Categories form={form} multiple />
         </Panel>
       </Collapse>
     </>

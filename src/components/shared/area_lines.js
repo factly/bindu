@@ -3,11 +3,25 @@ import { InputNumber, Select, Checkbox, Form } from 'antd';
 
 import _ from 'lodash';
 
-const { Option } = Select;
+export const getInterpolateOptions = async (form, setInterpolateOptions) => {
+  try {
+    const schema = form.getFieldValue('$schema');
+    const res = await fetch(schema);
+    const jsonData = await res.json();
+    setInterpolateOptions(jsonData.definitions.Interpolate.enum);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 function Lines(props) {
   const { form } = props;
   const [enable, setEnable] = React.useState(false);
+  const [interpolateOptions, setInterpolateOptions] = React.useState([]);
+
+  React.useEffect(() => {
+    getInterpolateOptions(props.form, setInterpolateOptions);
+  }, []);
 
   const markObj = props.properties.find((d) => d.prop === 'mark');
 
@@ -33,11 +47,20 @@ function Lines(props) {
       {enable ? (
         <React.Fragment>
           <Form.Item name={[...markObj.path, 'line', 'strokeWidth']} initialValue={4} label="Width">
-            <InputNumber />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+            />
           </Form.Item>
 
           <Form.Item name={[...markObj.path, 'line', 'opacity']} initialValue={1} label="Opacity">
-            <InputNumber min={0} max={1} step={0.05} />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+              min={0}
+              max={1}
+              step={0.05}
+            />
           </Form.Item>
 
           <Form.Item
@@ -46,11 +69,11 @@ function Lines(props) {
             label="Line Curve"
           >
             <Select>
-              <Option value="linear">Linear</Option>
-              <Option value="linear-closed">Linear Closed</Option>
-              <Option value="step">Step</Option>
-              <Option value="basis">Basis</Option>
-              <Option value="monotone">Monotone</Option>
+              {interpolateOptions.map((option) => (
+                <Select.Option key={option} value={option}>
+                  {option}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
 
@@ -59,7 +82,10 @@ function Lines(props) {
             initialValue={0}
             label="Dash Width"
           >
-            <InputNumber />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+            />
           </Form.Item>
         </React.Fragment>
       ) : null}

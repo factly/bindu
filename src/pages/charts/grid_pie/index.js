@@ -31,7 +31,7 @@ export const properties = [
         path: ['background'],
       },
     ],
-    Component: ChartProperties,
+    Component: 'ChartProperties',
   },
   {
     name: 'Colors',
@@ -42,7 +42,7 @@ export const properties = [
         path: ['encoding', 'color', 'scale', 'range'],
       },
     ],
-    Component: Colors,
+    Component: 'Colors',
   },
   {
     name: 'Grid',
@@ -56,7 +56,7 @@ export const properties = [
         path: ['encoding', 'facet', 'spacing'],
       },
     ],
-    Component: Facet,
+    Component: 'Facet',
   },
   {
     name: 'Segment',
@@ -78,7 +78,7 @@ export const properties = [
         path: ['mark', 'outerRadius'],
       },
     ],
-    Component: Segment,
+    Component: 'Segment',
   },
   {
     name: 'Legend',
@@ -104,7 +104,7 @@ export const properties = [
         path: ['encoding', 'color', 'legend', 'orient'],
       },
     ],
-    Component: Legend,
+    Component: 'Legend',
   },
   {
     name: 'Legend Label',
@@ -122,6 +122,6 @@ export const properties = [
         path: ['encoding', 'color', 'legend', 'labelColor'],
       },
     ],
-    Component: LegendLabel,
+    Component: 'LegendLabel',
   },
 ];

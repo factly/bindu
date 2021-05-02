@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { getCategories, addCategory } from '../actions/categories';
 
-function Categories(props) {
+function Categories({ required, multiple, label = '' }) {
   const dispatch = useDispatch();
   const [searchText, setSearchText] = React.useState('');
   const categories = useSelector(({ categories }) => Object.values(categories.details));
@@ -25,49 +25,57 @@ function Categories(props) {
       });
   };
 
+  let rules = [];
+  if (required) {
+    rules = [
+      {
+        required: true,
+        message: 'Please select a category!',
+      },
+    ];
+  }
+
   return (
-    <div className="property-container">
-      <Form.Item name={'categories'}>
-        <Select
-          showSearch
-          mode="multiple"
-          placeholder="select categories"
-          type="text"
-          onSelect={() => setSearchText('')}
-          onSearch={setSearchText}
-          filterOption={(input, option) =>
-            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-          }
-          notFoundContent={
-            searchText.trim() ? (
-              <Button
-                block
-                type="dashed"
-                style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-                onClick={onCreate}
-              >
-                Create {searchText}
-              </Button>
-            ) : (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={'No categories available. Type something to create new category'}
-              />
-            )
-          }
-        >
-          {categories.map((category) => (
-            <Select.Option key={category.id} value={category.id}>
-              {category.name}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
-    </div>
+    <Form.Item label={label} name={'categories'} rules={rules}>
+      <Select
+        showSearch
+        mode={multiple ? 'multiple' : ''}
+        placeholder="select categories"
+        type="text"
+        onSelect={() => setSearchText('')}
+        onSearch={setSearchText}
+        filterOption={(input, option) =>
+          option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        }
+        notFoundContent={
+          searchText.trim() ? (
+            <Button
+              block
+              type="dashed"
+              style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+              onClick={onCreate}
+            >
+              Create {searchText}
+            </Button>
+          ) : (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={'No categories available. Type something to create new category'}
+            />
+          )
+        }
+      >
+        {categories.map((category) => (
+          <Select.Option key={category.id} value={category.id}>
+            {category.name}
+          </Select.Option>
+        ))}
+      </Select>
+    </Form.Item>
   );
 }
 

@@ -8,7 +8,14 @@ function Bars(props) {
   return (
     <div className="property-container">
       <Form.Item name={opacityObj.path} label="Bar Opacity">
-        <InputNumber min={0} max={1} step={0.05} placeholder="Opacity" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={0}
+          max={1}
+          step={0.05}
+          placeholder="Opacity"
+        />
       </Form.Item>
 
       <Form.Item name={cornerRadiusObj.path} label="Corner Radius">

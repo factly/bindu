@@ -10,9 +10,7 @@ import '@uppy/dashboard/dist/style.css';
 import '@uppy/url/dist/style.css';
 
 function UppyUploader({ onUpload }) {
-  const organisationTitle = useSelector(
-    ({ organisation }) => organisation.details[organisation.selected].title,
-  );
+  const spaceTitle = useSelector(({ spaces }) => spaces.details[spaces.selected].slug);
 
   const uppy = Uppy({
     id: 'uppy-media',
@@ -28,7 +26,7 @@ function UppyUploader({ onUpload }) {
           ...files[fileID],
           meta: {
             ...files[fileID].meta,
-            name: `bindu/${organisationTitle}/${new Date().getFullYear()}/${new Date().getMonth()}/${Date.now().toString()}_${
+            name: `bindu/${spaceTitle}/${new Date().getFullYear()}/${new Date().getMonth()}/${Date.now().toString()}_${
               files[fileID].meta.name
             }`,
           },

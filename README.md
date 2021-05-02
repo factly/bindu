@@ -46,3 +46,19 @@ Bindu is a modern open source Data visualization platform built on Vega-Lite
 - Add index.js; specifying the options to customize the chart
 - Add the chart in the redux store: src/reducer/templates.js
 - Add a switch case for the new chart in src/pages/charts/options.js
+
+## Usage Instructions
+
+To run the server locally, you must first install the dependencies and then launch a local web server
+
+1. Install the dependencies:
+
+```
+$ npm install
+```
+
+2. Start the server:
+
+```
+$ npm start
+```

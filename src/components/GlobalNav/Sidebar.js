@@ -33,12 +33,22 @@ function Sidebar() {
         dispatch(toggleSider());
       }}
     >
-      <div className="menu-header">
-        <img alt="logo" className="menu-logo" src={logo} />
-        <span hidden={collapsed} className="menu-company">
-          BINDU
-        </span>
-      </div>
+      <Link to="/">
+        <div className="menu-header" style={{ backgroundColor: '#D4DBE2' }}>
+          <img
+            alt="logo"
+            hidden={!collapsed}
+            className="menu-logo"
+            src={require('../../assets/icon.png')}
+          />
+          <img
+            alt="logo"
+            hidden={collapsed}
+            src={require('../../assets/logo.png')}
+            style={{ width: '60%' }}
+          />
+        </div>
+      </Link>
       <Menu theme="dark" mode="inline" className="slider-menu">
         <Menu.Item key="1" icon={<BarChartOutlined />}>
           <Link to={'/templates'}>Templates</Link>
