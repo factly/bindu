@@ -12,27 +12,63 @@ function Zoom(props) {
   return (
     <div className="property-container">
       <Form.Item name={scaleObj.path} label="Scale">
-        <InputNumber min={50} max={2000} placeholder="scale" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={50}
+          max={2000}
+          placeholder="scale"
+        />
       </Form.Item>
 
       <Form.Item name={rotate0Obj.path} label="Rotate 0">
-        <InputNumber min={-180} max={180} placeholder="rotate0" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={-180}
+          max={180}
+          placeholder="rotate0"
+        />
       </Form.Item>
 
       <Form.Item name={rotate1Obj.path} label="Rotate 1">
-        <InputNumber min={-90} max={90} placeholder="rotate1" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={-90}
+          max={90}
+          placeholder="rotate1"
+        />
       </Form.Item>
 
       <Form.Item name={rotate2Obj.path} label="Rotate 2">
-        <InputNumber min={-90} max={90} placeholder="rotate2" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={-90}
+          max={90}
+          placeholder="rotate2"
+        />
       </Form.Item>
 
       <Form.Item name={center0Obj.path} label="Center 0">
-        <InputNumber min={-180} max={180} placeholder="center0" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={-180}
+          max={180}
+          placeholder="center0"
+        />
       </Form.Item>
 
       <Form.Item name={center1Obj.path} label="Center 1">
-        <InputNumber min={-180} max={180} placeholder="center1" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={-180}
+          max={180}
+          placeholder="center1"
+        />
       </Form.Item>
     </div>
   );

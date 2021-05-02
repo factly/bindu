@@ -12,19 +12,46 @@ function Graticule(props) {
   return (
     <div className="property-container">
       <Form.Item name={longSepObj.path} label="Longitude Separation">
-        <InputNumber min={0} placeholder="Long Sep" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={0}
+          placeholder="Long Sep"
+        />
       </Form.Item>
       <Form.Item name={latSepObj.path} label="Latitude Separation">
-        <InputNumber min={0} placeholder="Lat Sep" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={0}
+          placeholder="Lat Sep"
+        />
       </Form.Item>
       <Form.Item name={widthObj.path} label="Width">
-        <InputNumber min={0} placeholder="width" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={0}
+          placeholder="width"
+        />
       </Form.Item>
       <Form.Item name={strokeDashObj.path} label="Dashed">
-        <InputNumber min={0} placeholder="dash" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={0}
+          placeholder="dash"
+        />
       </Form.Item>
       <Form.Item name={opacityObj.path} label="Opacity">
-        <InputNumber min={0} max={1} step={0.05} placeholder="opacity" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={0}
+          max={1}
+          step={0.05}
+          placeholder="opacity"
+        />
       </Form.Item>
       <Form.Item name={colorObj.path} label="Color">
         <InputNumber type="color" />

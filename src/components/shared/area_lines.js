@@ -47,11 +47,20 @@ function Lines(props) {
       {enable ? (
         <React.Fragment>
           <Form.Item name={[...markObj.path, 'line', 'strokeWidth']} initialValue={4} label="Width">
-            <InputNumber />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+            />
           </Form.Item>
 
           <Form.Item name={[...markObj.path, 'line', 'opacity']} initialValue={1} label="Opacity">
-            <InputNumber min={0} max={1} step={0.05} />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+              min={0}
+              max={1}
+              step={0.05}
+            />
           </Form.Item>
 
           <Form.Item
@@ -73,7 +82,10 @@ function Lines(props) {
             initialValue={0}
             label="Dash Width"
           >
-            <InputNumber />
+            <InputNumber
+              formatter={(value) => parseInt(value) || 0}
+              parser={(value) => parseInt(value) || 0}
+            />
           </Form.Item>
         </React.Fragment>
       ) : null}

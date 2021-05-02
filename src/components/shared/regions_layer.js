@@ -12,7 +12,12 @@ function RegionsLayer(props) {
     <div className="property-container">
       {strokeWidthObj ? (
         <Form.Item name={strokeWidthObj.path} label="Stroke Width">
-          <InputNumber min={0} placeholder="stroke width" />
+          <InputNumber
+            formatter={(value) => parseInt(value) || 0}
+            parser={(value) => parseInt(value) || 0}
+            min={0}
+            placeholder="stroke width"
+          />
         </Form.Item>
       ) : null}
       {strokeObj ? (
@@ -22,7 +27,13 @@ function RegionsLayer(props) {
       ) : null}
       {strokeOpacityObj ? (
         <Form.Item name={strokeOpacityObj.path} label="Stroke Opacity">
-          <InputNumber min={0} max={1} step={0.05} />
+          <InputNumber
+            formatter={(value) => parseInt(value) || 0}
+            parser={(value) => parseInt(value) || 0}
+            min={0}
+            max={1}
+            step={0.05}
+          />
         </Form.Item>
       ) : null}
 

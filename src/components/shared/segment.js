@@ -38,7 +38,15 @@ function Segment(props) {
       </Form.Item>
 
       <Form.Item name={padAngleObj.path} label="Padding Angle">
-        <InputNumber min={0} max={0.5} step="0.025" placeholder="height" type="number" />
+        <InputNumber
+          formatter={(value) => parseInt(value) || 0}
+          parser={(value) => parseInt(value) || 0}
+          min={0}
+          max={0.5}
+          step="0.025"
+          placeholder="height"
+          type="number"
+        />
       </Form.Item>
     </div>
   );
