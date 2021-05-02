@@ -53,17 +53,16 @@ function OptionComponent(props) {
   const dispatch = useDispatch();
 
   let { templateId } = useParams();
-
-  const tID = templateId ? parseInt(templateId, 10) : props.templateId;
-  const component = useSelector(({ templates }) => templates.details[tID]);
+  if (!templateId) templateId = props.templateId;
+  const component = useSelector(({ templates }) => templates.details[templateId]);
 
   useEffect(() => {
-    dispatch(getTemplate(tID));
+    if (templateId) dispatch(getTemplate(parseInt(templateId, 10)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    form.setFieldsValue(component?.spec);
+    if (!props.isEdit) form.setFieldsValue(component?.spec);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [component]);
 

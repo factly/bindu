@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Display from './display.js';
 import ChartOption from './options.js';
 import { saveAs } from 'file-saver';
@@ -23,6 +23,7 @@ import UppyUploader from '../../components/uppy';
 import { b64toBlob } from '../../utils/file';
 import { useParams } from 'react-router';
 import { collapseSider } from '../../actions/settings.js';
+import updateFormData from '../../utils/updateFormData.js';
 
 const IconSize = 20;
 
@@ -70,7 +71,7 @@ function Chart({ data = {}, onSubmit }) {
   const [isDataView, setDataView] = useState(false);
   const [values, setValues] = useState([]);
   const [columns, setColumns] = useState([]);
-
+  const space_slug = useSelector((state) => state.spaces.details[state.spaces.selected]?.slug);
   const splitContainer = React.useRef(null);
 
   const onDataUpload = (dataDetails) => {
@@ -80,6 +81,19 @@ function Chart({ data = {}, onSubmit }) {
     _.unset(values, ['data', 'values']);
     _.set(values, ['data', 'url'], dataDetails.url.raw);
     form.setFieldsValue(values);
+    fetch(dataDetails.url.raw)
+      .then((res) => res.json())
+      .then((newValues) => {
+        const newColumns = Object.keys(newValues[0]).map((d) => {
+          return {
+            title: d,
+            dataIndex: d,
+          };
+        });
+
+        setColumns(newColumns);
+        setValues(newValues);
+      });
   };
 
   React.useEffect(() => {
@@ -129,15 +143,32 @@ function Chart({ data = {}, onSubmit }) {
     // If spec contains values, remove it and push it to minio. Then, set url of that file in spec
     const formData = form.getFieldValue();
     let url = formData.data.url;
+    const path =
+      space_slug +
+      '/' +
+      new Date().getFullYear() +
+      '/' +
+      new Date().getMonth() +
+      '/' +
+      Date.now().toString() +
+      '_';
 
     if (formData.data.values) {
-      // TODO: make a json file out of values
+      // make a json file out of values
       if (formData.data.url) {
-        // TODO: replace file in minio at location `data.url`
+        // replace file in minio at location `data.url`
+
+        url = await updateFormData(
+          formData,
+          formData.data.url.includes('http://localhost:9000/dega/')
+            ? formData.data.url.replace('http://localhost:9000/dega/', '')
+            : path + chartName,
+        );
       } else {
-        // TODO: upload file to minio
+        // upload file to minio
+        url = await updateFormData(formData, path + chartName);
       }
-      // TODO: send uploaded file url in api
+      // send uploaded file url in api
     }
 
     const { tags, categories, ...values } = formData;
@@ -146,11 +177,11 @@ function Chart({ data = {}, onSubmit }) {
     onSubmit({
       title: chartName,
       data_url: url,
-      config: values,
+      config: { ...values, data: { url } },
       featured_medium: imageBlob,
       category_ids: categories,
       tag_ids: tags,
-      template_id: Number(templateId),
+      template_id: data.id ? data.template_id : Number(templateId),
     });
   };
 
@@ -165,11 +196,9 @@ function Chart({ data = {}, onSubmit }) {
       setValues(updatedValues);
 
       let formData = form.getFieldValue();
-      // removing `data.url` from spec so that vega only considers the data that was udpated by user which will be in `data.values`
-      _.unset(formData, ['data', 'url']);
+
       _.set(formData, ['data', 'values'], updatedValues);
       form.setFieldsValue(formData);
-      console.log({ formData });
     } catch (error) {
       console.error(error);
     }
@@ -315,7 +344,7 @@ function Chart({ data = {}, onSubmit }) {
           }}
           split="horizontal"
         >
-          <ChartOption form={form} templateId={data ? data.template_id : 0} />
+          <ChartOption form={form} templateId={data.template_id} isEdit={!!data.id} />
           {/* <div className="extra-options" style={{ padding: '12px' }}>
             <ChartMeta />
           </div> */}
@@ -338,6 +367,7 @@ function Chart({ data = {}, onSubmit }) {
       <Modal
         title="Upload Dataset"
         visible={showModal}
+        onCancel={() => setShowModal(false)}
         onOk={() => setShowModal(false)}
         okText="Done"
       >
