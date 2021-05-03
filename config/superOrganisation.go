@@ -41,6 +41,20 @@ type OrganisationPermission struct {
 	Spaces         int64 `gorm:"column:spaces" json:"spaces"`
 }
 
+// Space model
+type Space struct {
+	Base
+	Name           string `gorm:"column:name" json:"name"`
+	OrganisationID int    `gorm:"column:organisation_id" json:"organisation_id"`
+}
+
+// SpacePermission model
+type SpacePermission struct {
+	Base
+	SpaceID uint  `gorm:"column:space_id" json:"space_id"`
+	Charts  int64 `gorm:"column:charts" json:"charts"`
+}
+
 var ketoPolicyPath string = "/engines/acp/ory/regex/policies"
 
 // CheckSuperOrganisation checks if super organisation is present in kavach or not
@@ -89,7 +103,7 @@ func CheckSuperOrganisation() bool {
 
 // UserConfigPresent checks if user config params is present in config file
 func UserConfigPresent() bool {
-	return viper.IsSet("default_user_email") && viper.IsSet("default_user_password") && viper.GetString("default_user_email") != "" && viper.GetString("default_user_password") != "" && viper.IsSet("super_organisation_title")
+	return viper.IsSet("default_user_email") && viper.IsSet("default_user_password") && viper.GetString("default_user_email") != "" && viper.GetString("default_user_password") != "" && viper.IsSet("super_organisation_title") && viper.IsSet("super_space_name")
 }
 
 // CreateSuperOrganisation creates a super user and organisation in kavach
@@ -155,6 +169,12 @@ func CreateSuperOrganisation() error {
 
 		// create permissions for super organisation
 		err = createSuperOrganisationPermissions(respOrganisation.ID)
+		if err != nil {
+			return err
+		}
+
+		// Create super space
+		err = createSuperSpace(respOrganisation.ID)
 		if err != nil {
 			return err
 		}
@@ -273,6 +293,25 @@ func createSuperOrganisationPermissions(oID uint) error {
 		OrganisationID: oID,
 		Spaces:         -1,
 	}).Error
+}
+
+func createSuperSpace(oID uint) error {
+	space := Space{
+		Name:           viper.GetString("super_space_name"),
+		OrganisationID: int(oID),
+	}
+	err := DB.Model(&Space{}).Create(&space).Error
+	if err != nil {
+		return err
+	}
+
+	if err = DB.Model(&SpacePermission{}).Create(&SpacePermission{
+		SpaceID: space.ID,
+		Charts:  -1,
+	}).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func createKetoPolicy(organisationID uint) (*http.Response, error) {

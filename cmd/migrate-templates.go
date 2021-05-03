@@ -14,6 +14,7 @@ import (
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	minioutil "github.com/factly/bindu-server/util/minio"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/requestx"
 	"github.com/minio/minio-go/v7"
 	"github.com/spf13/cobra"
@@ -23,8 +24,8 @@ import (
 var (
 	TemplatesPath string            = "./templates"
 	headers       map[string]string = map[string]string{
-		"X-Space": viper.GetString("migration_space"),
-		"X-User":  viper.GetString("migration_user"),
+		"X-Space": "0",
+		"X-User":  "0",
 	}
 	BinduURL string = "http://localhost:8000"
 )
@@ -33,14 +34,12 @@ func init() {
 	rootCmd.AddCommand(migrateTemplatesCmd)
 
 	config.SetupVars()
+	config.SetupDB()
 
 	minioutil.SetupClient()
 
 	TemplatesPath = "./templates"
-	headers = map[string]string{
-		"X-Space": fmt.Sprint(viper.GetInt("migration_space")),
-		"X-User":  fmt.Sprint(viper.GetInt("migration_user")),
-	}
+
 	BinduURL = viper.GetString("bindu_url")
 }
 
@@ -48,11 +47,77 @@ var migrateTemplatesCmd = &cobra.Command{
 	Use:   "migrate-templates",
 	Short: "Apply migrations for templates data for bindu-server.",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := MigrateTemplate()
+		spaceID, err := GetSuperOrgSpace()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		userID, err := GetUserID()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		headers = map[string]string{
+			"X-Space": fmt.Sprint(spaceID),
+			"X-User":  userID,
+		}
+
+		err = MigrateTemplate()
 		if err != nil {
 			log.Fatal(err)
 		}
 	},
+}
+
+func GetUserID() (string, error) {
+	kavachUserCheckers := map[string]interface{}{
+		"extra": map[string]interface{}{
+			"identity": map[string]interface{}{
+				"traits": map[string]interface{}{
+					"email": viper.GetString("default_user_email"),
+				},
+			},
+		},
+	}
+
+	resp, err := requestx.Request("POST", viper.GetString("kavach_url")+"/users/checker", kavachUserCheckers, map[string]string{
+		"Content-Type": "application/json",
+	})
+	if err != nil {
+		return "", err
+	}
+
+	var respBody map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&respBody)
+	if err != nil {
+		return "", err
+	}
+
+	headerMap := respBody["header"].(map[string]interface{})
+	userIDArr := headerMap["X-User"].([]interface{})
+	return userIDArr[0].(string), nil
+}
+
+func GetSuperOrgSpace() (uint, error) {
+	soID, err := middlewarex.GetSuperOrganisationID("bindu")
+	if err != nil {
+		return 0, err
+	}
+
+	spaces := make([]model.Space, 0)
+	err = config.DB.Model(&model.Space{}).Where(&model.Space{
+		OrganisationID: soID,
+	}).Find(&spaces).Error
+	if err != nil {
+		return 0, err
+	}
+
+	for _, space := range spaces {
+		if space.Name == viper.GetString("super_space_name") {
+			return space.ID, nil
+		}
+	}
+	return 0, errors.New("cannot get super space")
 }
 
 func MigrateTemplate() error {
@@ -173,7 +238,7 @@ func MigrateTemplate() error {
 }
 
 func CreateMedium(path, chartName, filename string) (uint, error) {
-	info, err := minioutil.Client.FPutObject(context.Background(), "dega", fmt.Sprint("bindu/", chartName), fmt.Sprint(path, "/", filename), minio.PutObjectOptions{})
+	info, err := minioutil.Client.FPutObject(context.Background(), viper.GetString("minio_bucket"), fmt.Sprint("bindu/", chartName), fmt.Sprint(path, "/", filename), minio.PutObjectOptions{})
 	if err != nil {
 		return 0, err
 	}
@@ -181,7 +246,7 @@ func CreateMedium(path, chartName, filename string) (uint, error) {
 	mediumBody := map[string]interface{}{
 		"name": chartName,
 		"url": map[string]interface{}{
-			"raw": fmt.Sprint("http://", viper.GetString("minio_url"), "/dega/bindu/", chartName),
+			"raw": fmt.Sprint("http://", viper.GetString("minio_public_url"), "/", viper.GetString("minio_bucket"), "/bindu/", chartName),
 		},
 		"file_size": info.Size,
 	}
