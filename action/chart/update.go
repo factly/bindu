@@ -98,45 +98,45 @@ func update(w http.ResponseWriter, r *http.Request) {
 		chartSlug = slugx.Approve(&config.DB, slugx.Make(chart.Title), sID, tableName)
 	}
 
-	mediaURL, err := minio.Upload(r, chart.FeaturedMedium)
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
-	mediumJSON := map[string]interface{}{
-		"url": mediaURL,
-	}
-
-	mediumByte, err := json.Marshal(mediumJSON)
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
-	msg := json.RawMessage(mediumByte)
-
-	var msgJSONB postgres.Jsonb
-
-	msgJSONB.RawMessage = msg
-
-	medium := model.Medium{
-		URL:     msgJSONB,
-		SpaceID: uint(sID),
-	}
-
 	tx := config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
+	if chart.FeaturedMediumID == 0 {
+		mediaURL, err := minio.Upload(r, chart.FeaturedMedium)
 
-	err = tx.Model(&model.Medium{}).Create(&medium).Error
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
 
-	if err != nil {
-		tx.Rollback()
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.DBError()))
-		return
+		mediumJSON := map[string]interface{}{
+			"url": mediaURL,
+		}
+
+		mediumByte, err := json.Marshal(mediumJSON)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+
+		msg := json.RawMessage(mediumByte)
+
+		var msgJSONB postgres.Jsonb
+
+		msgJSONB.RawMessage = msg
+
+		medium := model.Medium{
+			URL:     msgJSONB,
+			SpaceID: uint(sID),
+		}
+		err = tx.Model(&model.Medium{}).Create(&medium).Error
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+		chart.FeaturedMediumID = medium.ID
 	}
 
 	newTags := make([]model.Tag, 0)
