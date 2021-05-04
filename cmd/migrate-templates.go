@@ -14,6 +14,7 @@ import (
 	"github.com/factly/bindu-server/model"
 	minioutil "github.com/factly/bindu-server/util/minio"
 	"github.com/factly/x/middlewarex"
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/minio/minio-go/v7"
 	"github.com/spf13/cobra"
@@ -171,21 +172,23 @@ func MigrateTemplate() error {
 				SpaceID: SpaceID,
 			}
 
-			presentTemplate := model.Template{
-				Title:   chart_name,
-				SpaceID: SpaceID,
-			}
-
-			err = config.DB.Model(&model.Template{}).Where(&presentTemplate).First(&presentTemplate).Error
-			if err != nil {
-				// not found any such template
+			migratedID, err := ioutil.ReadFile(fmt.Sprint(filepath, "/migrate.out"))
+			if err != nil || migratedID == nil {
+				// file not found
+				template.ID = strings.ReplaceAll(uuid.New().String(), "-", "")
 				if err = config.DB.Create(&template).Error; err != nil {
 					return err
 				} else {
 					fmt.Println("template " + chart_name + " created")
 				}
+				err = ioutil.WriteFile(fmt.Sprint(filepath, "/migrate.out"), []byte(template.ID), 0777)
+				if err != nil {
+					return err
+				}
 			} else {
-				// found template
+				// already migrated template
+				presentTemplate := model.Template{}
+				presentTemplate.ID = string(migratedID)
 				if err = config.DB.Model(&presentTemplate).Updates(template).Error; err != nil {
 					return err
 				} else {
