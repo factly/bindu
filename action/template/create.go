@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -14,6 +15,7 @@ import (
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -82,6 +84,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Template{
+		ID:         strings.ReplaceAll(uuid.New().String(), "-", ""),
 		Title:      template.Title,
 		Slug:       slugx.Approve(&config.DB, templateSlug, sID, tableName),
 		Spec:       template.Spec,

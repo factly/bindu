@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -32,11 +31,8 @@ import (
 // @Success 200 {object} model.Template
 // @Router /templates/{template_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
-	templateID := chi.URLParam(r, "template_id")
-	id, err := strconv.Atoi(templateID)
-
-	if err != nil {
-		loggerx.Error(err)
+	id := chi.URLParam(r, "template_id")
+	if id == "" {
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
@@ -72,7 +68,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Template{}
-	result.ID = uint(id)
+	result.ID = id
 
 	// check record exists or not
 	err = config.DB.Where(&model.Template{
@@ -116,13 +112,13 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx.Model(&result).Updates(model.Template{
-		Base:       config.Base{UpdatedByID: uint(uID)},
-		Title:      template.Title,
-		Slug:       templateSlug,
-		Spec:       template.Spec,
-		Properties: template.Properties,
-		MediumID:   mediumID,
-		CategoryID: template.CategoryID,
+		UpdatedByID: uint(uID),
+		Title:       template.Title,
+		Slug:        templateSlug,
+		Spec:        template.Spec,
+		Properties:  template.Properties,
+		MediumID:    mediumID,
+		CategoryID:  template.CategoryID,
 	}).Preload("Medium").Preload("Category").First(&result)
 
 	tx.Commit()
