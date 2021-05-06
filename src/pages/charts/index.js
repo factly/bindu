@@ -243,9 +243,7 @@ function Chart({ data = {}, onSubmit }) {
             </div>
           }
         >
-          <Button type="text" style={{ marginBottom: 5 }} onClick={() => setShowOptions(false)}>
-            <SaveOutlined style={{ fontSize: IconSize }} />
-          </Button>
+          <SaveOutlined style={{ fontSize: IconSize }} onClick={() => setShowOptions(false)} />
         </Dropdown>
       ),
     },
@@ -258,9 +256,12 @@ function Chart({ data = {}, onSubmit }) {
     {
       name: isDataView ? 'Chart' : 'Data',
       Component: isDataView ? (
-        <AreaChartOutlined onClick={() => setDataView(!isDataView)} />
+        <AreaChartOutlined
+          style={{ fontSize: IconSize }}
+          onClick={() => setDataView(!isDataView)}
+        />
       ) : (
-        <DatabaseOutlined onClick={() => setDataView(!isDataView)} />
+        <DatabaseOutlined style={{ fontSize: IconSize }} onClick={() => setDataView(!isDataView)} />
       ),
     },
     {
