@@ -13,6 +13,7 @@ function Tags(props) {
 
   React.useEffect(() => {
     dispatch(getTags());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCreate = () => {

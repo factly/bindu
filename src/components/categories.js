@@ -11,6 +11,7 @@ function Categories({ required, multiple, label = '' }) {
 
   React.useEffect(() => {
     dispatch(getCategories());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCreate = () => {

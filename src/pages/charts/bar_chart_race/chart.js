@@ -283,7 +283,7 @@ export default function BarChartRace(ref, chartSettings) {
 
   function renderPlayPauseIcon(status) {
     d3.selectAll('.playback-button path').remove();
-    if (status == 'pause') {
+    if (status === 'pause') {
       d3.select('.playback-button')
         .append('path')
         .attr(
@@ -305,7 +305,7 @@ export default function BarChartRace(ref, chartSettings) {
   }
 
   function toogleStatus() {
-    if (status == 'play') {
+    if (status === 'play') {
       status = 'pause';
       stop();
     } else {

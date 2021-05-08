@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, Form, Input, Select, Space } from 'antd';
+import { Button, Form, Input, Space } from 'antd';
 import { maker, checker } from '../../../utils/slug';
-import ReactJson from 'react-json-view';
 
 import MediaSelector from '../../../components/MediaSelector';
 
@@ -20,17 +19,6 @@ const tailLayout = {
     offset: 5,
     span: 14,
   },
-};
-
-const JSONEditor = ({ value, onChange }) => {
-  return (
-    <ReactJson
-      src={value}
-      onEdit={({ updated_src }) => onChange(updated_src)}
-      onDelete={() => {}}
-      onAdd={() => {}}
-    />
-  );
 };
 
 const jsonChecker = (value) => {

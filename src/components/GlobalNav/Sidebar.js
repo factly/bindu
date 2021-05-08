@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import { toggleSider } from '../../actions/settings';
 
-import logo from '../../assets/logo.svg';
 import {
   TagOutlined,
   BarChartOutlined,

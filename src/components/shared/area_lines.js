@@ -21,6 +21,7 @@ function Lines(props) {
 
   React.useEffect(() => {
     getInterpolateOptions(props.form, setInterpolateOptions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const markObj = props.properties.find((d) => d.prop === 'mark');
