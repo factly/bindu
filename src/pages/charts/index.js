@@ -111,6 +111,7 @@ function Chart({ data = {}, onSubmit }) {
   React.useEffect(() => {
     dispatch(collapseSider());
     onValuesChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template]);
 
   React.useEffect(() => {
@@ -122,10 +123,12 @@ function Chart({ data = {}, onSubmit }) {
       });
       setChartName(data.title);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   React.useEffect(() => {
     setSpec(form.getFieldValue());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getFieldValue()]);
 
   const downloadSampleData = () => {
@@ -399,7 +402,7 @@ function Chart({ data = {}, onSubmit }) {
             x: width,
           }}
         />
-        <SplitPane pane1Style={{ height: '50%', height: 'inherit' }} split="horizontal">
+        <SplitPane pane1Style={{ height: 'inherit' }} split="horizontal">
           {/* <DataComponent /> */}
           <Display spec={spec} setView={setView} />
         </SplitPane>

@@ -7,7 +7,7 @@ import {
   RESET_MEDIA,
   MEDIA_API,
 } from '../constants/media';
-import { addErrorNotification, addSuccessNotification } from './notifications';
+import { addErrorNotification, addSuccessNotification } from './notification';
 
 export const getMedia = (query) => {
   return (dispatch) => {

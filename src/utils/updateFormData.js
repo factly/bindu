@@ -13,7 +13,7 @@ const updateFormData = async (formData, path) => {
 
       const chartFormData = new FormData();
 
-      Object.keys(data.fields).map((key) => {
+      Object.keys(data.fields).forEach((key) => {
         chartFormData.append(key, data.fields[key]);
       });
 

@@ -59,6 +59,7 @@ function Chart({ spec, setView = () => {} }) {
 
   React.useEffect(() => {
     renderChart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spec]);
 
   return <div style={{ height: 'inherit', overflow: 'auto' }} ref={refContainer}></div>;

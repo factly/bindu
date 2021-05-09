@@ -15,6 +15,7 @@ function CreateTemplate() {
 
   React.useEffect(() => {
     dispatch(collapseSider());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCreate = (values) => {

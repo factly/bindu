@@ -22,6 +22,7 @@ function Facet(props) {
 
   React.useEffect(() => {
     getResolveOptions(props.form, setResolveOptions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

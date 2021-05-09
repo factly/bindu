@@ -8,7 +8,7 @@ import {
   UPDATE_SPACE_SUCCESS,
   SPACES_API,
 } from '../constants/spaces';
-import { addErrorNotification, addSuccessNotification } from './notifications';
+import { addErrorNotification, addSuccessNotification } from './notification';
 
 export const getSpaces = () => {
   return (dispatch) => {
