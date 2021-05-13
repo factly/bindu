@@ -1,0 +1,289 @@
+[
+  {
+    "name": "Chart Properties",
+    "properties": [
+      {
+        "prop": "title",
+        "path": [
+          "title"
+        ]
+      },
+      {
+        "prop": "width",
+        "path": [
+          "width"
+        ]
+      },
+      {
+        "prop": "height",
+        "path": [
+          "height"
+        ]
+      },
+      {
+        "prop": "background",
+        "path": [
+          "background"
+        ]
+      }
+    ],
+    "Component": "ChartProperties"
+  },
+  {
+    "name": "Colors",
+    "properties": [
+      {
+        "prop": "color",
+        "type": "string",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "color",
+          "value"
+        ]
+      }
+    ],
+    "Component": "Colors"
+  },
+  {
+    "name": "Bars",
+    "properties": [
+      {
+        "prop": "opacity",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "opacity",
+          "value"
+        ]
+      },
+      {
+        "prop": "corner_radius",
+        "path": [
+          "layer",
+          0,
+          "mark",
+          "cornerRadius"
+        ]
+      }
+    ],
+    "Component": "Bars"
+  },
+  {
+    "name": "X Axis",
+    "properties": [
+      {
+        "prop": "title",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "x",
+          "axis",
+          "title"
+        ]
+      },
+      {
+        "prop": "field",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "x",
+          "field"
+        ]
+      },
+      {
+        "prop": "orient",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "x",
+          "axis",
+          "orient"
+        ]
+      },
+      {
+        "prop": "format",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "x",
+          "axis",
+          "format"
+        ]
+      },
+      {
+        "prop": "label_color",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "x",
+          "axis",
+          "labelColor"
+        ]
+      },
+      {
+        "prop": "type",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "x",
+          "type"
+        ]
+      },
+      {
+        "prop": "aggregate",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "x",
+          "aggregate"
+        ]
+      },
+      {
+        "prop": "sort",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "x",
+          "sort"
+        ]
+      }
+    ],
+    "Component": "XAxis"
+  },
+  {
+    "name": "Y Axis",
+    "properties": [
+      {
+        "prop": "title",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "y",
+          "axis",
+          "title"
+        ]
+      },
+      {
+        "prop": "field",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "y",
+          "field"
+        ]
+      },
+      {
+        "prop": "orient",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "y",
+          "axis",
+          "orient"
+        ]
+      },
+      {
+        "prop": "format",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "y",
+          "axis",
+          "format"
+        ]
+      },
+      {
+        "prop": "label_color",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "y",
+          "axis",
+          "labelColor"
+        ]
+      },
+      {
+        "prop": "type",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "y",
+          "type"
+        ]
+      },
+      {
+        "prop": "aggregate",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "y",
+          "aggregate"
+        ]
+      },
+      {
+        "prop": "sort",
+        "path": [
+          "layer",
+          0,
+          "encoding",
+          "y",
+          "sort"
+        ]
+      }
+    ],
+    "Component": "YAxis"
+  },
+  {
+    "name": "Data Labels",
+    "properties": [
+      {
+        "prop": "color",
+        "path": [
+          "layer",
+          1,
+          "encoding",
+          "color",
+          "value"
+        ]
+      },
+      {
+        "prop": "font_size",
+        "path": [
+          "layer",
+          1,
+          "mark",
+          "fontSize"
+        ]
+      },
+      {
+        "prop": "format",
+        "path": [
+          "layer",
+          1,
+          "encoding",
+          "text",
+          "format"
+        ]
+      }
+    ],
+    "Component": "DataLabels"
+  }
+]

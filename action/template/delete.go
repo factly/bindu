@@ -2,7 +2,6 @@ package template
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -27,11 +26,8 @@ import (
 // @Router  /templates/{template_id} [delete]
 func delete(w http.ResponseWriter, r *http.Request) {
 
-	templateID := chi.URLParam(r, "template_id")
-	id, err := strconv.Atoi(templateID)
-
-	if err != nil {
-		loggerx.Error(err)
+	id := chi.URLParam(r, "template_id")
+	if id != "" {
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
@@ -44,8 +40,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Template{}
-
-	result.ID = uint(id)
+	result.ID = id
 
 	// check record exists or not
 	err = config.DB.Where(&model.Template{

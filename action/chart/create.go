@@ -96,49 +96,50 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	mediaURL, err := minio.Upload(r, chart.FeaturedMedium)
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
-	mediumJSON := map[string]interface{}{
-		"url": mediaURL,
-	}
-
-	mediumByte, err := json.Marshal(mediumJSON)
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
-	msg := json.RawMessage(mediumByte)
-
-	var msgJSONB postgres.Jsonb
-
-	msgJSONB.RawMessage = msg
-
-	medium := model.Medium{
-		Base: config.Base{
-			CreatedByID: uint(uID),
-			UpdatedByID: uint(uID),
-		},
-		URL:     msgJSONB,
-		SpaceID: uint(sID),
-	}
-
 	tx := config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
+	if chart.FeaturedMediumID == 0 {
+		mediaURL, err := minio.Upload(r, chart.FeaturedMedium)
 
-	err = tx.Model(&model.Medium{}).Create(&medium).Error
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
 
-	if err != nil {
-		tx.Rollback()
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.DBError()))
-		return
+		mediumJSON := map[string]interface{}{
+			"url": mediaURL,
+		}
+
+		mediumByte, err := json.Marshal(mediumJSON)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+
+		msg := json.RawMessage(mediumByte)
+
+		var msgJSONB postgres.Jsonb
+
+		msgJSONB.RawMessage = msg
+
+		medium := model.Medium{
+			Base: config.Base{
+				CreatedByID: uint(uID),
+				UpdatedByID: uint(uID),
+			},
+			URL:     msgJSONB,
+			SpaceID: uint(sID),
+		}
+		err = tx.Model(&model.Medium{}).Create(&medium).Error
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+
+		chart.FeaturedMediumID = medium.ID
 	}
 
 	// Get table name
@@ -167,7 +168,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Description:      chart.Description,
 		Status:           chart.Status,
 		IsPublic:         chart.IsPublic,
-		FeaturedMediumID: &medium.ID,
+		FeaturedMediumID: &chart.FeaturedMediumID,
 		ThemeID:          themeID,
 		TemplateID:       chart.TemplateID,
 		PublishedDate:    chart.PublishedDate,

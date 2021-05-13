@@ -2,7 +2,6 @@ package template
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
@@ -32,18 +31,15 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templateID := chi.URLParam(r, "template_id")
-	id, err := strconv.Atoi(templateID)
-
-	if err != nil {
+	id := chi.URLParam(r, "template_id")
+	if id == "" {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
 
 	result := &model.Template{}
-
-	result.ID = uint(id)
+	result.ID = id
 
 	err = config.DB.Model(&model.Template{}).Preload("Medium").Preload("Category").Where(&model.Template{
 		SpaceID: uint(sID),

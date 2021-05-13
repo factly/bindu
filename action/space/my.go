@@ -50,7 +50,7 @@ func my(w http.ResponseWriter, r *http.Request) {
 	for _, organisation := range orgList {
 		spaces := make([]model.Space, 0)
 		for _, space := range allSpaces {
-			if space.OrganisationID == int(space.OrganisationID) {
+			if space.OrganisationID == int(organisation.ID) {
 				spaces = append(spaces, space)
 			}
 		}
