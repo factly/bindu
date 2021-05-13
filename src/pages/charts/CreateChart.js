@@ -15,7 +15,7 @@ function CreateCharts() {
     dispatch(
       addChart({
         ...values,
-        template_id: parseInt(templateId, 10),
+        template_id: templateId,
       }),
     ).then(() => {
       history.push('/charts/saved');

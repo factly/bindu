@@ -4,10 +4,12 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import { getTemplate, updateTemplate } from '../../actions/templates';
 import TemplateForm from './components/TemplateForm';
+import Display from '../charts/display';
 
 function EditTemplate() {
   const history = useHistory();
   const { templateId: id } = useParams();
+  const [spec, setSpec] = React.useState({});
 
   const dispatch = useDispatch();
 
@@ -23,6 +25,10 @@ function EditTemplate() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  React.useEffect(() => {
+    if (template?.spec) setSpec(template.spec);
+  }, [template]);
+
   if (loading) return null;
 
   const onUpdate = (values) => {
@@ -35,8 +41,26 @@ function EditTemplate() {
       history.push('/templates');
     });
   };
-
-  return <TemplateForm data={template} onSubmit={onUpdate} />;
+  const onChange = (values) => {
+    if (values.spec) {
+      try {
+        const spec = JSON.parse(values.spec);
+        setSpec(spec);
+      } catch {
+        console.log('Spec is not JSON');
+      }
+    }
+  };
+  return (
+    <div style={{ display: 'flex', height: '80vh' }}>
+      <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
+        <Display spec={spec} />
+      </div>
+      <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
+        <TemplateForm onSubmit={onUpdate} onChange={onChange} data={template} />
+      </div>
+    </div>
+  );
 }
 
 export default EditTemplate;

@@ -58,7 +58,11 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
     <Form
       {...layout}
       form={form}
-      initialValues={{ ...data }}
+      initialValues={{
+        ...data,
+        spec: data?.spec ? JSON.stringify(data.spec) : '',
+        properties: data?.properties ? JSON.stringify(data.properties) : '',
+      }}
       onValuesChange={onChange}
       name="create-chart"
       onFinish={onFinish}
@@ -102,13 +106,9 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
             required: true,
             message: 'Please add spec!',
           },
-          {
-            pattern: jsonChecker,
-            message: 'Please enter valid json object!',
-          },
         ]}
       >
-        <Input.TextArea />
+        <Input.TextArea autoSize={{ minRows: 15, maxRows: 30 }} />
       </Form.Item>
       <Form.Item
         name="properties"
@@ -120,7 +120,7 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
           },
         ]}
       >
-        <Input.TextArea />
+        <Input.TextArea autoSize={{ minRows: 15, maxRows: 30 }} />
       </Form.Item>
       <Form.Item label="Featured Image" name="medium_id">
         <MediaSelector />

@@ -35,9 +35,9 @@ function UppyUploader({ onUpload }) {
       return updatedFiles;
     },
   })
-    .use(AwsS3, { companionUrl: 'http://127.0.0.1:3020/' })
-    .use(Url, { companionUrl: 'http://127.0.0.1:3020/' })
-    .use(GoogleDrive, { companionUrl: 'http://127.0.0.11:3020' });
+    .use(AwsS3, { companionUrl: window.REACT_APP_COMPANION_URL })
+    .use(Url, { companionUrl: window.REACT_APP_COMPANION_URL })
+    .use(GoogleDrive, { companionUrl: window.REACT_APP_COMPANION_URL });
 
   uppy.on('complete', (result) => {
     const successful = result.successful[0];

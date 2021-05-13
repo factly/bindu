@@ -57,7 +57,7 @@ function OptionComponent(props) {
   const component = useSelector(({ templates }) => templates.details[templateId]);
 
   useEffect(() => {
-    if (templateId) dispatch(getTemplate(parseInt(templateId, 10)));
+    if (templateId && !component) dispatch(getTemplate(templateId));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
