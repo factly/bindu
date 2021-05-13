@@ -196,7 +196,7 @@ function Chart({ data = {}, onSubmit }) {
       featured_medium: imageBlob,
       category_ids: categories,
       tag_ids: tags,
-      template_id: data.id ? data.template_id : Number(templateId),
+      template_id: data.id ? data.template_id : templateId,
       status: e.key,
       is_public: e.key === 'publish',
       published_date: e.key === 'publish' ? new Date() : null,
@@ -217,6 +217,7 @@ function Chart({ data = {}, onSubmit }) {
 
       _.set(formData, ['data', 'values'], updatedValues);
       form.setFieldsValue(formData);
+      setSpec(form.getFieldValue());
     } catch (error) {
       console.error(error);
     }
