@@ -74,7 +74,6 @@ function Chart({ data = {}, onSubmit }) {
   const { templateId } = useParams();
   const [form] = Form.useForm();
 
-  const [spec, setSpec] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [showOptions, setShowOptions] = useState(true);
   const [chartName, setChartName] = useState('Untitled');
@@ -110,7 +109,6 @@ function Chart({ data = {}, onSubmit }) {
 
   React.useEffect(() => {
     dispatch(collapseSider());
-    onValuesChange();
   }, [template]);
 
   React.useEffect(() => {
@@ -123,10 +121,6 @@ function Chart({ data = {}, onSubmit }) {
       setChartName(data.title);
     }
   }, [data]);
-
-  React.useEffect(() => {
-    setSpec(form.getFieldValue());
-  }, [form.getFieldValue()]);
 
   const downloadSampleData = () => {
     const url = form.getFieldValue(['data', 'url']);
@@ -198,10 +192,6 @@ function Chart({ data = {}, onSubmit }) {
       is_public: e.key === 'publish',
       published_date: e.key === 'publish' ? new Date() : null,
     });
-  };
-
-  const onValuesChange = () => {
-    setSpec(form.getFieldValue());
   };
 
   const onDataChange = (rowIndex, columnIndex, newValue) => {
@@ -352,6 +342,7 @@ function Chart({ data = {}, onSubmit }) {
   let SplitView;
   if (isDataView) {
     let headerRow = {};
+    const spec = form.getFieldValue();
     if (spec?.data?.values) {
       const newColumns = Object.keys(spec.data.values[0]).map((d) => {
         headerRow[d] = d;
@@ -401,7 +392,11 @@ function Chart({ data = {}, onSubmit }) {
         />
         <SplitPane pane1Style={{ height: '50%', height: 'inherit' }} split="horizontal">
           {/* <DataComponent /> */}
-          <Display spec={spec} setView={setView} />
+          <Form.Item noStyle shouldUpdate={true}>
+            {(form) => {
+              return <Display form={form} setView={setView} />;
+            }}
+          </Form.Item>
         </SplitPane>
       </SplitPane>
     );
@@ -413,7 +408,11 @@ function Chart({ data = {}, onSubmit }) {
         style={{ height: 'calc(100% - 48px)' }}
         split="vertical"
       >
-        <Display spec={spec} setView={setView} />
+        <Form.Item noStyle shouldUpdate={true}>
+          {(form) => {
+            return <Display form={form} setView={setView} />;
+          }}
+        </Form.Item>
         <SplitPane
           pane1Style={{
             height: 'inherit',
@@ -434,7 +433,7 @@ function Chart({ data = {}, onSubmit }) {
 
   return (
     <>
-      <Form form={form} layout="horizontal" onValuesChange={onValuesChange}>
+      <Form form={form} layout="horizontal">
         <Card
           title={<TitleComponent chartName={chartName} setChartName={setChartName} />}
           extra={actionsList}
