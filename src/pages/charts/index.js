@@ -83,7 +83,9 @@ function Chart({ data = {}, onSubmit }) {
   const [columns, setColumns] = useState([]);
   const space_slug = useSelector((state) => state.spaces.details[state.spaces.selected]?.slug);
   const template = useSelector(({ templates }) => templates.details[templateId]);
-  const splitContainer = React.useRef(null);
+  const dataViewContainer = React.useRef(null);
+  const displayRef = React.useRef(null);
+  const containerRef = React.useRef(null);
 
   const onDataUpload = (dataDetails) => {
     let values = form.getFieldValue();
@@ -339,13 +341,10 @@ function Chart({ data = {}, onSubmit }) {
     </div>
   );
 
-  let SplitView;
-  if (isDataView) {
-    let headerRow = {};
+  if (isDataView && !(values.length && columns.length)) {
     const spec = form.getFieldValue();
     if (spec?.data?.values) {
       const newColumns = Object.keys(spec.data.values[0]).map((d) => {
-        headerRow[d] = d;
         return {
           title: d,
           dataIndex: d,
@@ -360,7 +359,6 @@ function Chart({ data = {}, onSubmit }) {
         .then((res) => res.json())
         .then((newValues) => {
           const newColumns = Object.keys(newValues[0]).map((d) => {
-            headerRow[d] = d;
             return {
               title: d,
               dataIndex: d,
@@ -371,77 +369,47 @@ function Chart({ data = {}, onSubmit }) {
           if (!values.length) setValues(newValues);
         });
     }
-
-    const { width, height } = splitContainer.current.pane1.getBoundingClientRect();
-
-    SplitView = (
-      <SplitPane
-        ref={splitContainer}
-        pane1Style={{ width: '70%' }}
-        style={{ height: 'calc(100% - 48px)' }}
-        split="vertical"
-      >
-        <DataViewer
-          columns={columns}
-          dataSource={values}
-          onDataChange={onDataChange}
-          scroll={{
-            y: height - 55,
-            x: width,
-          }}
-        />
-        <SplitPane pane1Style={{ height: '50%', height: 'inherit' }} split="horizontal">
-          {/* <DataComponent /> */}
-          <Form.Item noStyle shouldUpdate={true}>
-            {(form) => {
-              return <Display form={form} setView={setView} />;
-            }}
-          </Form.Item>
-        </SplitPane>
-      </SplitPane>
-    );
-  } else {
-    SplitView = (
-      <SplitPane
-        ref={splitContainer}
-        pane1Style={{ width: showOptions ? '70%' : '100%', height: 'inherit' }}
-        style={{ height: 'calc(100% - 48px)' }}
-        split="vertical"
-      >
-        <Form.Item noStyle shouldUpdate={true}>
-          {(form) => {
-            return <Display form={form} setView={setView} />;
-          }}
-        </Form.Item>
-        <SplitPane
-          pane1Style={{
-            height: 'inherit',
-            overflow: 'auto',
-            flexDirection: 'column',
-            right: showOptions ? '0' : '-400px',
-          }}
-          split="horizontal"
-        >
-          <ChartOption form={form} templateId={data.template_id} isEdit={!!data.id} />
-          {/* <div className="extra-options" style={{ padding: '12px' }}>
-            <ChartMeta />
-          </div> */}
-        </SplitPane>
-      </SplitPane>
-    );
   }
+
+  const { width: containerWidth = 0, height: containerHeight = 0 } =
+    containerRef?.current?.getBoundingClientRect() || {};
+  const { width: displayWidth = 0, height: displayHeight = 0 } =
+    displayRef?.current?.getBoundingClientRect() || {};
 
   return (
     <>
-      <Form form={form} layout="horizontal">
-        <Card
-          title={<TitleComponent chartName={chartName} setChartName={setChartName} />}
-          extra={actionsList}
-          bodyStyle={{ overflow: 'auto', display: 'flex', padding: '0px', height: '80vh' }}
-        >
-          {SplitView}
-        </Card>
-      </Form>
+      <div ref={containerRef} className="chart-area-container">
+        <Form form={form} layout="horizontal">
+          <Card
+            title={<TitleComponent chartName={chartName} setChartName={setChartName} />}
+            extra={actionsList}
+            bodyStyle={{ overflow: 'auto', display: 'flex', padding: '0px', height: '80vh' }}
+          >
+            <div className="display-container" ref={displayRef}>
+              <Form.Item noStyle shouldUpdate={true}>
+                {(form) => {
+                  return <Display form={form} setView={setView} />;
+                }}
+              </Form.Item>
+            </div>
+
+            {isDataView ? (
+              <div ref={dataViewContainer} className="data-view-container">
+                <DataViewer
+                  columns={columns}
+                  dataSource={values}
+                  onDataChange={onDataChange}
+                  scroll={{ x: containerWidth - displayWidth + 100, y: displayHeight - 40 }}
+                />
+              </div>
+            ) : (
+              <div className="option-container">
+                <ChartOption form={form} templateId={data.template_id} isEdit={!!data.id} />
+              </div>
+            )}
+          </Card>
+        </Form>
+      </div>
       <Modal
         title="Upload Dataset"
         visible={showModal}
