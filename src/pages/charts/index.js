@@ -17,6 +17,7 @@ import {
   Menu,
   Popover,
   Typography,
+  List,
 } from 'antd';
 import {
   SaveOutlined,
@@ -73,6 +74,9 @@ function Chart({ data = {}, onSubmit }) {
   const { templateId } = useParams();
   const [form] = Form.useForm();
 
+  const [uploadDataFile, setUploadDataFile] = useState('');
+  const [showUploadDataModal, setShowUploadDataModal] = useState(false);
+  const [showSampleDataModal, setShowSampleDataModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showOptions, setShowOptions] = useState(true);
   const [chartName, setChartName] = useState('Untitled');
@@ -86,9 +90,10 @@ function Chart({ data = {}, onSubmit }) {
   const displayRef = React.useRef(null);
   const containerRef = React.useRef(null);
 
-  const onDataUpload = (dataDetails) => {
-    let values = form.getFieldValue();
+  const spec = form.getFieldValue();
 
+  const handleVegaLiteUpload = (dataDetails) => {
+    let values = form.getFieldValue();
     // Keep only one of values and url. If url exists, then remove values.
     _.unset(values, ['data', 'values']);
     _.set(values, ['data', 'url'], dataDetails.url.raw);
@@ -108,6 +113,33 @@ function Chart({ data = {}, onSubmit }) {
       });
   };
 
+  const handleVegaUpload = (dataDetails) => {
+    let values = form.getFieldValue();
+    const dataObjIndex = values.data.findIndex((dataObj) => dataObj.name === uploadDataFile);
+    if (dataObjIndex === -1) return;
+    _.unset(values, ['data', dataObjIndex, 'values']);
+    _.set(values, ['data', dataObjIndex, 'url'], dataDetails.url.raw);
+    form.setFieldsValue(values);
+    setUploadDataFile('');
+  };
+
+  const onDataUpload = (dataDetails) => {
+    let values = form.getFieldValue();
+    switch (values.mode) {
+      case 'vega': {
+        handleVegaUpload(dataDetails);
+        return;
+      }
+      case 'vega-lite': {
+        handleVegaLiteUpload(dataDetails);
+        return;
+      }
+      default: {
+        return;
+      }
+    }
+  };
+
   React.useEffect(() => {
     dispatch(collapseSider());
   }, [template]);
@@ -124,15 +156,48 @@ function Chart({ data = {}, onSubmit }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  const downloadSampleData = () => {
-    const url = form.getFieldValue(['data', 'url']);
-    const values = form.getFieldValue(['data', 'values']);
+  const saveFileFromUrl = (url) => {
+    saveAs(url, url.split('/').pop());
+  };
+
+  const saveFileFromValues = (values) => {
+    const blob = new Blob([JSON.stringify(values)], {
+      type: 'application/json;charset=utf-8',
+    });
+    saveAs(blob, 'sample.json');
+  };
+
+  const downloadData = (data) => {
+    const url = data.url;
+    const values = data.values;
     if (url) {
-      saveAs(url, url.split('/').pop());
+      saveFileFromUrl(url);
     } else if (values) {
-      const blob = new Blob([JSON.stringify(values)], { type: 'application/json;charset=utf-8' });
-      saveAs(blob, 'sample.json');
+      saveFileFromValues(values);
     }
+  };
+
+  const downloadSampleData = () => {
+    const spec = form.getFieldValue();
+    switch (spec.mode) {
+      case 'vega': {
+        setShowSampleDataModal(true);
+        return;
+      }
+      case 'vega-lite': {
+        const data = form.getFieldValue('data');
+        downloadData(data);
+        return;
+      }
+      default: {
+        return;
+      }
+    }
+  };
+
+  const uploadData = (name) => {
+    setUploadDataFile(name);
+    setShowModal(true);
   };
 
   const downloadImage = async (e) => {
@@ -211,6 +276,22 @@ function Chart({ data = {}, onSubmit }) {
     }
   };
 
+  const handleUploadDataClick = () => {
+    switch (spec.mode) {
+      case 'vega': {
+        setShowUploadDataModal(true);
+        return;
+      }
+      case 'vega-lite': {
+        setShowModal(true);
+        return;
+      }
+      default: {
+        return;
+      }
+    }
+  };
+
   const IconSize = 20;
   let actions = [
     {
@@ -241,9 +322,7 @@ function Chart({ data = {}, onSubmit }) {
     },
     {
       name: 'Upload',
-      Component: (
-        <UploadOutlined style={{ fontSize: IconSize }} onClick={() => setShowModal(true)} />
-      ),
+      Component: <UploadOutlined style={{ fontSize: IconSize }} onClick={handleUploadDataClick} />,
     },
     {
       name: isDataView ? 'Chart' : 'Data',
@@ -419,6 +498,46 @@ function Chart({ data = {}, onSubmit }) {
       >
         <UppyUploader onUpload={onDataUpload} />
       </Modal>
+      {spec.mode === 'vega' && (
+        <Modal
+          title="Download Sample Data"
+          visible={showSampleDataModal}
+          onCancel={() => setShowSampleDataModal(false)}
+          onOk={() => setShowSampleDataModal(false)}
+          okText="Done"
+        >
+          <List
+            size="large"
+            bordered
+            dataSource={spec.data?.filter((dataObj) => dataObj.url || dataObj.values)}
+            renderItem={(dataObj) => (
+              <List.Item actions={[<a onClick={() => downloadData(dataObj)}>Download</a>]}>
+                {dataObj.name}
+              </List.Item>
+            )}
+          />
+        </Modal>
+      )}
+      {spec.mode === 'vega' && (
+        <Modal
+          title="Download Sample Data"
+          visible={showUploadDataModal}
+          onCancel={() => setShowUploadDataModal(false)}
+          onOk={() => setShowUploadDataModal(false)}
+          okText="Done"
+        >
+          <List
+            size="large"
+            bordered
+            dataSource={spec.data?.filter((dataObj) => dataObj.url || dataObj.values)}
+            renderItem={(dataObj) => (
+              <List.Item actions={[<a onClick={() => uploadData(dataObj.name)}>Upload</a>]}>
+                {dataObj.name}
+              </List.Item>
+            )}
+          />
+        </Modal>
+      )}
     </>
   );
 }
