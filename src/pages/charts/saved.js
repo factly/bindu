@@ -15,7 +15,9 @@ function SavedCharts() {
 
   React.useEffect(() => {
     dispatch(getCharts());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return loading ? null : (
     <List
       grid={{ gutter: 16, column: 5 }}

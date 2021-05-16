@@ -104,6 +104,7 @@ function Axis(props) {
     getSortOrderOptions(props.form, setSortOrderOptions);
     getTypeOptions(props.form, setTypeOptions);
     getTimeUnitOptions(props.form, setTimeUnitOptions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const titleObj = props.properties.find((d) => d.prop === 'title');

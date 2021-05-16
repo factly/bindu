@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, Form, Input, Select, Space } from 'antd';
+import { Button, Form, Input, Space } from 'antd';
 import { maker, checker } from '../../../utils/slug';
-import ReactJson from 'react-json-view';
 
 import MediaSelector from '../../../components/MediaSelector';
 
@@ -20,17 +19,6 @@ const tailLayout = {
     offset: 5,
     span: 14,
   },
-};
-
-const JSONEditor = ({ value, onChange }) => {
-  return (
-    <ReactJson
-      src={value}
-      onEdit={({ updated_src }) => onChange(updated_src)}
-      onDelete={() => {}}
-      onAdd={() => {}}
-    />
-  );
 };
 
 const jsonChecker = (value) => {
@@ -70,7 +58,11 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
     <Form
       {...layout}
       form={form}
-      initialValues={{ ...data }}
+      initialValues={{
+        ...data,
+        spec: data?.spec ? JSON.stringify(data.spec) : '',
+        properties: data?.properties ? JSON.stringify(data.properties) : '',
+      }}
       onValuesChange={onChange}
       name="create-chart"
       onFinish={onFinish}
@@ -114,13 +106,9 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
             required: true,
             message: 'Please add spec!',
           },
-          {
-            pattern: jsonChecker,
-            message: 'Please enter valid json object!',
-          },
         ]}
       >
-        <Input.TextArea />
+        <Input.TextArea autoSize={{ minRows: 15, maxRows: 30 }} />
       </Form.Item>
       <Form.Item
         name="properties"
@@ -132,7 +120,7 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
           },
         ]}
       >
-        <Input.TextArea />
+        <Input.TextArea autoSize={{ minRows: 15, maxRows: 30 }} />
       </Form.Item>
       <Form.Item label="Featured Image" name="medium_id">
         <MediaSelector />

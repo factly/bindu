@@ -15,19 +15,7 @@ function BasicLayout(props) {
 
   const dispatch = useDispatch();
 
-  const { permission, orgs, loading, selected } = useSelector((state) => {
-    const { selected, orgs, loading } = state.spaces;
-
-    if (selected > 0) {
-      return {
-        permission: state.spaces.details[selected].permissions || [],
-        orgs: orgs,
-        loading: loading,
-        selected: selected,
-      };
-    }
-    return { orgs: orgs, loading: loading, permission: [], selected: selected };
-  });
+  const selected = useSelector(({ spaces }) => spaces.selected);
 
   const { type, message, description } = useSelector((state) => state.notifications);
 

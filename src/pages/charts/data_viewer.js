@@ -3,11 +3,10 @@ import './data_viewer.css';
 import { VariableSizeGrid as Grid } from 'react-window';
 import classNames from 'classnames';
 import { Button, Input, InputNumber, Table } from 'antd';
-import { useDispatch } from 'react-redux';
 
 function DataViewer(props) {
   const { columns, scroll, onDataChange } = props;
-  const [tableWidth, setTableWidth] = useState(scroll.x);
+  const tableWidth = scroll.x;
   const [isEditable, setIsEditable] = useState(false);
   const mergedColumns = columns.map((column) => {
     if (column.width) {
@@ -21,7 +20,6 @@ function DataViewer(props) {
   });
 
   const gridRef = useRef();
-  const dispatch = useDispatch();
 
   const [connectObject] = useState(() => {
     const obj = {};
