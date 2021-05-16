@@ -5,7 +5,6 @@ import ChartOption from './options.js';
 import { saveAs } from 'file-saver';
 import './index.css';
 import _ from 'lodash';
-import SplitPane from 'react-split-pane';
 
 import {
   Card,
@@ -207,7 +206,6 @@ function Chart({ data = {}, onSubmit }) {
 
       _.set(formData, ['data', 'values'], updatedValues);
       form.setFieldsValue(formData);
-      setSpec(form.getFieldValue());
     } catch (error) {
       console.error(error);
     }
