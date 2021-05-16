@@ -19,6 +19,7 @@
   overflow: auto;
   /* min-width: 800px; */
   width: 60%;
+  height: 100%;
 }
 
 .option-container {
