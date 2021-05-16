@@ -9,7 +9,8 @@ RUN go mod download
 RUN go get github.com/githubnemo/CompileDaemon
 
 # Following lines provides ability to add WAIT_HOSTS in docker-compose to wait for other hosts to start
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait /wait
+# All configuration options are available here: https://github.com/ufoscout/docker-compose-wait#additional-configuration-options
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
 RUN chmod +x /wait
 
 ENTRYPOINT /wait && CompileDaemon -exclude-dir=.git -exclude-dir=docs --build="go build main.go" --command="./main serve"
