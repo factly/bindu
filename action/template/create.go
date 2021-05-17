@@ -11,6 +11,7 @@ import (
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/slugx"
@@ -94,13 +95,42 @@ func create(w http.ResponseWriter, r *http.Request) {
 		CategoryID: template.CategoryID,
 	}
 
-	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Template{}).Preload("Medium").Preload("Category").Create(&result).Error
-
+	tx := config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
+	err = tx.Model(&model.Template{}).Preload("Medium").Preload("Category").Create(&result).Error
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 
+	if err = AddToMeili(result); err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
 	renderx.JSON(w, http.StatusCreated, result)
+}
+
+func AddToMeili(result *model.Template) error {
+	// Insert into meili index
+	meiliObj := map[string]interface{}{
+		"id":          result.ID,
+		"kind":        "template",
+		"title":       result.Title,
+		"slug":        result.Slug,
+		"category_id": result.CategoryID,
+		"medium_id":   result.MediumID,
+		"is_default":  result.IsDefault,
+		"space_id":    result.SpaceID,
+	}
+
+	err := meilisearchx.AddDocument("bindu", meiliObj)
+	if err != nil {
+		return err
+	}
+	return err
 }

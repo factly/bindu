@@ -3412,9 +3412,6 @@ var doc = `{
                 "is_public": {
                     "type": "boolean"
                 },
-                "organisation_id": {
-                    "type": "integer"
-                },
                 "published_date": {
                     "type": "string"
                 },
@@ -3431,7 +3428,7 @@ var doc = `{
                     }
                 },
                 "template_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "theme_id": {
                     "type": "integer"
@@ -3616,7 +3613,7 @@ var doc = `{
                     "$ref": "#/definitions/model.Template"
                 },
                 "template_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "theme": {
                     "$ref": "#/definitions/model.Theme"
@@ -4060,7 +4057,10 @@ var doc = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
+                },
+                "is_default": {
+                    "type": "boolean"
                 },
                 "medium": {
                     "$ref": "#/definitions/model.Medium"
@@ -4234,6 +4234,41 @@ var doc = `{
                 }
             }
         },
+        "organisation.orgWithPermissions": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "permission": {
+                    "$ref": "#/definitions/model.OrganisationPermission"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "organisation.organisationPermission": {
             "type": "object",
             "required": [
@@ -4275,7 +4310,7 @@ var doc = `{
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Organisation"
+                        "$ref": "#/definitions/organisation.orgWithPermissions"
                     }
                 },
                 "total": {

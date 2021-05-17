@@ -9,6 +9,7 @@ import (
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/slugx"
@@ -127,7 +128,34 @@ func update(w http.ResponseWriter, r *http.Request) {
 		CategoryID:  template.CategoryID,
 	}).Preload("Medium").Preload("Category").First(&result)
 
+	if err = UpdateInMeili(result); err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
 	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, result)
+}
+
+func UpdateInMeili(result *model.Template) error {
+	// Insert into meili index
+	meiliObj := map[string]interface{}{
+		"id":          result.ID,
+		"kind":        "template",
+		"title":       result.Title,
+		"slug":        result.Slug,
+		"category_id": result.CategoryID,
+		"medium_id":   result.MediumID,
+		"is_default":  result.IsDefault,
+		"space_id":    result.SpaceID,
+	}
+
+	err := meilisearchx.UpdateDocument("bindu", meiliObj)
+	if err != nil {
+		return err
+	}
+	return err
 }

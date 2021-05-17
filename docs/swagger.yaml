@@ -38,8 +38,6 @@ definitions:
         type: integer
       is_public:
         type: boolean
-      organisation_id:
-        type: integer
       published_date:
         type: string
       slug:
@@ -51,7 +49,7 @@ definitions:
           type: integer
         type: array
       template_id:
-        type: integer
+        type: string
       theme_id:
         type: integer
       title:
@@ -175,7 +173,7 @@ definitions:
       template:
         $ref: '#/definitions/model.Template'
       template_id:
-        type: integer
+        type: string
       theme:
         $ref: '#/definitions/model.Theme'
       theme_id:
@@ -467,7 +465,9 @@ definitions:
       deleted_at:
         type: string
       id:
-        type: integer
+        type: string
+      is_default:
+        type: boolean
       medium:
         $ref: '#/definitions/model.Medium'
       medium_id:
@@ -581,6 +581,29 @@ definitions:
       updated_by_id:
         type: integer
     type: object
+  organisation.orgWithPermissions:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      permission:
+        $ref: '#/definitions/model.OrganisationPermission'
+      slug:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+    type: object
   organisation.organisationPermission:
     properties:
       organisation_id:
@@ -608,7 +631,7 @@ definitions:
     properties:
       nodes:
         items:
-          $ref: '#/definitions/model.Organisation'
+          $ref: '#/definitions/organisation.orgWithPermissions'
         type: array
       total:
         type: integer
