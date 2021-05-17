@@ -186,13 +186,28 @@ func MigrateTemplate() error {
 					return err
 				}
 			} else {
-				// already migrated template
+				// file found
 				presentTemplate := model.Template{}
 				presentTemplate.ID = string(migratedID)
-				if err = config.DB.Model(&presentTemplate).Updates(template).Error; err != nil {
-					return err
-				} else {
-					fmt.Println("template " + chart_name + " updated")
+
+				if err = config.DB.Model(&presentTemplate).Where(&presentTemplate).First(&model.Template{}).Error; err == nil {
+					// template found
+					if err = config.DB.Model(&presentTemplate).Updates(template).Error; err != nil {
+						return err
+					} else {
+						fmt.Println("template " + chart_name + " updated")
+					}
+				} else { // template not found
+					template.ID = strings.ReplaceAll(uuid.New().String(), "-", "")
+					if err = config.DB.Create(&template).Error; err != nil {
+						return err
+					} else {
+						fmt.Println("template " + chart_name + " created")
+					}
+					err = ioutil.WriteFile(fmt.Sprint(filepath, "/migrate.out"), []byte(template.ID), 0777)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}

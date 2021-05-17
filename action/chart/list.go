@@ -44,7 +44,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	config.DB.Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").Model(&model.Chart{}).Where(&model.Chart{
+	config.DB.Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").Preload("Template").Model(&model.Chart{}).Where(&model.Chart{
 		SpaceID: uint(sID),
 	}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes)
 
