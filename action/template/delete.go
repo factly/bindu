@@ -53,6 +53,12 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if result.IsDefault {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot delete default template", http.StatusUnprocessableEntity)))
+		return
+	}
+
 	config.DB.Delete(&result)
 
 	renderx.JSON(w, http.StatusOK, nil)

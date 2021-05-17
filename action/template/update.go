@@ -81,6 +81,12 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if result.IsDefault {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot edit default template", http.StatusUnprocessableEntity)))
+		return
+	}
+
 	tx := config.DB.Begin()
 
 	mediumID := &template.MediumID
