@@ -28,6 +28,7 @@ func Router() chi.Router {
 	app := "bindu"
 
 	r.Get("/", list)
+	r.Get("/search", search)
 	r.With(middlewarex.CheckSuperOrganisation(app, util.GetOrganisation)).Post("/", create)
 
 	r.Route("/{template_id}", func(r chi.Router) {

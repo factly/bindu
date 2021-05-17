@@ -37,7 +37,7 @@ var serveCmd = &cobra.Command{
 		// db setup
 		config.SetupDB()
 
-		meilisearchx.SetupMeiliSearch("bindu", []string{"title", "slug", "description", "tags", "categories"})
+		meilisearchx.SetupMeiliSearch("bindu", []string{"title", "slug", "description", "tags", "categories", "status"})
 
 		// register routes
 		r := action.RegisterRoutes()
