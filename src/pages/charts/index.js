@@ -212,10 +212,9 @@ function Chart({ data = {}, onSubmit }) {
     saveAs(blob, `${chartName}.${ext}`);
   };
 
-  const saveChart = async (e) => {
+  const constructData = async (data) => {
     // If spec contains values, remove it and push it to minio. Then, set url of that file in spec
-    const formData = form.getFieldValue();
-    let url = formData.data.url;
+    let url = data.url;
     const path =
       space_slug +
       '/' +
@@ -226,31 +225,72 @@ function Chart({ data = {}, onSubmit }) {
       Date.now().toString() +
       '_';
 
-    if (formData.data.values) {
+    if (data.values) {
       // make a json file out of values
-      if (formData.data.url) {
+      if (data.url) {
         // replace file in minio at location `data.url`
 
         url = await updateFormData(
-          formData,
-          formData.data.url.includes('http://localhost:9000/dega/')
-            ? formData.data.url.replace('http://localhost:9000/dega/', '')
+          data,
+          data.url.includes('http://localhost:9000/dega/')
+            ? data.url.replace('http://localhost:9000/dega/', '')
             : path + chartName,
         );
       } else {
         // upload file to minio
-        url = await updateFormData(formData, path + chartName);
+        url = await updateFormData(data, path + chartName);
       }
       // send uploaded file url in api
     }
+    _.set(data, 'url', url);
+    _.unset(data, 'values');
+    return data;
+  };
 
+  const constructDataForVega = async (data) => {
+    return await Promise.all(
+      data.map(async (dataObj) => {
+        if (!(dataObj.url || dataObj.values)) return dataObj;
+        return await constructData(dataObj);
+      }),
+    );
+  };
+
+  const constructDataForVegaLite = async (data) => {
+    return await constructData(data);
+  };
+
+  const handleSaveChart = async (e) => {
+    const spec = form.getFieldValue();
+    const data = form.getFieldValue('data');
+    let updatedData = data;
+    switch (spec.mode) {
+      case 'vega': {
+        updatedData = await constructDataForVega(data);
+        break;
+      }
+      case 'vega-lite': {
+        updatedData = await constructDataForVegaLite(data);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    console.log('handleSaveChart', { spec, updatedData });
+    _.set(spec, ['data'], updatedData);
+    saveChart(e, spec);
+  };
+
+  const saveChart = async (e, formData) => {
     const { tags, categories, ...values } = formData;
     const imageBlob = await view?.toImageURL('png', 1);
+    // const svg = await view.toSVG();
 
     onSubmit({
       title: chartName,
-      data_url: url,
-      config: { ...values, data: { url } },
+      data_url: '', // TODO: handle this for vega and vega-lite
+      config: { ...values },
       featured_medium: imageBlob,
       category_ids: categories,
       tag_ids: tags,
@@ -309,7 +349,7 @@ function Chart({ data = {}, onSubmit }) {
         <Dropdown
           overlay={
             <div style={{ boxShadow: '0px 0px 6px 1px #999' }}>
-              <Menu onClick={saveChart}>
+              <Menu onClick={handleSaveChart}>
                 <Menu.Item key="draft">Draft</Menu.Item>
                 <Menu.Item key="publish">Publish</Menu.Item>
               </Menu>
