@@ -18,6 +18,7 @@ import {
   Popover,
   Typography,
   List,
+  Tabs,
 } from 'antd';
 import {
   SaveOutlined,
@@ -460,33 +461,66 @@ function Chart({ data = {}, onSubmit }) {
     </div>
   );
 
-  if (isDataView && !(values.length && columns.length)) {
-    const spec = form.getFieldValue();
-    if (spec?.data?.values) {
-      const newColumns = Object.keys(spec.data.values[0]).map((d) => {
+  const getData = async (data) => {
+    if (data?.values) {
+      const newColumns = Object.keys(data.values[0]).map((d) => {
         return {
           title: d,
           dataIndex: d,
         };
       });
 
-      if (!columns.length) setColumns(newColumns);
-      if (!values.length) setValues(spec.data.values);
-    } else if (spec?.data?.url) {
-      const url = spec.data.url;
-      fetch(url)
-        .then((res) => res.json())
-        .then((newValues) => {
-          const newColumns = Object.keys(newValues[0]).map((d) => {
-            return {
-              title: d,
-              dataIndex: d,
-            };
-          });
+      return [newColumns, data.values];
+    } else if (data?.url) {
+      const url = data.url;
+      const res = await fetch(url);
+      const newValues = await res.json();
 
-          if (!columns.length) setColumns(newColumns);
-          if (!values.length) setValues(newValues);
-        });
+      const newColumns = Object.keys(newValues[0]).map((d) => {
+        return {
+          title: d,
+          dataIndex: d,
+        };
+      });
+
+      return [newColumns, newValues];
+    } else {
+      return [[], []];
+    }
+  };
+
+  const setDataForVegaLite = async (data) => {
+    const [newColumns, newValues] = await getData(data);
+    if (!columns.length) setColumns(newColumns);
+    if (!values.length) setValues(newValues);
+  };
+
+  const setDataForVega = async (data) => {
+    const promises = data
+      ?.filter((dataObj) => dataObj.url || dataObj.values)
+      .map(async (dataObj) => {
+        const [newColumns, newValues] = await getData(dataObj);
+        setValues([...values, newValues]);
+        setColumns([...columns, newColumns]);
+      });
+    await Promise.all(promises);
+    return;
+  };
+
+  if (isDataView && !(values.length && columns.length)) {
+    const spec = form.getFieldValue();
+    switch (spec.mode) {
+      case 'vega': {
+        setDataForVega(spec.data);
+        break;
+      }
+      case 'vega-lite': {
+        setDataForVegaLite(spec.data);
+        break;
+      }
+      default: {
+        break;
+      }
     }
   }
 
@@ -514,12 +548,32 @@ function Chart({ data = {}, onSubmit }) {
 
             {isDataView ? (
               <div ref={dataViewContainer} className="data-view-container">
-                <DataViewer
-                  columns={columns}
-                  dataSource={values}
-                  onDataChange={onDataChange}
-                  scroll={{ x: containerWidth - displayWidth + 100, y: displayHeight - 40 }}
-                />
+                {spec.mode === 'vega' ? (
+                  <Tabs tabPosition={'left'}>
+                    {spec.data
+                      ?.filter((dataObj) => dataObj.url || dataObj.values)
+                      .map((dataObj, index) => (
+                        <Tabs.TabPane tab={dataObj.name} key={index}>
+                          <DataViewer
+                            columns={columns[index] || []}
+                            dataSource={values[index] || []}
+                            onDataChange={onDataChange}
+                            scroll={{
+                              x: containerWidth - displayWidth,
+                              y: displayHeight - 40,
+                            }}
+                          />
+                        </Tabs.TabPane>
+                      ))}
+                  </Tabs>
+                ) : (
+                  <DataViewer
+                    columns={columns}
+                    dataSource={values}
+                    onDataChange={onDataChange}
+                    scroll={{ x: containerWidth - displayWidth + 100, y: displayHeight - 40 }}
+                  />
+                )}
               </div>
             ) : (
               <div className="option-container">
