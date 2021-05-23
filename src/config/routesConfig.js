@@ -14,6 +14,7 @@ import CreateChart from '../pages/charts/CreateChart.js';
 // Templates
 import CreateTemplate from '../pages/templates/CreateTemplate.js';
 import EditTemplate from '../pages/templates/EditTemplate.js';
+import TemplatesList from '../pages/templates/list.js';
 
 // Spaces
 import Spaces from '../pages/spaces/index.js';
@@ -33,6 +34,10 @@ const routes = {
   templates: {
     path: '/templates',
     Component: Templates,
+  },
+  templatesList: {
+    path: '/templates/list',
+    Component: TemplatesList,
   },
   createTemplate: {
     path: '/templates/create',
