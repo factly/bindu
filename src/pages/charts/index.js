@@ -302,10 +302,12 @@ function Chart({ data = {}, onSubmit }) {
     });
   };
 
-  const onDataChange = (rowIndex, columnIndex, newValue) => {
+  const onDataChange = ({ fromRow, toRow, updated }) => {
     const updatedValues = [...values];
     try {
-      updatedValues[rowIndex][columnIndex] = values[rowIndex][columnIndex].constructor(newValue);
+      for (let i = fromRow; i <= toRow; i++) {
+        updatedValues[i] = { ...updatedValues[i], ...updated };
+      }
       setValues(updatedValues);
 
       let formData = form.getFieldValue();
@@ -465,8 +467,8 @@ function Chart({ data = {}, onSubmit }) {
     if (data?.values) {
       const newColumns = Object.keys(data.values[0]).map((d) => {
         return {
-          title: d,
-          dataIndex: d,
+          name: d,
+          key: d,
         };
       });
 
@@ -478,8 +480,8 @@ function Chart({ data = {}, onSubmit }) {
 
       const newColumns = Object.keys(newValues[0]).map((d) => {
         return {
-          title: d,
-          dataIndex: d,
+          name: d,
+          key: d,
         };
       });
 
@@ -558,10 +560,8 @@ function Chart({ data = {}, onSubmit }) {
                             columns={columns[index] || []}
                             dataSource={values[index] || []}
                             onDataChange={onDataChange}
-                            scroll={{
-                              x: containerWidth - displayWidth,
-                              y: displayHeight - 40,
-                            }}
+                            tableWidth={containerWidth - displayWidth}
+                            tableHeight={displayHeight - 40}
                           />
                         </Tabs.TabPane>
                       ))}
@@ -571,7 +571,8 @@ function Chart({ data = {}, onSubmit }) {
                     columns={columns}
                     dataSource={values}
                     onDataChange={onDataChange}
-                    scroll={{ x: containerWidth - displayWidth + 100, y: displayHeight - 40 }}
+                    tableWidth={containerWidth - displayWidth}
+                    tableHeight={displayHeight - 40}
                   />
                 )}
               </div>
