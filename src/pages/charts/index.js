@@ -146,6 +146,26 @@ function Chart({ data = {}, onSubmit }) {
   }, [template]);
 
   React.useEffect(() => {
+    if (values.length > 0 && columns.length > 0) {
+      return;
+    }
+    const spec = form.getFieldValue();
+    switch (spec.mode) {
+      case 'vega': {
+        setDataForVega(spec.data);
+        break;
+      }
+      case 'vega-lite': {
+        setDataForVegaLite(spec.data);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [isDataView]);
+
+  React.useEffect(() => {
     if (data && data.id) {
       form.setFieldsValue({
         ...data.config,
@@ -302,18 +322,59 @@ function Chart({ data = {}, onSubmit }) {
     });
   };
 
-  const onDataChange = ({ fromRow, toRow, updated }) => {
+  const vegaLiteDataChange = ({ fromRow, toRow, updated }) => {
     const updatedValues = [...values];
-    try {
-      for (let i = fromRow; i <= toRow; i++) {
-        updatedValues[i] = { ...updatedValues[i], ...updated };
+    for (let i = fromRow; i <= toRow; i++) {
+      updatedValues[i] = { ...updatedValues[i], ...updated };
+    }
+    setValues(updatedValues);
+
+    let formData = form.getFieldValue();
+    _.set(formData, ['data', 'values'], updatedValues);
+    form.setFieldsValue(formData);
+  };
+
+  const vegaDataChange = ({ fromRow, toRow, updated }, tabIndex) => {
+    const updatedValues = [...values];
+    for (let i = fromRow; i <= toRow; i++) {
+      updatedValues[tabIndex][i] = { ...updatedValues[tabIndex][i], ...updated };
+    }
+    setValues(updatedValues);
+
+    const data = spec.data;
+    const updatedValuesClone = [...updatedValues];
+    const updatedDataList = data.map((dataObj) => {
+      if (!dataObj.url && !dataObj.values) {
+        return dataObj;
       }
-      setValues(updatedValues);
+      const nextValues = updatedValuesClone.shift();
+      if (dataObj.url) {
+        _.unset(dataObj, ['url']);
+      }
+      _.set(dataObj, ['values'], nextValues);
+      return dataObj;
+    });
 
-      let formData = form.getFieldValue();
+    let formData = form.getFieldValue();
+    _.set(formData, ['data'], updatedDataList);
+    form.setFieldsValue(formData);
+  };
 
-      _.set(formData, ['data', 'values'], updatedValues);
-      form.setFieldsValue(formData);
+  const onDataChange = ({ fromRow, toRow, updated }, tabIndex) => {
+    try {
+      switch (spec.mode) {
+        case 'vega': {
+          vegaDataChange({ fromRow, toRow, updated }, tabIndex);
+          break;
+        }
+        case 'vega-lite': {
+          vegaLiteDataChange({ fromRow, toRow, updated });
+          break;
+        }
+        default: {
+          break;
+        }
+      }
     } catch (error) {
       console.error(error);
     }
@@ -509,23 +570,6 @@ function Chart({ data = {}, onSubmit }) {
     return;
   };
 
-  if (isDataView && !(values.length && columns.length)) {
-    const spec = form.getFieldValue();
-    switch (spec.mode) {
-      case 'vega': {
-        setDataForVega(spec.data);
-        break;
-      }
-      case 'vega-lite': {
-        setDataForVegaLite(spec.data);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }
-
   const { width: containerWidth = 0, height: containerHeight = 0 } =
     containerRef?.current?.getBoundingClientRect() || {};
   const { width: displayWidth = 0, height: displayHeight = 0 } =
@@ -562,6 +606,7 @@ function Chart({ data = {}, onSubmit }) {
                             onDataChange={onDataChange}
                             tableWidth={containerWidth - displayWidth}
                             tableHeight={displayHeight - 40}
+                            tabIndex={index}
                           />
                         </Tabs.TabPane>
                       ))}

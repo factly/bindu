@@ -13,7 +13,7 @@ const EmptyRowsView = () => {
 };
 
 function DataViewer(props) {
-  const { columns, dataSource, tableWidth, tableHeight, onDataChange } = props;
+  const { columns, dataSource, tableWidth, tableHeight, onDataChange, tabIndex } = props;
   const [isEditable, setIsEditable] = useState(false);
 
   const mergedColumns = columns.map((column) => {
@@ -37,7 +37,7 @@ function DataViewer(props) {
         columns={mergedColumns}
         rowGetter={(i) => dataSource[i]}
         rowsCount={dataSource.length}
-        onGridRowsUpdated={onDataChange}
+        onGridRowsUpdated={(...params) => onDataChange(...params, tabIndex)}
         enableCellSelect={true}
         minHeight={tableHeight}
         minWidth={tableWidth}
