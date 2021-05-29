@@ -7,6 +7,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/action"
+	"github.com/factly/bindu-server/test/category"
+	"github.com/factly/bindu-server/test/medium"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect"
 	"gopkg.in/h2non/gock.v1"
@@ -24,17 +26,6 @@ func TestTemplateUpdate(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
-	t.Run("invalid template id", func(t *testing.T) {
-		test.CheckSpace(mock)
-		e.PUT(path).
-			WithPath("template_id", "invalid_id").
-			WithHeaders(headers).
-			WithJSON(data).
-			Expect().
-			Status(http.StatusBadRequest)
-		test.ExpectationsMet(t, mock)
-	})
-
 	t.Run("undecodable template", func(t *testing.T) {
 		test.CheckSpace(mock)
 		e.PUT(path).
@@ -49,7 +40,6 @@ func TestTemplateUpdate(t *testing.T) {
 		test.CheckSpace(mock)
 
 		mock.ExpectQuery(selectQuery).
-			WithArgs(1, 1).
 			WillReturnRows(sqlmock.NewRows(columns))
 
 		e.PUT(path).
@@ -64,14 +54,16 @@ func TestTemplateUpdate(t *testing.T) {
 	t.Run("update template", func(t *testing.T) {
 		test.CheckSpace(mock)
 
-		SelectMock(mock, 1, 1)
+		SelectMock(mock)
 		mock.ExpectBegin()
 
 		mock.ExpectExec(`UPDATE \"bi_template\"`).
-			WithArgs(test.AnyTime{}, 1, data["title"], data["slug"], data["schema"], data["properties"], data["medium_id"], 1).
+			WithArgs(test.AnyTime{}, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["medium_id"], "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		SelectMock(mock)
+		category.SelectMock(mock)
+		medium.SelectMock(mock)
 		mock.ExpectCommit()
 
 		e.PUT(path).
@@ -86,18 +78,20 @@ func TestTemplateUpdate(t *testing.T) {
 	t.Run("update template when medium_id = 0", func(t *testing.T) {
 		test.CheckSpace(mock)
 
-		SelectMock(mock, 1, 1)
+		SelectMock(mock)
 		mock.ExpectBegin()
 
 		mock.ExpectExec(`UPDATE \"bi_template\"`).
-			WithArgs(nil, test.AnyTime{}, 1).
+			WithArgs(nil, test.AnyTime{}, "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		mock.ExpectExec(`UPDATE \"bi_template\"`).
-			WithArgs(test.AnyTime{}, 1, data["title"], data["slug"], data["schema"], data["properties"], 1).
+			WithArgs(test.AnyTime{}, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		SelectMock(mock)
+		category.SelectMock(mock)
+		medium.SelectMock(mock)
 		mock.ExpectCommit()
 
 		data["medium_id"] = 0
