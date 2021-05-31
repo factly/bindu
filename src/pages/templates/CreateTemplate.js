@@ -9,6 +9,7 @@ import { collapseSider } from '../../actions/settings';
 
 function CreateTemplate() {
   const [spec, setSpec] = React.useState({});
+  const [mode, setMode] = React.useState('vega-lite');
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -36,10 +37,10 @@ function CreateTemplate() {
   return (
     <div style={{ display: 'flex', height: '80vh' }}>
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
-        <Display spec={spec} />
+        <Display spec={spec} mode={mode} />
       </div>
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
-        <TemplateForm onSubmit={onCreate} onChange={onChange} />
+        <TemplateForm onSubmit={onCreate} onChange={onChange} onModeChange={setMode} />
       </div>
     </div>
   );

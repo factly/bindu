@@ -4,11 +4,10 @@ import { compile } from 'vega-lite';
 
 import BarChartRace from './bar_chart_race/chart.js';
 
-function Chart({ spec, setView = () => {} }) {
+function Chart({ spec, mode, setView = () => {} }) {
   const refContainer = React.useRef(null);
-
-  const getSpec = () => {
-    switch (spec.mode) {
+  const getSpec = (spec, new_mode) => {
+    switch (new_mode) {
       case 'vega':
         return spec;
       case 'vega-lite':
@@ -18,21 +17,25 @@ function Chart({ spec, setView = () => {} }) {
     }
   };
 
-  const renderVega = () => {
+  const renderVega = (spec, new_mode) => {
     if (Object.keys(spec).length) {
-      const spec = getSpec();
-      let runtime = vega.parse(spec);
-      const loader = vega.loader();
-      const view = new vega.View(runtime, {
-        loader,
-      }).hover();
+      try {
+        const runtimeSpec = getSpec(spec, new_mode);
+        let runtime = vega.parse(runtimeSpec);
+        const loader = vega.loader();
+        const view = new vega.View(runtime, {
+          loader,
+        }).hover();
 
-      view.logLevel(vega.Warn).renderer('svg').initialize(refContainer.current).runAsync();
-      setView(view);
+        view.logLevel(vega.Warn).renderer('svg').initialize(refContainer.current).runAsync();
+        setView(view);
+      } catch (error) {
+        refContainer.current.innerHTML = error.message;
+      }
     }
   };
 
-  const renderCustomChart = () => {
+  const renderCustomChart = (spec, new_mode) => {
     const type = spec.type;
     switch (type) {
       case 'bar-chart-race':
@@ -44,23 +47,23 @@ function Chart({ spec, setView = () => {} }) {
     }
   };
 
-  const renderChart = () => {
-    switch (spec.mode) {
+  const renderChart = (spec, new_mode) => {
+    switch (new_mode) {
       case 'vega':
-        return renderVega();
+        return renderVega(spec, new_mode);
       case 'vega-lite':
-        return renderVega();
+        return renderVega(spec, new_mode);
       case 'custom':
-        return renderCustomChart();
+        return renderCustomChart(spec, new_mode);
       default:
         return spec;
     }
   };
 
   React.useEffect(() => {
-    renderChart();
+    renderChart(spec, mode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spec]);
+  }, [spec, mode]);
 
   return <div style={{ height: 'inherit', overflow: 'auto' }} ref={refContainer}></div>;
 }
