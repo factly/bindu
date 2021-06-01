@@ -76,6 +76,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	} else {
 		tagSlug = slugx.Make(tag.Name)
 	}
+
 	// Check if tag with same name exist
 	if util.CheckName(uint(sID), tag.Name, tableName) {
 		loggerx.Error(errors.New(`tag with same name exist`))

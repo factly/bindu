@@ -8,6 +8,7 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
@@ -99,6 +100,13 @@ func update(w http.ResponseWriter, r *http.Request) {
 		categorySlug = slugx.Approve(&config.DB, category.Slug, sID, tableName)
 	} else {
 		categorySlug = slugx.Approve(&config.DB, slugx.Make(category.Name), sID, tableName)
+	}
+
+	// Check if category with same name exist
+	if category.Name != result.Name && util.CheckCategoryName(uint(sID), category.Name, category.IsForTemplate) {
+		loggerx.Error(errors.New(`category with same name exist`))
+		errorx.Render(w, errorx.Parser(errorx.SameNameExist()))
+		return
 	}
 
 	tx := config.DB.Begin()
