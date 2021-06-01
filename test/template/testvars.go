@@ -57,7 +57,6 @@ var templateList = []map[string]interface{}{
 var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "title", "slug", "spec", "properties", "category_id", "medium_id", "is_default", "space_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_template"`)
-var countQuery = regexp.QuoteMeta(`SELECT count(1) FROM "bi_template"`)
 
 var basePath = "/templates"
 var path = "/templates/{template_id}"
