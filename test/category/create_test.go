@@ -47,6 +47,7 @@ func TestCategoryCreate(t *testing.T) {
 
 	t.Run("create category", func(t *testing.T) {
 		test.CheckSpace(mock)
+		categoryCountQuery(mock, 0)
 
 		slugCheckMock(mock)
 

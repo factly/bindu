@@ -73,8 +73,9 @@ func TestCategoryUpdate(t *testing.T) {
 
 		test.CheckSpace(mock)
 		updatedCategory := map[string]interface{}{
-			"name": "Politics",
-			"slug": "politics",
+			"name":            "Politics",
+			"slug":            "politics",
+			"is_for_template": true,
 		}
 
 		SelectMock(mock)
@@ -82,6 +83,7 @@ func TestCategoryUpdate(t *testing.T) {
 		categoryUpdateMock(mock, updatedCategory)
 
 		selectAfterUpdate(mock, updatedCategory)
+		mock.ExpectCommit()
 
 		e.PUT(path).
 			WithPath("category_id", 1).
@@ -96,19 +98,21 @@ func TestCategoryUpdate(t *testing.T) {
 
 		test.CheckSpace(mock)
 		updatedCategory := map[string]interface{}{
-			"name": "Politics",
-			"slug": "politics-1",
+			"name":            "Politics",
+			"slug":            "politics-1",
+			"is_for_template": true,
 		}
 		SelectMock(mock)
 
 		mock.ExpectQuery(`SELECT slug, space_id FROM "bi_category"`).
 			WithArgs("politics%", 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, "Politics", "politics", 1))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, "Politics", "politics", true, 1))
 
 		categoryUpdateMock(mock, updatedCategory)
 
 		selectAfterUpdate(mock, updatedCategory)
+		mock.ExpectCommit()
 
 		e.PUT(path).
 			WithPath("category_id", 1).
@@ -122,8 +126,9 @@ func TestCategoryUpdate(t *testing.T) {
 	t.Run("update category with different slug", func(t *testing.T) {
 		test.CheckSpace(mock)
 		updatedCategory := map[string]interface{}{
-			"name": "Politics",
-			"slug": "testing-slug",
+			"name":            "Politics",
+			"slug":            "testing-slug",
+			"is_for_template": true,
 		}
 		SelectMock(mock)
 
@@ -134,6 +139,7 @@ func TestCategoryUpdate(t *testing.T) {
 		categoryUpdateMock(mock, updatedCategory)
 
 		selectAfterUpdate(mock, updatedCategory)
+		mock.ExpectCommit()
 
 		e.PUT(path).
 			WithPath("category_id", 1).
