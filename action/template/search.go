@@ -1,10 +1,11 @@
-package chart
+package template
 
 import (
 	"fmt"
 	"net/http"
 	"net/url"
 
+	"github.com/factly/bindu-server/action/chart"
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/x/errorx"
@@ -17,28 +18,25 @@ import (
 
 // list response
 type paging struct {
-	Total int64         `json:"total"`
-	Nodes []model.Chart `json:"nodes"`
+	Total int64            `json:"total"`
+	Nodes []model.Template `json:"nodes"`
 }
 
-// list - Get all charts
-// @Summary Show all charts
-// @Description Get all charts
-// @Tags Chart
-// @ID get-all-charts
+// search - Search all templates
+// @Summary Search in all templates
+// @Description Search all templates
+// @Tags Template
+// @ID search-all-templates
 // @Produce  json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
 // @Param limit query string false "limit per page"
 // @Param page query string false "page number"
 // @Param category query string false "category"
-// @Param tag query string false "tag"
-// @Param status query string false "status"
 // @Param q query string false "search query"
-// @Success 200 {array} model.Chart
-// @Router /charts [get]
-func list(w http.ResponseWriter, r *http.Request) {
-
+// @Success 200 {array} paging
+// @Router /templates/search [get]
+func search(w http.ResponseWriter, r *http.Request) {
 	sID, err := middlewarex.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
@@ -53,8 +51,8 @@ func list(w http.ResponseWriter, r *http.Request) {
 	searchQuery := r.URL.Query().Get("q")
 	sort := r.URL.Query().Get("sort")
 
-	filters := generateFilters(queryMap["tag"], queryMap["category"], queryMap["status"])
-	filteredChartIDs := make([]string, 0)
+	filters := generateFilters(queryMap["category"])
+	filteredTemplateIDs := make([]string, 0)
 
 	if filters != "" {
 		filters = fmt.Sprint(filters, " AND space_id=", sID)
@@ -63,7 +61,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 	offset, limit := paginationx.Parse(r.URL.Query())
 
 	result := paging{}
-	result.Nodes = make([]model.Chart, 0)
+	result.Nodes = make([]model.Template, 0)
 
 	if filters != "" || searchQuery != "" {
 		// Search posts with filter
@@ -71,9 +69,9 @@ func list(w http.ResponseWriter, r *http.Request) {
 		var res map[string]interface{}
 
 		if searchQuery != "" {
-			hits, err = meilisearchx.SearchWithQuery("bindu", searchQuery, filters, "chart")
+			hits, err = meilisearchx.SearchWithQuery("bindu", searchQuery, filters, "template")
 		} else {
-			res, err = meilisearchx.SearchWithoutQuery("bindu", filters, "chart")
+			res, err = meilisearchx.SearchWithoutQuery("bindu", filters, "template")
 			if _, found := res["hits"]; found {
 				hits = res["hits"].([]interface{})
 			}
@@ -84,8 +82,8 @@ func list(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		filteredChartIDs = GetIDArray(hits)
-		if len(filteredChartIDs) == 0 {
+		filteredTemplateIDs = chart.GetIDArray(hits)
+		if len(filteredTemplateIDs) == 0 {
 			renderx.JSON(w, http.StatusOK, result)
 			return
 		}
@@ -95,15 +93,14 @@ func list(w http.ResponseWriter, r *http.Request) {
 		sort = "desc"
 	}
 
-	tx := config.DB.Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").Preload("Template").Model(&model.Chart{}).Where(&model.Chart{
-		SpaceID: uint(sID),
-	}).Order("created_at " + sort)
+	tx := config.DB.Preload("Medium").Preload("Category").Model(&model.Template{}).Order("created_at " + sort)
 
-	if len(filteredChartIDs) > 0 {
-		err = tx.Where(filteredChartIDs).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
+	if len(filteredTemplateIDs) > 0 {
+		err = tx.Where(filteredTemplateIDs).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
 	} else {
 		err = tx.Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
 	}
+
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
@@ -113,18 +110,10 @@ func list(w http.ResponseWriter, r *http.Request) {
 	renderx.JSON(w, http.StatusOK, result)
 }
 
-func generateFilters(tagIDs, categoryIDs, status []string) string {
+func generateFilters(categoryIDs []string) string {
 	filters := ""
-	if len(tagIDs) > 0 {
-		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(tagIDs, "tag_ids"), " AND ")
-	}
-
 	if len(categoryIDs) > 0 {
-		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(categoryIDs, "category_ids"), " AND ")
-	}
-
-	if len(status) > 0 {
-		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(status, "status"), " AND ")
+		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(categoryIDs, "category_id"), " AND ")
 	}
 
 	if filters != "" && filters[len(filters)-5:] == " AND " {
@@ -132,20 +121,4 @@ func generateFilters(tagIDs, categoryIDs, status []string) string {
 	}
 
 	return filters
-}
-
-func GetIDArray(hits []interface{}) []string {
-	arr := make([]string, 0)
-
-	if len(hits) == 0 {
-		return arr
-	}
-
-	for _, hit := range hits {
-		hitMap := hit.(map[string]interface{})
-		id := hitMap["id"].(string)
-		arr = append(arr, id)
-	}
-
-	return arr
 }

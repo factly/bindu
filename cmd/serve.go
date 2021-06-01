@@ -15,6 +15,7 @@ import (
 	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/minio"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus"
@@ -35,6 +36,9 @@ var serveCmd = &cobra.Command{
 
 		// db setup
 		config.SetupDB()
+
+		meilisearchx.SetupMeiliSearch("bindu", []string{"title", "slug", "description", "tags", "categories", "status"})
+
 		// register routes
 		r := action.RegisterRoutes()
 

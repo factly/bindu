@@ -16,6 +16,7 @@ import (
 	"github.com/factly/bindu-server/model"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/slugx"
@@ -191,7 +192,38 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx.Model(&model.Chart{}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result)
+	tx.Model(&model.Chart{}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").Preload("Template").First(&result)
+
+	// Insert into meili index
+	var meiliPublishDate int64
+	if result.PublishedDate != nil {
+		meiliPublishDate = result.PublishedDate.Unix()
+	}
+	meiliObj := map[string]interface{}{
+		"id":                 result.ID,
+		"kind":               "chart",
+		"title":              result.Title,
+		"slug":               result.Slug,
+		"status":             result.Status,
+		"description":        result.Description,
+		"data_url":           result.DataURL,
+		"is_public":          result.IsPublic,
+		"featured_medium_id": result.FeaturedMediumID,
+		"published_date":     meiliPublishDate,
+		"template_id":        result.TemplateID,
+		"theme_id":           result.ThemeID,
+		"space_id":           result.SpaceID,
+		"tag_ids":            chart.TagIDs,
+		"category_ids":       chart.CategoryIDs,
+	}
+
+	err = meilisearchx.AddDocument("bindu", meiliObj)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
 
 	tx.Commit()
 

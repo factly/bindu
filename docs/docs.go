@@ -313,6 +313,30 @@ var doc = `{
                         "description": "page number",
                         "name": "page",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "tag",
+                        "name": "tag",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "search query",
+                        "name": "q",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -410,15 +434,15 @@ var doc = `{
         },
         "/charts/{chart_id}": {
             "get": {
-                "description": "Get chart by ID",
+                "description": "Get spec chart by ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Chart"
                 ],
-                "summary": "Show a chart by id",
-                "operationId": "get-chart-by-id",
+                "summary": "Show a spec chart by id",
+                "operationId": "get-chart-spec-by-id",
                 "parameters": [
                     {
                         "type": "string",
@@ -2917,6 +2941,70 @@ var doc = `{
                 }
             }
         },
+        "/templates/search": {
+            "get": {
+                "description": "Search all templates",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Template"
+                ],
+                "summary": "Search in all templates",
+                "operationId": "search-all-templates",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "search query",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/template.paging"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/templates/{template_id}": {
             "get": {
                 "description": "Get template by ID",
@@ -3412,9 +3500,6 @@ var doc = `{
                 "is_public": {
                     "type": "boolean"
                 },
-                "organisation_id": {
-                    "type": "integer"
-                },
                 "published_date": {
                     "type": "string"
                 },
@@ -3431,7 +3516,7 @@ var doc = `{
                     }
                 },
                 "template_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "theme_id": {
                     "type": "integer"
@@ -3616,7 +3701,7 @@ var doc = `{
                     "$ref": "#/definitions/model.Template"
                 },
                 "template_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "theme": {
                     "$ref": "#/definitions/model.Theme"
@@ -4060,7 +4145,10 @@ var doc = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
+                },
+                "is_default": {
+                    "type": "boolean"
                 },
                 "medium": {
                     "$ref": "#/definitions/model.Medium"
@@ -4275,7 +4363,7 @@ var doc = `{
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Organisation"
+                        "$ref": "#/definitions/model.OrganisationPermissionRequest"
                     }
                 },
                 "total": {
@@ -4642,6 +4730,20 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_by_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "template.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Template"
+                    }
+                },
+                "total": {
                     "type": "integer"
                 }
             }

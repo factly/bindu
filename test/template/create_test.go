@@ -7,6 +7,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/action"
+	"github.com/factly/bindu-server/test/category"
+	"github.com/factly/bindu-server/test/medium"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect"
 	"gopkg.in/h2non/gock.v1"
@@ -42,10 +44,14 @@ func TestTemplateCreate(t *testing.T) {
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "bi_template"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], data["schema"], data["properties"], 1, data["medium_id"]).
+			WithArgs(sqlmock.AnyArg(), test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["is_default"], 1, data["medium_id"]).
 			WillReturnRows(sqlmock.
-				NewRows([]string{"id", "medium_id"}).
-				AddRow(1, 1))
+				NewRows([]string{"medium_id"}).
+				AddRow(1))
+
+		SelectMock(mock)
+		category.SelectMock(mock)
+		medium.SelectMock(mock)
 		mock.ExpectCommit()
 
 		e.POST(basePath).

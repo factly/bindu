@@ -101,12 +101,13 @@ func TestChartCreate(t *testing.T) {
 			WithArgs(sqlmock.AnyArg()).
 			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
-					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, 1))
 
 		chartPreloadMock(mock)
 
 		mock.ExpectCommit()
 
+		data["featured_medium_id"] = 0
 		result := e.POST(basePath).
 			WithHeaders(headers).
 			WithJSON(data).
@@ -115,16 +116,12 @@ func TestChartCreate(t *testing.T) {
 
 		validateAssociations(result)
 		test.ExpectationsMet(t, mock)
-
+		data["featured_medium_id"] = 1
 	})
 
 	t.Run("create chart with slug is empty", func(t *testing.T) {
 		test.CheckSpace(mock)
 		mock.ExpectBegin()
-
-		mock.ExpectQuery(`INSERT INTO "bi_medium"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1).
-			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 		slugCheckMock(mock)
 
@@ -138,7 +135,7 @@ func TestChartCreate(t *testing.T) {
 			WithArgs(sqlmock.AnyArg()).
 			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
-					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["theme_id"], time.Time{}, 1))
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, 1))
 
 		chartPreloadMock(mock)
 		mock.ExpectCommit()
@@ -159,11 +156,13 @@ func TestChartCreate(t *testing.T) {
 			return "", errors.New("some error")
 		}
 
+		data["featured_medium_id"] = 0
 		e.POST(basePath).
 			WithHeaders(headers).
 			WithJSON(data).
 			Expect().
 			Status(http.StatusInternalServerError)
+		data["featured_medium_id"] = 1
 
 		test.ExpectationsMet(t, mock)
 	})

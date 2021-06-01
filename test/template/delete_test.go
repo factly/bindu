@@ -25,17 +25,6 @@ func TestTemplateDelete(t *testing.T) {
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
 
-	t.Run("invalid template id", func(t *testing.T) {
-		test.CheckSpace(mock)
-
-		e.DELETE(path).
-			WithPath("template_id", "invalid").
-			WithHeaders(headers).
-			Expect().
-			Status(http.StatusBadRequest)
-		test.ExpectationsMet(t, mock)
-	})
-
 	t.Run("template record not found", func(t *testing.T) {
 		test.CheckSpace(mock)
 
@@ -56,7 +45,7 @@ func TestTemplateDelete(t *testing.T) {
 		SelectMock(mock)
 		mock.ExpectBegin()
 		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "bi_template" SET`)).
-			WithArgs(test.AnyTime{}, 1).
+			WithArgs(test.AnyTime{}, "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 

@@ -65,4 +65,12 @@ func SetupVars() {
 	if !viper.IsSet("minio_bucket") {
 		log.Fatal("please provide minio_bucket in config file")
 	}
+
+	if !viper.IsSet("meili_url") {
+		log.Fatal("please provide meili_url in config file")
+	}
+
+	if !viper.IsSet("meili_key") {
+		log.Fatal("please provide meili_key in config file")
+	}
 }

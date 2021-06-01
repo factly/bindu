@@ -38,8 +38,6 @@ definitions:
         type: integer
       is_public:
         type: boolean
-      organisation_id:
-        type: integer
       published_date:
         type: string
       slug:
@@ -51,7 +49,7 @@ definitions:
           type: integer
         type: array
       template_id:
-        type: integer
+        type: string
       theme_id:
         type: integer
       title:
@@ -175,7 +173,7 @@ definitions:
       template:
         $ref: '#/definitions/model.Template'
       template_id:
-        type: integer
+        type: string
       theme:
         $ref: '#/definitions/model.Theme'
       theme_id:
@@ -467,7 +465,9 @@ definitions:
       deleted_at:
         type: string
       id:
-        type: integer
+        type: string
+      is_default:
+        type: boolean
       medium:
         $ref: '#/definitions/model.Medium'
       medium_id:
@@ -608,7 +608,7 @@ definitions:
     properties:
       nodes:
         items:
-          $ref: '#/definitions/model.Organisation'
+          $ref: '#/definitions/model.OrganisationPermissionRequest'
         type: array
       total:
         type: integer
@@ -851,6 +851,15 @@ definitions:
     required:
     - name
     - slug
+    type: object
+  template.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Template'
+        type: array
+      total:
+        type: integer
     type: object
   template.template:
     properties:
@@ -1100,6 +1109,22 @@ paths:
         in: query
         name: page
         type: string
+      - description: category
+        in: query
+        name: category
+        type: string
+      - description: tag
+        in: query
+        name: tag
+        type: string
+      - description: status
+        in: query
+        name: status
+        type: string
+      - description: search query
+        in: query
+        name: q
+        type: string
       produces:
       - application/json
       responses:
@@ -1181,8 +1206,8 @@ paths:
       tags:
       - Chart
     get:
-      description: Get chart by ID
-      operationId: get-chart-by-id
+      description: Get spec chart by ID
+      operationId: get-chart-spec-by-id
       parameters:
       - description: User ID
         in: header
@@ -1206,7 +1231,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Chart'
-      summary: Show a chart by id
+      summary: Show a spec chart by id
       tags:
       - Chart
     put:
@@ -2964,6 +2989,49 @@ paths:
           schema:
             $ref: '#/definitions/model.Template'
       summary: Update a template by id
+      tags:
+      - Template
+  /templates/search:
+    get:
+      description: Search all templates
+      operationId: search-all-templates
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      - description: category
+        in: query
+        name: category
+        type: string
+      - description: search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/template.paging'
+            type: array
+      summary: Search in all templates
       tags:
       - Template
   /themes:

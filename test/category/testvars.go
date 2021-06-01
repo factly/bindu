@@ -1,6 +1,7 @@
 package category
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"regexp"
 	"time"
@@ -60,9 +61,9 @@ func recordNotFoundMock(mock sqlmock.Sqlmock) {
 		WillReturnRows(sqlmock.NewRows(columns))
 }
 
-func SelectMock(mock sqlmock.Sqlmock) {
+func SelectMock(mock sqlmock.Sqlmock, args ...driver.Value) {
 	mock.ExpectQuery(selectQuery).
-		WithArgs(1, 1).
+		WithArgs(args...).
 		WillReturnRows(sqlmock.NewRows(columns).
 			AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["name"], data["slug"], 1))
 }

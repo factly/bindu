@@ -17,7 +17,7 @@ var headers = map[string]string{
 	"X-User":  "1",
 }
 var invalidData = map[string]interface{}{
-	"name": "po",
+	"nam": "po",
 }
 
 var data = map[string]interface{}{

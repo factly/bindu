@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/factly/bindu-server/config"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/go-chi/chi"
@@ -53,7 +55,18 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	config.DB.Delete(&result)
+	tx := config.DB.Begin()
+	tx.Delete(&result)
 
+	objectID := fmt.Sprint("chart_", result.ID)
+	_, err = meilisearchx.Client.Documents("bindu").Delete(objectID)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
 	renderx.JSON(w, http.StatusOK, nil)
 }
