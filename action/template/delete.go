@@ -27,7 +27,7 @@ import (
 func delete(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "template_id")
-	if id != "" {
+	if id == "" {
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
@@ -50,6 +50,12 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
+		return
+	}
+
+	if result.IsDefault {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot delete default template", http.StatusUnprocessableEntity)))
 		return
 	}
 

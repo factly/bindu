@@ -43,7 +43,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 
 	err = config.DB.Model(&model.Chart{}).Where(&model.Chart{
 		SpaceID: uint(sID),
-	}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").First(&result).Error
+	}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").Preload("Template").First(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)

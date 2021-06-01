@@ -14,6 +14,7 @@ import (
 	"github.com/factly/bindu-server/model"
 	minioutil "github.com/factly/bindu-server/util/minio"
 	"github.com/factly/x/middlewarex"
+	"github.com/factly/x/slugx"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/minio/minio-go/v7"
@@ -167,9 +168,10 @@ func MigrateTemplate() error {
 				Spec: postgres.Jsonb{
 					RawMessage: specBytes,
 				},
-				Title:   chart_name,
-				Slug:    strings.ToLower(chart_name),
-				SpaceID: SpaceID,
+				Title:     chart_name,
+				IsDefault: true,
+				Slug:      slugx.Make(fmt.Sprint("bindu ", chart_name)),
+				SpaceID:   SpaceID,
 			}
 
 			migratedID, err := ioutil.ReadFile(fmt.Sprint(filepath, "/migrate.out"))
@@ -186,13 +188,28 @@ func MigrateTemplate() error {
 					return err
 				}
 			} else {
-				// already migrated template
+				// file found
 				presentTemplate := model.Template{}
 				presentTemplate.ID = string(migratedID)
-				if err = config.DB.Model(&presentTemplate).Updates(template).Error; err != nil {
-					return err
-				} else {
-					fmt.Println("template " + chart_name + " updated")
+
+				if err = config.DB.Model(&presentTemplate).Where(&presentTemplate).First(&model.Template{}).Error; err == nil {
+					// template found
+					if err = config.DB.Model(&presentTemplate).Updates(template).Error; err != nil {
+						return err
+					} else {
+						fmt.Println("template " + chart_name + " updated")
+					}
+				} else { // template not found
+					template.ID = strings.ReplaceAll(uuid.New().String(), "-", "")
+					if err = config.DB.Create(&template).Error; err != nil {
+						return err
+					} else {
+						fmt.Println("template " + chart_name + " created")
+					}
+					err = ioutil.WriteFile(fmt.Sprint(filepath, "/migrate.out"), []byte(template.ID), 0777)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
