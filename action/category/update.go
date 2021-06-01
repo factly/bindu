@@ -101,12 +101,16 @@ func update(w http.ResponseWriter, r *http.Request) {
 		categorySlug = slugx.Approve(&config.DB, slugx.Make(category.Name), sID, tableName)
 	}
 
-	config.DB.Model(&result).Updates(model.Category{
+	tx := config.DB.Begin()
+	tx.Model(&result).Select("IsForTemplate").Updates(model.Category{IsForTemplate: category.IsForTemplate})
+	tx.Model(&result).Updates(model.Category{
 		Base:        config.Base{UpdatedByID: uint(uID)},
 		Name:        category.Name,
 		Slug:        categorySlug,
 		Description: category.Description,
 	}).First(&result)
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, result)
 }

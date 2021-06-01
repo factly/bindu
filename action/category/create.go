@@ -77,10 +77,11 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &model.Category{
-		Name:        category.Name,
-		Slug:        slugx.Approve(&config.DB, categorySlug, sID, tableName),
-		Description: category.Description,
-		SpaceID:     uint(sID),
+		Name:          category.Name,
+		Slug:          slugx.Approve(&config.DB, categorySlug, sID, tableName),
+		Description:   category.Description,
+		IsForTemplate: category.IsForTemplate,
+		SpaceID:       uint(sID),
 	}
 
 	err = config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Model(&model.Category{}).Create(&result).Error

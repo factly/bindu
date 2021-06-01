@@ -4,6 +4,8 @@ definitions:
     properties:
       description:
         type: string
+      is_for_template:
+        type: boolean
       name:
         type: string
       slug:
@@ -91,6 +93,8 @@ definitions:
         type: string
       slug:
         type: string
+      title:
+        type: string
       type:
         type: string
       url:
@@ -114,6 +118,8 @@ definitions:
         type: string
       id:
         type: integer
+      is_for_template:
+        type: boolean
       name:
         type: string
       slug:
@@ -832,6 +838,8 @@ definitions:
         type: string
       id:
         type: integer
+      is_for_template:
+        type: boolean
       name:
         type: string
       slug:
@@ -1206,8 +1214,8 @@ paths:
       tags:
       - Chart
     get:
-      description: Get spec chart by ID
-      operationId: get-chart-spec-by-id
+      description: Get chart by ID
+      operationId: get-chart-by-id
       parameters:
       - description: User ID
         in: header
@@ -1231,7 +1239,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Chart'
-      summary: Show a spec chart by id
+      summary: Show a chart by id
       tags:
       - Chart
     put:
