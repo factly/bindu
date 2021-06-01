@@ -79,6 +79,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Name:        medium.Name,
 		Slug:        slugx.Approve(&config.DB, mediumSlug, sID, tableName),
 		Type:        medium.Type,
+		Title:       medium.Title,
 		Description: medium.Description,
 		Caption:     medium.Caption,
 		AltText:     medium.AltText,

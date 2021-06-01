@@ -9,6 +9,9 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/bindu-server/config"
+	"github.com/factly/x/meilisearchx"
+	"github.com/meilisearch/meilisearch-go"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -26,6 +29,9 @@ func (a AnyTime) Match(v driver.Value) bool {
 
 // SetupMockDB setups the mock sql db
 func SetupMockDB() sqlmock.Sqlmock {
+	viper.Set("meili_url", "http://meili:7700")
+	viper.Set("meili_key", "password")
+
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		log.Println(err)
@@ -49,6 +55,11 @@ func SetupMockDB() sqlmock.Sqlmock {
 	if err != nil {
 		log.Println(err)
 	}
+
+	meilisearchx.Client = meilisearch.NewClient(meilisearch.Config{
+		Host:   viper.GetString("meili_url"),
+		APIKey: viper.GetString("meili_key"),
+	})
 
 	return mock
 }

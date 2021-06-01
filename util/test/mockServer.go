@@ -13,6 +13,7 @@ import (
 func MockServers() {
 	KavachMock()
 	KetoMock()
+	MeiliGock()
 
 	minio.Upload = func(r *http.Request, image string) (string, error) {
 		return "http://" + viper.GetString("minio_url") + "/dega/test.jpg", nil
@@ -109,6 +110,35 @@ func KetoMock() {
 		Post("/engines/acp/ory/regex/allowed").
 		Persist().
 		Reply(http.StatusOK)
+}
+
+func MeiliGock() {
+	gock.New(viper.GetString("meili_url") + "/indexes/bindu/search").
+		HeaderPresent("X-Meili-API-Key").
+		Persist().
+		Reply(http.StatusOK).
+		JSON(MeiliHits)
+
+	gock.New(viper.GetString("meili_url")).
+		Post("/indexes/bindu/documents").
+		HeaderPresent("X-Meili-API-Key").
+		Persist().
+		Reply(http.StatusAccepted).
+		JSON(ReturnUpdate)
+
+	gock.New(viper.GetString("meili_url")).
+		Put("/indexes/bindu/documents").
+		HeaderPresent("X-Meili-API-Key").
+		Persist().
+		Reply(http.StatusAccepted).
+		JSON(ReturnUpdate)
+
+	gock.New(viper.GetString("meili_url")).
+		Delete("/indexes/bindu/documents/(.+)").
+		HeaderPresent("X-Meili-API-Key").
+		Persist().
+		Reply(http.StatusAccepted).
+		JSON(ReturnUpdate)
 }
 
 func DisableKavachGock(serverURL string) {
