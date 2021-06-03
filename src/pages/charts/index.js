@@ -388,11 +388,10 @@ function Chart({ data = {}, onSubmit }) {
             <div className="display-container" ref={displayRef}>
               <Form.Item noStyle shouldUpdate={true}>
                 {(form) => {
-                  return <Display form={form} setView={setView} />;
+                  return <Display spec={form.getFieldValue()} setView={setView} />;
                 }}
               </Form.Item>
             </div>
-
             {isDataView ? (
               <div ref={dataViewContainer} className="data-view-container">
                 <DataViewer

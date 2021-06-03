@@ -4,8 +4,7 @@ import { compile } from 'vega-lite';
 
 import BarChartRace from './bar_chart_race/chart.js';
 
-function Chart({ form, setView = () => {} }) {
-  const spec = form.getFieldValue();
+function Chart({ spec, setView = () => {} }) {
   const refContainer = React.useRef(null);
 
   const getSpec = () => {
