@@ -1,9 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { List, Card } from 'antd';
+import { List, Card, Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 
 import { getCharts } from '../../actions/charts';
+import routes from '../../config/routesConfig';
 
 const { Meta } = Card;
 function SavedCharts() {
@@ -18,14 +20,22 @@ function SavedCharts() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return loading ? null : (
+  return (
     <List
+      header={
+        <Link to={routes.templatesList.path}>
+          <Button type="primary" icon={<PlusOutlined />} size={'large'}>
+            Create New Chart
+          </Button>
+        </Link>
+      }
+      loading={loading}
       grid={{ gutter: 16, column: 5 }}
       dataSource={savedCharts}
       renderItem={(chart, index) => {
         return (
           <List.Item>
-            <Link key={index} to={`/charts/${chart.id}/edit`}>
+            <div style={{ position: 'relative' }}>
               <Card
                 hoverable
                 cover={
@@ -37,9 +47,28 @@ function SavedCharts() {
                   />
                 }
               >
-                <Meta title={chart.title} />
+                <Link key={index} to={`/charts/${chart.id}/edit`}>
+                  <Meta title={chart.title} />
+                </Link>
               </Card>
-            </Link>
+              {chart.is_public && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    backgroundColor: '#108ee9',
+                    color: '#fff',
+                    top: 0,
+                    left: 0,
+                    paddingLeft: 6,
+                    paddingRight: 6,
+                    borderRadius: 20,
+                    boxShadow: '0px 0px 10px 2px #aaa',
+                  }}
+                >
+                  Public
+                </div>
+              )}
+            </div>
           </List.Item>
         );
       }}
