@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Form, Input, Space, Select } from 'antd';
 import { maker, checker } from '../../../utils/slug';
 import MediaSelector from '../../../components/MediaSelector';
-import MONACOEditor from '../../../components/monacoEditor';
+import SpecEditor from '../../../components/specEditor';
 import PropertiesEditor from '../../../components/propertiesEditor';
 
 import Categories from '../../../components/categories';
@@ -125,7 +125,7 @@ const TemplateForm = ({ onSubmit, data = {}, onChange, onModeChange }) => {
           },
         ]}
       >
-        <MONACOEditor />
+        <SpecEditor />
       </Form.Item>
       <Form.Item
         name="properties"

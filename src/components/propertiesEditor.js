@@ -46,7 +46,7 @@ const MONACOEditor = ({ value, onChange }) => {
         scrollBeyondLastLine: false,
         wordWrap: 'on',
       }}
-      height="340"
+      height="640"
       value={value}
       onChange={debounce(300, onChange)}
       editorDidMount={editorDidMount}
