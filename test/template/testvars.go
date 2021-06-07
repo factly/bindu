@@ -31,6 +31,7 @@ var data = map[string]interface{}{
 	"medium_id":   1,
 	"category_id": 1,
 	"is_default":  false,
+	"mode":        "vega",
 }
 
 var templateList = []map[string]interface{}{
@@ -42,6 +43,7 @@ var templateList = []map[string]interface{}{
 		"medium_id":   1,
 		"category_id": 1,
 		"is_default":  false,
+		"mode":        "vega",
 	},
 	{
 		"title":       "test title 2",
@@ -51,10 +53,11 @@ var templateList = []map[string]interface{}{
 		"medium_id":   1,
 		"category_id": 1,
 		"is_default":  false,
+		"mode":        "vega",
 	},
 }
 
-var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "title", "slug", "spec", "properties", "category_id", "medium_id", "is_default", "space_id"}
+var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "title", "slug", "spec", "properties", "category_id", "medium_id", "is_default", "mode", "space_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_template"`)
 
@@ -71,5 +74,5 @@ func SelectMock(mock sqlmock.Sqlmock, args ...driver.Value) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(args...).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["medium_id"], data["is_default"], 1))
+			AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["medium_id"], data["is_default"], data["mode"], 1))
 }

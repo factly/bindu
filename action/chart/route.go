@@ -23,6 +23,7 @@ type chart struct {
 	ThemeID          uint           `json:"theme_id"`
 	TemplateID       string         `json:"template_id"`
 	PublishedDate    *time.Time     `json:"published_date"`
+	Mode             string         `json:"mode"`
 	CategoryIDs      []uint         `json:"category_ids"`
 	TagIDs           []uint         `json:"tag_ids"`
 }

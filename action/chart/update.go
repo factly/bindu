@@ -192,6 +192,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		ThemeID:          themeID,
 		TemplateID:       chart.TemplateID,
 		PublishedDate:    chart.PublishedDate,
+		Mode:             chart.Mode,
 	}).Preload("Medium").Preload("Theme").Preload("Tags").Preload("Categories").Preload("Template").First(&result).Error
 
 	if err != nil {
@@ -222,6 +223,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"space_id":           result.SpaceID,
 		"tag_ids":            chart.TagIDs,
 		"category_ids":       chart.CategoryIDs,
+		"mode":               chart.Mode,
 	}
 
 	err = meilisearchx.UpdateDocument("bindu", meiliObj)

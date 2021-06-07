@@ -58,7 +58,7 @@ func TestTemplateUpdate(t *testing.T) {
 		mock.ExpectBegin()
 
 		mock.ExpectExec(`UPDATE \"bi_template\"`).
-			WithArgs(test.AnyTime{}, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["medium_id"], "1").
+			WithArgs(test.AnyTime{}, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["medium_id"], data["mode"], "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		SelectMock(mock)
@@ -86,7 +86,7 @@ func TestTemplateUpdate(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		mock.ExpectExec(`UPDATE \"bi_template\"`).
-			WithArgs(test.AnyTime{}, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], "1").
+			WithArgs(test.AnyTime{}, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["mode"], "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		SelectMock(mock)

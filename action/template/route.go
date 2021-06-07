@@ -16,6 +16,7 @@ type template struct {
 	Properties postgres.Jsonb `json:"properties"  swaggertype:"primitive,string"`
 	CategoryID uint           `json:"category_id"`
 	MediumID   uint           `json:"medium_id"`
+	Mode       string         `json:"mode"`
 	SpaceID    uint           `json:"space_id"`
 }
 

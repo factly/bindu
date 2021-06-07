@@ -25,6 +25,7 @@ type Template struct {
 	MediumID    *uint           `gorm:"column:medium_id;default:NULL" json:"medium_id"`
 	Medium      *Medium         `gorm:"foreignKey:medium_id" json:"medium"`
 	IsDefault   bool            `gorm:"column:is_default" json:"is_default"`
+	Mode        string          `gorm:"column:mode" json:"mode"`
 	SpaceID     uint            `gorm:"column:space_id" json:"space_id"`
 	Space       *Space          `gorm:"foreignKey:space_id" json:"space,omitempty"`
 }

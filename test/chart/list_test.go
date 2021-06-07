@@ -29,6 +29,7 @@ func TestChartList(t *testing.T) {
 		{
 			"title": "Chart Test 1",
 			"slug":  "chart-test-1",
+			"mode":  "vega",
 			"description": `{
 				"data": [
 					{
@@ -122,9 +123,9 @@ func TestChartList(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, 1, chartlist[0]["title"], chartlist[0]["slug"], byteDescriptionDataOne,
-					chartlist[0]["data_url"], byteConfigDataOne, chartlist[0]["status"], chartlist[0]["featured_medium_id"], chartlist[0]["template_id"], chartlist[0]["theme_id"], time.Time{}, 1).
+					chartlist[0]["data_url"], byteConfigDataOne, chartlist[0]["status"], chartlist[0]["featured_medium_id"], chartlist[0]["template_id"], chartlist[0]["theme_id"], time.Time{}, chartlist[0]["mode"], 1).
 				AddRow(2, time.Now(), time.Now(), nil, 1, 1, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
-					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["template_id"], chartlist[1]["theme_id"], time.Time{}, 1))
+					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["template_id"], chartlist[1]["theme_id"], time.Time{}, chartlist[1]["mode"], 1))
 
 		chartPreloadMock(mock)
 
@@ -152,7 +153,7 @@ func TestChartList(t *testing.T) {
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(2, time.Now(), time.Now(), nil, 1, 1, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
-					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["template_id"], chartlist[1]["theme_id"], time.Time{}, 1))
+					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["template_id"], chartlist[1]["theme_id"], time.Time{}, chartlist[1]["mode"], 1))
 
 		chartPreloadMock(mock)
 

@@ -28,6 +28,7 @@ var invalidData = map[string]interface{}{
 var data = map[string]interface{}{
 	"title": "Pie",
 	"slug":  "pie",
+	"mode":  "vega",
 	"description": `{
 		"data": [
 			{
@@ -71,6 +72,7 @@ var dataWithoutSlug = map[string]interface{}{
 	"slug":        "",
 	"is_public":   true,
 	"template_id": "testtemplate",
+	"mode":        "vega",
 	"description": `{
 		"data": [
 			{
@@ -137,7 +139,7 @@ var medium = map[string]interface{}{
 var byteThemeData, _ = json.Marshal(theme["config"])
 
 var columns = []string{
-	"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "title", "slug", "description", "data_url", "config", "status", "featured_medium_id", "template_id", "theme_id", "published_date", "space_id"}
+	"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "title", "slug", "description", "data_url", "config", "status", "featured_medium_id", "template_id", "theme_id", "published_date", "mode", "space_id"}
 
 var selectQuery = `SELECT (.+) FROM "bi_chart"`
 var tagQuery = regexp.QuoteMeta(`SELECT * FROM "bi_tag"`)
@@ -172,7 +174,7 @@ func SelectMock(mock sqlmock.Sqlmock) {
 		WithArgs(1, "1").
 		WillReturnRows(sqlmock.NewRows(columns).
 			AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
-				data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, 1))
+				data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, data["mode"], 1))
 }
 
 func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
@@ -182,7 +184,7 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows(columns).
 			AddRow("1", time.Now(), time.Now(), nil, 1, 1, chart["title"], chart["slug"], description,
-				chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["template_id"], chart["theme_id"], time.Time{}, 1))
+				chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["template_id"], chart["theme_id"], time.Time{}, data["mode"], 1))
 
 	chartPreloadMock(mock)
 }
@@ -257,7 +259,7 @@ func chartUpdateMock(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	mediumQueryMock(mock)
 	themeQueryMock(mock)
 	mock.ExpectExec(`UPDATE \"bi_chart\"`).
-		WithArgs(test.AnyTime{}, 1, chart["title"], chart["slug"], description, chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], test.AnyTime{}, "1").
+		WithArgs(test.AnyTime{}, 1, chart["title"], chart["slug"], description, chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], test.AnyTime{}, data["mode"], "1").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 }
 
@@ -273,7 +275,7 @@ func chartInsertMock(mock sqlmock.Sqlmock) {
 
 	mock.ExpectQuery(`INSERT INTO "bi_chart"`).
 		WithArgs(sqlmock.AnyArg(), test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
-			data["data_url"], byteConfigData, data["status"], data["is_public"], data["template_id"], data["theme_id"], test.AnyTime{}, 1, data["featured_medium_id"]).
+			data["data_url"], byteConfigData, data["status"], data["is_public"], data["template_id"], data["theme_id"], test.AnyTime{}, data["mode"], 1, data["featured_medium_id"]).
 		WillReturnRows(sqlmock.NewRows([]string{"published_date", "featured_medium_id"}))
 
 	mock.ExpectQuery(`INSERT INTO "bi_tag"`).
