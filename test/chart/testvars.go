@@ -223,7 +223,7 @@ func chartCategoryUpdate(mock sqlmock.Sqlmock, err error) {
 
 	if err != nil {
 		mock.ExpectQuery(`INSERT INTO "bi_category"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", false, 1, 1).
 			WillReturnError(err)
 		mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
 			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
@@ -234,7 +234,7 @@ func chartCategoryUpdate(mock sqlmock.Sqlmock, err error) {
 			WillReturnError(err)
 	} else {
 		mock.ExpectQuery(`INSERT INTO "bi_category"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", false, 1, 1).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 		mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
 			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
@@ -284,7 +284,7 @@ func chartInsertMock(mock sqlmock.Sqlmock) {
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	mock.ExpectQuery(`INSERT INTO "bi_category"`).
-		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", 1, 1).
+		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, 1, 1, "Elections", "elections", "", false, 1, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectExec(`INSERT INTO "bi_chart_category"`).
 		WithArgs(sqlmock.AnyArg(), 1).

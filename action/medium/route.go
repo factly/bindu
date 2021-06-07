@@ -14,6 +14,7 @@ type medium struct {
 	Type        string         `json:"type" `
 	Description string         `json:"description"`
 	Caption     string         `json:"caption"`
+	Title       string         `json:"title"`
 	AltText     string         `json:"alt_text"`
 	FileSize    int64          `json:"file_size" `
 	URL         postgres.Jsonb `json:"url" swaggertype:"primitive,string"`

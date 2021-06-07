@@ -8,9 +8,10 @@ import (
 
 // category request model
 type category struct {
-	Name        string `json:"name" validate:"required,min=3,max=50"`
-	Slug        string `json:"slug"`
-	Description string `json:"description"`
+	Name          string `json:"name" validate:"required,min=3,max=50"`
+	Slug          string `json:"slug"`
+	IsForTemplate bool   `json:"is_for_template"`
+	Description   string `json:"description"`
 }
 
 var userContext config.ContextKey = "category_user"

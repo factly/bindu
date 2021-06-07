@@ -166,19 +166,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 		_ = tx.Model(&result).Association("Categories").Clear()
 	}
 
-	featuredMediumID := &chart.FeaturedMediumID
-	result.FeaturedMediumID = &chart.FeaturedMediumID
-	if chart.FeaturedMediumID == 0 {
-		err = tx.Model(&result).Omit("Tags", "Categories").Updates(map[string]interface{}{"featured_medium_id": nil}).Error
-		featuredMediumID = nil
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.DBError()))
-			return
-		}
-	}
-
 	themeID := &chart.ThemeID
 	result.ThemeID = &chart.ThemeID
 	if chart.ThemeID == 0 {
@@ -200,7 +187,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		DataURL:          chart.DataURL,
 		Description:      chart.Description,
 		Status:           chart.Status,
-		FeaturedMediumID: featuredMediumID,
+		FeaturedMediumID: &chart.FeaturedMediumID,
 		Config:           chart.Config,
 		ThemeID:          themeID,
 		TemplateID:       chart.TemplateID,

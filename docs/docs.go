@@ -434,15 +434,15 @@ var doc = `{
         },
         "/charts/{chart_id}": {
             "get": {
-                "description": "Get spec chart by ID",
+                "description": "Get chart by ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Chart"
                 ],
-                "summary": "Show a spec chart by id",
-                "operationId": "get-chart-spec-by-id",
+                "summary": "Show a chart by id",
+                "operationId": "get-chart-by-id",
                 "parameters": [
                     {
                         "type": "string",
@@ -3448,6 +3448,9 @@ var doc = `{
                 "description": {
                     "type": "string"
                 },
+                "is_for_template": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -3581,6 +3584,9 @@ var doc = `{
                 "slug": {
                     "type": "string"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 },
@@ -3616,6 +3622,9 @@ var doc = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "is_for_template": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -4707,6 +4716,9 @@ var doc = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "is_for_template": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"

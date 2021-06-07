@@ -8,6 +8,7 @@ import (
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
@@ -98,6 +99,13 @@ func update(w http.ResponseWriter, r *http.Request) {
 		tagSlug = slugx.Approve(&config.DB, tag.Slug, sID, tableName)
 	} else {
 		tagSlug = slugx.Approve(&config.DB, slugx.Make(tag.Name), sID, tableName)
+	}
+
+	// Check if tag with same name exist
+	if tag.Name != result.Name && util.CheckName(uint(sID), tag.Name, tableName) {
+		loggerx.Error(errors.New(`tag with same name exist`))
+		errorx.Render(w, errorx.Parser(errorx.SameNameExist()))
+		return
 	}
 
 	config.DB.Model(&result).Updates(model.Tag{

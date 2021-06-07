@@ -105,8 +105,9 @@ func MigrateTemplate() error {
 	for _, category_name := range categories {
 		if _, found := category_map[category_name]; !found {
 			category := model.Category{
-				Name:    category_name,
-				SpaceID: SpaceID,
+				Name:          category_name,
+				IsForTemplate: true,
+				SpaceID:       SpaceID,
 			}
 
 			if err = config.DB.Create(&category).Error; err != nil {

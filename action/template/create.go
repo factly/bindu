@@ -96,13 +96,15 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx := config.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
-	err = tx.Model(&model.Template{}).Preload("Medium").Preload("Category").Create(&result).Error
+	err = tx.Model(&model.Template{}).Create(&result).Error
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
+
+	tx.Model(&result).Preload("Medium").Preload("Category").Find(&result)
 
 	if err = AddToMeili(result); err != nil {
 		tx.Rollback()

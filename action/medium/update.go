@@ -105,6 +105,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Name:        medium.Name,
 		Slug:        mediumSlug,
 		Type:        medium.Type,
+		Title:       medium.Title,
 		Description: medium.Description,
 		AltText:     medium.AltText,
 		Caption:     medium.Caption,
