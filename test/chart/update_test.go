@@ -19,6 +19,7 @@ import (
 var updateData = map[string]interface{}{
 	"title":     "Pie",
 	"is_public": true,
+	"mode":      "vega",
 	"description": `{
 		"data": [
 			{
@@ -92,6 +93,7 @@ func TestChartUpdate(t *testing.T) {
 		"featured_medium_id": uint(1),
 		"theme_id":           uint(1),
 		"published_date":     time.Time{},
+		"mode":               "vega",
 	}
 
 	t.Run("cannot decode chart", func(t *testing.T) {
@@ -269,7 +271,7 @@ func TestChartUpdate(t *testing.T) {
 
 		mediumQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], test.AnyTime{}, "1").
+			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], test.AnyTime{}, data["mode"], "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)

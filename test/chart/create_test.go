@@ -101,7 +101,7 @@ func TestChartCreate(t *testing.T) {
 			WithArgs(sqlmock.AnyArg()).
 			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
-					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, 1))
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, data["mode"], 1))
 
 		chartPreloadMock(mock)
 
@@ -135,7 +135,7 @@ func TestChartCreate(t *testing.T) {
 			WithArgs(sqlmock.AnyArg()).
 			WillReturnRows(sqlmock.NewRows(columns).
 				AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
-					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, 1))
+					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, data["mode"], 1))
 
 		chartPreloadMock(mock)
 		mock.ExpectCommit()
