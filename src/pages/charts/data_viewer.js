@@ -1,84 +1,29 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import './data_viewer.css';
-import { VariableSizeGrid as Grid } from 'react-window';
-import classNames from 'classnames';
-import { Button, Input, InputNumber, Table } from 'antd';
+import { Button } from 'antd';
+import ReactDataGrid from 'react-data-grid';
+
+const EmptyRowsView = () => {
+  const message = 'No data to show';
+  return (
+    <div className="data-view-empty-message">
+      <h3>{message}</h3>
+    </div>
+  );
+};
 
 function DataViewer(props) {
-  const { columns, scroll, onDataChange } = props;
-  const tableWidth = scroll.x;
+  const { columns, dataSource, tableWidth, tableHeight, onDataChange, tabIndex } = props;
   const [isEditable, setIsEditable] = useState(false);
-  const mergedColumns = columns.map((column) => {
-    if (column.width) {
-      return column;
-    }
 
+  const mergedColumns = columns.map((column) => {
     return {
       ...column,
+      editable: isEditable,
+      resizable: true,
       width: Math.max(Math.floor((tableWidth - 4) / columns.length), 150),
     };
   });
-
-  const gridRef = useRef();
-
-  const [connectObject] = useState(() => {
-    const obj = {};
-    Object.defineProperty(obj, 'scrollLeft', {
-      get: () => null,
-      set: (scrollLeft) => {
-        if (gridRef.current) {
-          gridRef.current.scrollTo({
-            scrollLeft,
-          });
-        }
-      },
-    });
-    return obj;
-  });
-
-  const renderVirtualList = (rawData, { scrollbarSize, ref, onScroll }) => {
-    ref.current = connectObject;
-    return (
-      <Grid
-        ref={gridRef}
-        className="virtual-grid"
-        columnCount={mergedColumns.length}
-        columnWidth={(index) => {
-          const { width } = mergedColumns[index];
-          return index === mergedColumns.length - 1 ? width - scrollbarSize - 1 : width;
-        }}
-        height={scroll.y}
-        rowCount={rawData.length}
-        rowHeight={() => 54}
-        width={tableWidth}
-        onScroll={({ scrollLeft }) => {
-          onScroll({ scrollLeft });
-        }}
-      >
-        {({ columnIndex, rowIndex, style }) => {
-          const value = rawData[rowIndex][mergedColumns[columnIndex].dataIndex];
-          let InputComponent = Input;
-          let onChange = (event) =>
-            onDataChange(rowIndex, mergedColumns[columnIndex].dataIndex, event.target.value);
-          if (typeof value === 'number') {
-            InputComponent = InputNumber;
-            onChange = (value) =>
-              onDataChange(rowIndex, mergedColumns[columnIndex].dataIndex, value);
-          }
-          return (
-            <div
-              className={classNames('virtual-table-cell', {
-                'virtual-table-cell-last': columnIndex === mergedColumns.length - 1,
-              })}
-              style={style}
-            >
-              {isEditable ? <InputComponent value={value} onChange={onChange} /> : value}
-            </div>
-          );
-        }}
-      </Grid>
-    );
-  };
 
   return (
     <>
@@ -87,15 +32,16 @@ function DataViewer(props) {
       ) : (
         <Button onClick={() => setIsEditable(false)}>Done</Button>
       )}
-      <Table
-        {...props}
-        className="virtual-table"
+
+      <ReactDataGrid
         columns={mergedColumns}
-        pagination={false}
-        showHeader={true}
-        components={{
-          body: renderVirtualList,
-        }}
+        rowGetter={(i) => dataSource[i]}
+        rowsCount={dataSource.length}
+        onGridRowsUpdated={(...params) => onDataChange(...params, tabIndex)}
+        enableCellSelect={true}
+        minHeight={tableHeight}
+        minWidth={tableWidth}
+        emptyRowsView={EmptyRowsView}
       />
     </>
   );

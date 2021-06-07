@@ -1,4 +1,4 @@
-const updateFormData = async (formData, path) => {
+const updateFormData = async (specData, path) => {
   const minoURL = fetch(
     'http://127.0.0.1:3020/s3/params?' +
       new URLSearchParams({
@@ -8,7 +8,7 @@ const updateFormData = async (formData, path) => {
   )
     .then((res) => res.json())
     .then((data) => {
-      var jsonse = JSON.stringify(formData.data.values);
+      var jsonse = JSON.stringify(specData.values);
       var blob = new Blob([jsonse], { type: 'application/json' });
 
       const chartFormData = new FormData();
