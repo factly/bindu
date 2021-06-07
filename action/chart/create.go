@@ -173,6 +173,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		ThemeID:          themeID,
 		TemplateID:       chart.TemplateID,
 		PublishedDate:    chart.PublishedDate,
+		Mode:             chart.Mode,
 		SpaceID:          uint(sID),
 	}
 
@@ -215,6 +216,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"space_id":           result.SpaceID,
 		"tag_ids":            chart.TagIDs,
 		"category_ids":       chart.CategoryIDs,
+		"mode":               chart.Mode,
 	}
 
 	err = meilisearchx.AddDocument("bindu", meiliObj)

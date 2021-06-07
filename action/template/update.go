@@ -126,6 +126,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Properties:  template.Properties,
 		MediumID:    mediumID,
 		CategoryID:  template.CategoryID,
+		Mode:        template.Mode,
 	}).Preload("Medium").Preload("Category").First(&result)
 
 	if err = UpdateInMeili(result); err != nil {
@@ -150,6 +151,7 @@ func UpdateInMeili(result *model.Template) error {
 		"category_id": result.CategoryID,
 		"medium_id":   result.MediumID,
 		"is_default":  result.IsDefault,
+		"mode":        result.Mode,
 		"space_id":    result.SpaceID,
 	}
 

@@ -92,6 +92,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Properties: template.Properties,
 		SpaceID:    uint(sID),
 		MediumID:   mediumID,
+		Mode:       template.Mode,
 		CategoryID: template.CategoryID,
 	}
 
@@ -127,6 +128,7 @@ func AddToMeili(result *model.Template) error {
 		"category_id": result.CategoryID,
 		"medium_id":   result.MediumID,
 		"is_default":  result.IsDefault,
+		"mode":        result.Mode,
 		"space_id":    result.SpaceID,
 	}
 
