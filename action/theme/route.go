@@ -9,9 +9,10 @@ import (
 
 // theme request model
 type theme struct {
-	Name        string         `json:"name" validate:"required,min=3,max=50"`
-	Config      postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
-	Description string         `json:"description"`
+	Name            string         `json:"name" validate:"required,min=3,max=50"`
+	Config          postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
+	Description     postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
+	HtmlDescription string         `json:"html_description"`
 }
 
 var userContext config.ContextKey = "theme_user"

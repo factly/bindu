@@ -10,14 +10,16 @@ import (
 
 // template model
 type template struct {
-	Title      string         `json:"title"`
-	Slug       string         `json:"slug"`
-	Spec       postgres.Jsonb `json:"spec"  swaggertype:"primitive,string"`
-	Properties postgres.Jsonb `json:"properties"  swaggertype:"primitive,string"`
-	CategoryID uint           `json:"category_id"`
-	MediumID   uint           `json:"medium_id"`
-	Mode       string         `json:"mode"`
-	SpaceID    uint           `json:"space_id"`
+	Title           string         `json:"title"`
+	Slug            string         `json:"slug"`
+	Spec            postgres.Jsonb `json:"spec"  swaggertype:"primitive,string"`
+	Properties      postgres.Jsonb `json:"properties"  swaggertype:"primitive,string"`
+	CategoryID      uint           `json:"category_id"`
+	MediumID        uint           `json:"medium_id"`
+	Mode            string         `json:"mode"`
+	Description     postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
+	HtmlDescription string         `json:"html_description"`
+	SpaceID         uint           `json:"space_id"`
 }
 
 var userContext config.ContextKey = "template_user"

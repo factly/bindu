@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 	"strings"
 
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/minio"
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
@@ -160,6 +162,17 @@ func create(w http.ResponseWriter, r *http.Request) {
 		themeID = nil
 	}
 
+	// Store HTML description
+	var description string
+	if len(chart.Description.RawMessage) > 0 && !reflect.DeepEqual(chart.Description, util.NilJsonb()) {
+		description, err = util.HTMLDescription(chart.Description)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse chart description", http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
 	result := &model.Chart{
 		ID:               strings.ReplaceAll(uuid.New().String(), "-", ""),
 		Title:            chart.Title,
@@ -167,6 +180,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		DataURL:          chart.DataURL,
 		Config:           chart.Config,
 		Description:      chart.Description,
+		HtmlDescription:  description,
 		Status:           chart.Status,
 		IsPublic:         chart.IsPublic,
 		FeaturedMediumID: &chart.FeaturedMediumID,
@@ -207,6 +221,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"slug":               result.Slug,
 		"status":             result.Status,
 		"description":        result.Description,
+		"html_description":   result.HtmlDescription,
 		"data_url":           result.DataURL,
 		"is_public":          result.IsPublic,
 		"featured_medium_id": result.FeaturedMediumID,

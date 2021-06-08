@@ -19,7 +19,8 @@ type Chart struct {
 	UpdatedByID      uint            `gorm:"column:updated_by_id" json:"updated_by_id"`
 	Title            string          `json:"title"`
 	Slug             string          `json:"slug"`
-	Description      postgres.Jsonb  `json:"description" sql:"jsonb" swaggertype:"primitive,string"`
+	Description      postgres.Jsonb  `gorm:"column:description" json:"description" swaggertype:"primitive,string"`
+	HtmlDescription  string          `gorm:"column:html_description" json:"html_description"`
 	DataURL          string          `json:"data_url"`
 	Config           postgres.Jsonb  `json:"config" swaggertype:"primitive,string"`
 	Status           string          `json:"status"`

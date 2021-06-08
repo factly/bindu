@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/bindu-server/util/minio"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
@@ -179,6 +181,17 @@ func update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Store HTML description
+	var description string
+	if len(chart.Description.RawMessage) > 0 && !reflect.DeepEqual(chart.Description, util.NilJsonb()) {
+		description, err = util.HTMLDescription(chart.Description)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse chart description", http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
 	tx.Model(&result).Select("IsPublic").Updates(model.Chart{IsPublic: chart.IsPublic})
 	err = tx.Model(&result).Omit("Tags", "Categories").Updates(model.Chart{
 		UpdatedByID:      uint(uID),
@@ -186,6 +199,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Slug:             chartSlug,
 		DataURL:          chart.DataURL,
 		Description:      chart.Description,
+		HtmlDescription:  description,
 		Status:           chart.Status,
 		FeaturedMediumID: &chart.FeaturedMediumID,
 		Config:           chart.Config,
@@ -214,6 +228,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"slug":               result.Slug,
 		"status":             result.Status,
 		"description":        result.Description,
+		"html_description":   result.HtmlDescription,
 		"data_url":           result.DataURL,
 		"is_public":          result.IsPublic,
 		"featured_medium_id": result.FeaturedMediumID,
