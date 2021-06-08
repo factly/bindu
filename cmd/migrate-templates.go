@@ -155,6 +155,14 @@ func MigrateTemplate() error {
 				return err
 			}
 
+			var spec map[string]interface{}
+			err = json.Unmarshal(specBytes, &spec)
+			if err != nil {
+				return err
+			}
+
+			mode := spec["mode"].(string)
+
 			mediumID, err := CreateMedium(filepath, fmt.Sprint(chart_name, ".png"), "thumbnail.png")
 			if err != nil {
 				return err
@@ -172,6 +180,7 @@ func MigrateTemplate() error {
 				Title:     chart_name,
 				IsDefault: true,
 				Slug:      slugx.Make(fmt.Sprint("bindu ", chart_name)),
+				Mode:      mode,
 				SpaceID:   SpaceID,
 			}
 
