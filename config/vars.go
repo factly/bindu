@@ -73,4 +73,8 @@ func SetupVars() {
 	if !viper.IsSet("meili_key") {
 		log.Fatal("please provide meili_key in config file")
 	}
+
+	if !viper.IsSet("templates_path") {
+		log.Fatal("please provide templates_path in config file")
+	}
 }

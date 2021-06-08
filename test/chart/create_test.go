@@ -12,27 +12,18 @@ import (
 	"github.com/factly/bindu-server/util/minio"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"gopkg.in/h2non/gock.v1"
 )
 
 var res = map[string]interface{}{
 	"title": "Pie",
 	"slug":  "pie",
-	"description": `{
-		"data": [
-			{
-			"type": "articles",
-			"id": "3",
-			"attributes": {
-				"title": "JSON:API paints my bikeshed!",
-				"body": "The shortest article. Ever.",
-				"created": "2015-05-22T14:56:29.000Z",
-				"updated": "2015-05-22T14:56:28.000Z"
-			}
-			}
-		]
-		}`,
-	"data_url": "http://data.com/crime?page[number]=3&page[size]=1",
+	"description": postgres.Jsonb{
+		RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description"}}],"version":"2.19.0"}`),
+	},
+	"html_description": "<p>Test Description</p>",
+	"data_url":         "http://data.com/crime?page[number]=3&page[size]=1",
 	"config": `{
 		"links": {
 			"self": "http://example.com/articles?page[number]=3&page[size]=1",
@@ -100,7 +91,7 @@ func TestChartCreate(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(sqlmock.AnyArg()).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
+				AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData, data["html_description"],
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, data["mode"], 1))
 
 		chartPreloadMock(mock)
@@ -134,7 +125,7 @@ func TestChartCreate(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(sqlmock.AnyArg()).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData, data["html_description"],
 					data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, data["mode"], 1))
 
 		chartPreloadMock(mock)

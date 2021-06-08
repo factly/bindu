@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var headers = map[string]string{
@@ -16,6 +17,10 @@ var headers = map[string]string{
 
 var data = map[string]interface{}{
 	"name": "Light theme",
+	"description": postgres.Jsonb{
+		RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description"}}],"version":"2.19.0"}`),
+	},
+	"html_description": "<p>Test Description</p>",
 	"config": `{"image": { 
         "src": "Images/Sun.png",
         "name": "sun1",
@@ -31,7 +36,7 @@ var invalidData = map[string]interface{}{
 
 var byteData, _ = json.Marshal(data["config"])
 
-var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "organisation_id", "name", "config", "space_id"}
+var columns = []string{"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "organisation_id", "name", "config", "description", "html_description", "space_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "bi_theme"`)
 var deleteQuery = regexp.QuoteMeta(`UPDATE "bi_theme" SET "deleted_at"=`)
@@ -51,7 +56,7 @@ func SelectMock(mock sqlmock.Sqlmock, args ...driver.Value) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(args...).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, data["name"], byteData, 1))
+			AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, data["name"], byteData, data["description"], data["html_description"], 1))
 
 }
 

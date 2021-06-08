@@ -29,21 +29,11 @@ var data = map[string]interface{}{
 	"title": "Pie",
 	"slug":  "pie",
 	"mode":  "vega",
-	"description": `{
-		"data": [
-			{
-			"type": "articles",
-			"id": "3",
-			"attributes": {
-				"title": "JSON:API paints my bikeshed!",
-				"body": "The shortest article. Ever.",
-				"created": "2015-05-22T14:56:29.000Z",
-				"updated": "2015-05-22T14:56:28.000Z"
-			}
-			}
-		]
-		}`,
-	"data_url": "http://data.com/crime?page[number]=3&page[size]=1",
+	"description": postgres.Jsonb{
+		RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description"}}],"version":"2.19.0"}`),
+	},
+	"html_description": "<p>Test Description</p>",
+	"data_url":         "http://data.com/crime?page[number]=3&page[size]=1",
 	"config": `{
 		"links": {
 			"self": "http://example.com/articles?page[number]=3&page[size]=1",
@@ -73,21 +63,11 @@ var dataWithoutSlug = map[string]interface{}{
 	"is_public":   true,
 	"template_id": "testtemplate",
 	"mode":        "vega",
-	"description": `{
-		"data": [
-			{
-			"type": "articles",
-			"id": "3",
-			"attributes": {
-				"title": "JSON:API paints my bikeshed!",
-				"body": "The shortest article. Ever.",
-				"created": "2015-05-22T14:56:29.000Z",
-				"updated": "2015-05-22T14:56:28.000Z"
-			}
-			}
-		]
-		}`,
-	"data_url": "http://data.com/crime?page[number]=3&page[size]=1",
+	"description": postgres.Jsonb{
+		RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description"}}],"version":"2.19.0"}`),
+	},
+	"html_description": "<p>Test Description</p>",
+	"data_url":         "http://data.com/crime?page[number]=3&page[size]=1",
 	"config": `{
 		"links": {
 			"self": "http://example.com/articles?page[number]=3&page[size]=1",
@@ -139,7 +119,7 @@ var medium = map[string]interface{}{
 var byteThemeData, _ = json.Marshal(theme["config"])
 
 var columns = []string{
-	"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "title", "slug", "description", "data_url", "config", "status", "featured_medium_id", "template_id", "theme_id", "published_date", "mode", "space_id"}
+	"id", "created_at", "updated_at", "deleted_at", "created_by_id", "updated_by_id", "title", "slug", "description", "html_description", "data_url", "config", "status", "featured_medium_id", "template_id", "theme_id", "published_date", "mode", "space_id"}
 
 var selectQuery = `SELECT (.+) FROM "bi_chart"`
 var tagQuery = regexp.QuoteMeta(`SELECT * FROM "bi_tag"`)
@@ -173,7 +153,7 @@ func SelectMock(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1, "1").
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
+			AddRow("1", time.Now(), time.Now(), nil, 1, 1, data["title"], data["slug"], byteDescriptionData, data["html_description"],
 				data["data_url"], byteConfigData, data["status"], data["featured_medium_id"], data["template_id"], data["theme_id"], time.Time{}, data["mode"], 1))
 }
 
@@ -183,7 +163,7 @@ func selectAfterUpdate(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow("1", time.Now(), time.Now(), nil, 1, 1, chart["title"], chart["slug"], description,
+			AddRow("1", time.Now(), time.Now(), nil, 1, 1, chart["title"], chart["slug"], description, data["html_description"],
 				chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["template_id"], chart["theme_id"], time.Time{}, data["mode"], 1))
 
 	chartPreloadMock(mock)
@@ -259,7 +239,7 @@ func chartUpdateMock(mock sqlmock.Sqlmock, chart map[string]interface{}) {
 	mediumQueryMock(mock)
 	themeQueryMock(mock)
 	mock.ExpectExec(`UPDATE \"bi_chart\"`).
-		WithArgs(test.AnyTime{}, 1, chart["title"], chart["slug"], description, chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], test.AnyTime{}, data["mode"], "1").
+		WithArgs(test.AnyTime{}, 1, chart["title"], chart["slug"], description, chart["html_description"], chart["data_url"], config, chart["status"], chart["featured_medium_id"], chart["theme_id"], test.AnyTime{}, data["mode"], "1").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 }
 
@@ -274,8 +254,7 @@ func chartInsertMock(mock sqlmock.Sqlmock) {
 			AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, theme["name"], byteThemeData))
 
 	mock.ExpectQuery(`INSERT INTO "bi_chart"`).
-		WithArgs(sqlmock.AnyArg(), test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], byteDescriptionData,
-			data["data_url"], byteConfigData, data["status"], data["is_public"], data["template_id"], data["theme_id"], test.AnyTime{}, data["mode"], 1, data["featured_medium_id"]).
+		WithArgs(sqlmock.AnyArg(), test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], byteDescriptionData, data["html_description"], data["data_url"], byteConfigData, data["status"], data["is_public"], data["template_id"], data["theme_id"], test.AnyTime{}, data["mode"], 1, data["featured_medium_id"]).
 		WillReturnRows(sqlmock.NewRows([]string{"published_date", "featured_medium_id"}))
 
 	mock.ExpectQuery(`INSERT INTO "bi_tag"`).
