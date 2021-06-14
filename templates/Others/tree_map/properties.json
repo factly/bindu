@@ -1,61 +1,41 @@
-\{
-  "$schema": "PropertiesSchema",
-  "$components": [
-    {
-      "name": "Chart Properties",
-      "properties": [
+{
+    "$schema": "PropertiesSchema",
+    "$components": [
         {
-          "prop": "title",
-          "path": [
-            "title"
-          ]
+            "name": "Chart Properties",
+            "properties": [
+                {
+                    "prop": "title",
+                    "path": ["title"]
+                },
+                {
+                    "prop": "width",
+                    "path": ["width"]
+                },
+                {
+                    "prop": "height",
+                    "path": ["height"]
+                },
+                {
+                    "prop": "background",
+                    "path": ["background"]
+                }
+            ],
+            "Component": "ChartProperties"
         },
         {
-          "prop": "width",
-          "path": [
-            "width"
-          ]
-        },
-        {
-          "prop": "height",
-          "path": [
-            "height"
-          ]
-        },
-        {
-          "prop": "background",
-          "path": [
-            "background"
-          ]
+            "name": "Tree Map",
+            "properties": [
+                {
+                    "prop": "layout",
+                    "path": ["data", 0, "transform", 1, "method"]
+                },
+                {
+                    "prop": "aspect_ratio",
+                    "path": ["data", 0, "transform", 1, "ratio"]
+                }
+            ],
+            "Component": "TreeMap"
         }
-      ],
-      "Component": "ChartProperties"
-    },
-    {
-      "name": "Tree Map",
-      "properties": [
-        {
-          "prop": "layout",
-          "path": [
-            "data",
-            0,
-            "transform",
-            1,
-            "method"
-          ]
-        },
-        {
-          "prop": "aspect_ratio",
-          "path": [
-            "data",
-            0,
-            "transform",
-            1,
-            "ratio"
-          ]
-        }
-      ],
-      "Component": "TreeMap"
-    }
-  ]
+    ]
 }
