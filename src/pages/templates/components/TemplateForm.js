@@ -63,7 +63,7 @@ const TemplateForm = ({ onSubmit, data = {}, onChange, onModeChange }) => {
       initialValues={{
         ...data,
         spec: data?.spec ? JSON.stringify(data.spec) : '{}',
-        properties: data?.properties ? JSON.stringify(data.properties) : '{}',
+        properties: data?.properties ? JSON.stringify(data.properties) : '[]',
       }}
       onValuesChange={onChange}
       name="create-chart"

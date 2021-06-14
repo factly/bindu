@@ -1,8 +1,8 @@
 {
-  "title": "JSON schema for Azure Functions host.json files",
+  "title": "JSON schema for validating properties",
   "type": "object",
   "properties": {
-    "properties": {
+    "$components": {
       "type": "array",
       "items": {
         "type": "object",
@@ -10,7 +10,7 @@
           "name": {
             "type": "string"
           },
-          "props": {
+          "properties": {
             "type": "array",
             "items": {
               "type": "object",

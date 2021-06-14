@@ -59,7 +59,12 @@ function EditTemplate() {
         <Display spec={spec} mode={mode} />
       </div>
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
-        <TemplateForm onSubmit={onUpdate} onChange={onChange} data={template} />
+        <TemplateForm
+          onSubmit={onUpdate}
+          onChange={onChange}
+          data={template}
+          onModeChange={setMode}
+        />
       </div>
     </div>
   );

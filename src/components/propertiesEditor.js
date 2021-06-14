@@ -1,5 +1,4 @@
 import React from 'react';
-import * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import MonacoEditor from 'react-monaco-editor';
 import { debounce } from 'vega';
 
@@ -13,11 +12,11 @@ const MONACOEditor = ({ value, onChange }) => {
       };
     }
 
-    if (spec.$properties === undefined) {
-      spec.$properties = [];
+    if (spec.$components === undefined) {
+      spec.$components = [];
     }
 
-    spec.$properties = [...spec.$properties, { Component: '', name: '', props: [] }];
+    spec.$components = [...spec.$components, { Component: '', name: '', properties: [] }];
     if (confirm('Adding schema URL will format the specification too.')) {
       onChange(JSON.stringify(spec, null, 4));
     }
@@ -27,8 +26,8 @@ const MONACOEditor = ({ value, onChange }) => {
     editor.addAction({
       contextMenuGroupId: 'vega',
       contextMenuOrder: 0,
-      id: 'ADD_NEW_PROPERTY',
-      label: 'Add new property',
+      id: 'ADD_NEW_COMPONENT',
+      label: 'Add new component',
       run: () => addNewProperty(editor.getModel().getValue()),
     });
   };
