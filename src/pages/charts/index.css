@@ -33,8 +33,15 @@
 .data-view-container {
   position: relative;
   max-width: 600px;
+  min-width: 400px;
   margin-left: auto;
   height: inherit;
+}
+
+.data-view-empty-message {
+  text-align: 'center';
+  background-color: #ddd;
+  padding: 100px;
 }
 
 .chart-name {
