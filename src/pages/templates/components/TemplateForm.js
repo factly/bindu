@@ -1,10 +1,13 @@
 import React from 'react';
-import { Button, Form, Input, Space } from 'antd';
+import { Button, Form, Input, Space, Select } from 'antd';
 import { maker, checker } from '../../../utils/slug';
-
 import MediaSelector from '../../../components/MediaSelector';
+import SpecEditor from '../../../components/specEditor';
+import PropertiesEditor from '../../../components/propertiesEditor';
 
 import Categories from '../../../components/categories';
+
+const { Option } = Select;
 
 const layout = {
   labelCol: {
@@ -30,9 +33,8 @@ const jsonChecker = (value) => {
   }
 };
 
-const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
+const TemplateForm = ({ onSubmit, data = {}, onChange, onModeChange }) => {
   const [form] = Form.useForm();
-
   const onReset = () => {
     form.resetFields();
   };
@@ -60,8 +62,8 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
       form={form}
       initialValues={{
         ...data,
-        spec: data?.spec ? JSON.stringify(data.spec) : '',
-        properties: data?.properties ? JSON.stringify(data.properties) : '',
+        spec: data?.spec ? JSON.stringify(data.spec) : '{}',
+        properties: data?.properties ? JSON.stringify(data.properties) : '{}',
       }}
       onValuesChange={onChange}
       name="create-chart"
@@ -99,6 +101,21 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
       </Form.Item>
       <Categories form={form} required label="Category" />
       <Form.Item
+        name="mode"
+        label="Mode"
+        rules={[
+          {
+            required: true,
+            message: 'Please add mode!',
+          },
+        ]}
+      >
+        <Select defaultValue="vega-lite" onChange={onModeChange}>
+          <Option value="vega-lite">Vega Lite</Option>
+          <Option value="vega">Vega</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item
         name="spec"
         label="Spec"
         rules={[
@@ -108,7 +125,7 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
           },
         ]}
       >
-        <Input.TextArea autoSize={{ minRows: 15, maxRows: 30 }} />
+        <SpecEditor />
       </Form.Item>
       <Form.Item
         name="properties"
@@ -120,7 +137,7 @@ const TemplateForm = ({ onSubmit, data = {}, onChange }) => {
           },
         ]}
       >
-        <Input.TextArea autoSize={{ minRows: 15, maxRows: 30 }} />
+        <PropertiesEditor />
       </Form.Item>
       <Form.Item label="Featured Image" name="medium_id">
         <MediaSelector />

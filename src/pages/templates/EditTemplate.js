@@ -10,6 +10,7 @@ function EditTemplate() {
   const history = useHistory();
   const { templateId: id } = useParams();
   const [spec, setSpec] = React.useState({});
+  const [mode, setMode] = React.useState('');
 
   const dispatch = useDispatch();
 
@@ -27,6 +28,7 @@ function EditTemplate() {
 
   React.useEffect(() => {
     if (template?.spec) setSpec(template.spec);
+    if (template?.mode) setMode(template.mode);
   }, [template]);
 
   if (loading) return null;
@@ -54,10 +56,15 @@ function EditTemplate() {
   return (
     <div style={{ display: 'flex', height: '80vh' }}>
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
-        <Display spec={spec} />
+        <Display spec={spec} mode={mode} />
       </div>
       <div style={{ flex: 1, height: '100%', overflow: 'auto' }}>
-        <TemplateForm onSubmit={onUpdate} onChange={onChange} data={template} />
+        <TemplateForm
+          onSubmit={onUpdate}
+          onChange={onChange}
+          data={template}
+          onModeChange={setMode}
+        />
       </div>
     </div>
   );

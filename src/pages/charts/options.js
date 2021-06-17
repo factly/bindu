@@ -62,7 +62,7 @@ function OptionComponent(props) {
   }, []);
 
   useEffect(() => {
-    if (!props.isEdit) form.setFieldsValue(component?.spec);
+    if (!props.isEdit) form.setFieldsValue({ ...component?.spec, mode: component?.mode });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [component]);
 
@@ -71,13 +71,13 @@ function OptionComponent(props) {
   return !component ? null : (
     <>
       <Collapse className="option-item-collapse">
-        {component.properties.map((d, i) => {
+        {component.properties.$components.map((d, i) => {
           const PropertiesComponent = PropertiesComponentMap[d.Component];
-          return (
+          return PropertiesComponent ? (
             <Panel className="option-item-panel" header={d.name} key={i}>
               <PropertiesComponent properties={d.properties} form={form} />
             </Panel>
-          );
+          ) : null;
         })}
       </Collapse>
       <br />
