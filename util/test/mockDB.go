@@ -31,6 +31,7 @@ func (a AnyTime) Match(v driver.Value) bool {
 func SetupMockDB() sqlmock.Sqlmock {
 	viper.Set("meili_url", "http://meili:7700")
 	viper.Set("meili_key", "password")
+	viper.Set("templates_path", "../../web/parse_description/*")
 
 	db, mock, err := sqlmock.New()
 	if err != nil {

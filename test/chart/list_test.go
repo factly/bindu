@@ -11,6 +11,7 @@ import (
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -30,21 +31,11 @@ func TestChartList(t *testing.T) {
 			"title": "Chart Test 1",
 			"slug":  "chart-test-1",
 			"mode":  "vega",
-			"description": `{
-				"data": [
-					{
-					"type": "charts",
-					"id": "3",
-					"attributes": {
-						"title": "JSON:API paints my bikeshed!",
-						"body": "The shortest article. Ever.",
-						"created": "2015-05-22T14:56:29.000Z",
-						"updated": "2015-05-22T14:56:28.000Z"
-					}
-					}
-				]
-				}`,
-			"data_url": "http://data.com/crime?page[number]=3&page[size]=1",
+			"description": postgres.Jsonb{
+				RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description 1"}}],"version":"2.19.0"}`),
+			},
+			"html_description": "<p>Test Description 1</p>",
+			"data_url":         "http://data.com/crime?page[number]=3&page[size]=1",
 			"config": `{
 				"links": {
 					"self": "http://example.com/charts?page[number]=3&page[size]=1",
@@ -61,21 +52,11 @@ func TestChartList(t *testing.T) {
 		{
 			"title": "Chart Test 2",
 			"slug":  "chart-test-2",
-			"description": `{
-				"data": [
-					{
-					"type": "pie",
-					"id": "3",
-					"attributes": {
-						"title": "JSON:API paints my bikeshed!",
-						"body": "The shortest article. Ever.",
-						"created": "2015-05-22T14:56:29.000Z",
-						"updated": "2015-05-22T14:56:28.000Z"
-					}
-					}
-				]
-				}`,
-			"data_url": "http://data.com/crime?page[number]=3&page[size]=1",
+			"description": postgres.Jsonb{
+				RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description 2"}}],"version":"2.19.0"}`),
+			},
+			"html_description": "<p>Test Description 2</p>",
+			"data_url":         "http://data.com/crime?page[number]=3&page[size]=1",
 			"config": `{
 				"links": {
 					"self": "http://example.com/pie?page[number]=3&page[size]=1",
@@ -122,10 +103,8 @@ func TestChartList(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, chartlist[0]["title"], chartlist[0]["slug"], byteDescriptionDataOne,
-					chartlist[0]["data_url"], byteConfigDataOne, chartlist[0]["status"], chartlist[0]["featured_medium_id"], chartlist[0]["template_id"], chartlist[0]["theme_id"], time.Time{}, chartlist[0]["mode"], 1).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
-					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["template_id"], chartlist[1]["theme_id"], time.Time{}, chartlist[1]["mode"], 1))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, chartlist[0]["title"], chartlist[0]["slug"], byteDescriptionDataOne, chartlist[0]["html_description"], chartlist[0]["data_url"], byteConfigDataOne, chartlist[0]["status"], chartlist[0]["featured_medium_id"], chartlist[0]["template_id"], chartlist[0]["theme_id"], time.Time{}, chartlist[0]["mode"], 1).
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo, chartlist[1]["html_description"], chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["template_id"], chartlist[1]["theme_id"], time.Time{}, chartlist[1]["mode"], 1))
 
 		chartPreloadMock(mock)
 
@@ -152,8 +131,7 @@ func TestChartList(t *testing.T) {
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo,
-					chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["template_id"], chartlist[1]["theme_id"], time.Time{}, chartlist[1]["mode"], 1))
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, chartlist[1]["title"], chartlist[1]["slug"], byteDescriptionDataTwo, chartlist[1]["html_description"], chartlist[1]["data_url"], byteConfigDataTwo, chartlist[1]["status"], chartlist[1]["featured_medium_id"], chartlist[1]["template_id"], chartlist[1]["theme_id"], time.Time{}, chartlist[1]["mode"], 1))
 
 		chartPreloadMock(mock)
 

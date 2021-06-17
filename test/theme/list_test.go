@@ -11,6 +11,7 @@ import (
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -32,14 +33,24 @@ func TestThemeList(t *testing.T) {
 			"hOffset": 250,
 			"vOffset": 250,
 			"alignment": "center"
-		}}`},
+		}}`,
+			"description": postgres.Jsonb{
+				RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description 1"}}],"version":"2.19.0"}`),
+			},
+			"html_description": "<p>Test Description 1</p>",
+		},
 		{"name": "Test Theme 2", "config": `{"image": { 
 			"src": "Images/Sun.png",
 			"name": "sun2",
 			"hOffset": 250,
 			"vOffset": 250,
 			"alignment": "center"
-		}}`},
+		}}`,
+			"description": postgres.Jsonb{
+				RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description 2"}}],"version":"2.19.0"}`),
+			},
+			"html_description": "<p>Test Description 2</p>",
+		},
 	}
 
 	byteData0, _ := json.Marshal(themelist[0]["config"])
@@ -69,8 +80,8 @@ func TestThemeList(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, themelist[0]["name"], byteData0, 1).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1, 1))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, themelist[0]["name"], byteData0, themelist[0]["description"], themelist[0]["html_description"], 1).
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1, themelist[1]["description"], themelist[1]["html_description"], 1))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -94,7 +105,7 @@ func TestThemeList(t *testing.T) {
 
 		mock.ExpectQuery(paginationQuery).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1, 1))
+				AddRow(2, time.Now(), time.Now(), nil, 1, 1, 1, themelist[1]["name"], byteData1, themelist[1]["description"], themelist[1]["html_description"], 1))
 
 		e.GET(basePath).
 			WithQueryObject(map[string]interface{}{

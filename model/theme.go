@@ -9,10 +9,12 @@ import (
 // Theme model
 type Theme struct {
 	config.Base
-	Name    string         `json:"name" validate:"required"`
-	Config  postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
-	SpaceID uint           `gorm:"column:space_id" json:"space_id"`
-	Space   *Space         `json:"space,omitempty"`
+	Name            string         `json:"name" validate:"required"`
+	Config          postgres.Jsonb `json:"config" swaggertype:"primitive,string"`
+	Description     postgres.Jsonb `gorm:"column:description" json:"description" swaggertype:"primitive,string"`
+	HtmlDescription string         `gorm:"column:html_description" json:"html_description"`
+	SpaceID         uint           `gorm:"column:space_id" json:"space_id"`
+	Space           *Space         `json:"space,omitempty"`
 }
 
 var themeUser config.ContextKey = "theme_user"

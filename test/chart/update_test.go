@@ -13,6 +13,7 @@ import (
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -20,21 +21,11 @@ var updateData = map[string]interface{}{
 	"title":     "Pie",
 	"is_public": true,
 	"mode":      "vega",
-	"description": `{
-		"data": [
-			{
-			"type": "sport",
-			"id": "3",
-			"attributes": {
-				"title": "JSON:API paints my bikeshed!",
-				"body": "The shortest article. Ever.",
-				"created": "2015-05-22T14:56:29.000Z",
-				"updated": "2015-05-22T14:56:28.000Z"
-			}
-			}
-		]
-		}`,
-	"data_url": "http://data.com/sports?page[number]=3&page[size]=1",
+	"description": postgres.Jsonb{
+		RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description"}}],"version":"2.19.0"}`),
+	},
+	"html_description": "<p>Test Description</p>",
+	"data_url":         "http://data.com/sports?page[number]=3&page[size]=1",
 	"config": `{
 		"links": {
 			"self": "http://example.com/sport?page[number]=3&page[size]=1",
@@ -64,21 +55,11 @@ func TestChartUpdate(t *testing.T) {
 	e := httpexpect.New(t, testServer.URL)
 	res := map[string]interface{}{
 		"title": "Pie",
-		"description": `{
-			"data": [
-				{
-				"type": "sport",
-				"id": "3",
-				"attributes": {
-					"title": "JSON:API paints my bikeshed!",
-					"body": "The shortest article. Ever.",
-					"created": "2015-05-22T14:56:29.000Z",
-					"updated": "2015-05-22T14:56:28.000Z"
-				}
-				}
-			]
-			}`,
-		"data_url": "http://data.com/sports?page[number]=3&page[size]=1",
+		"description": postgres.Jsonb{
+			RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description"}}],"version":"2.19.0"}`),
+		},
+		"html_description": "<p>Test Description</p>",
+		"data_url":         "http://data.com/sports?page[number]=3&page[size]=1",
 		"config": `{
 			"links": {
 				"self": "http://example.com/sport?page[number]=3&page[size]=1",
@@ -271,7 +252,7 @@ func TestChartUpdate(t *testing.T) {
 
 		mediumQueryMock(mock)
 		mock.ExpectExec(`UPDATE \"bi_chart\"`).
-			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], test.AnyTime{}, data["mode"], "1").
+			WithArgs(test.AnyTime{}, 1, updateChart["title"], updateChart["slug"], description, updateChart["html_description"], updateChart["data_url"], config, updateChart["status"], updateChart["featured_medium_id"], test.AnyTime{}, data["mode"], "1").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		res["slug"] = "pie"
 		selectAfterUpdate(mock, res)

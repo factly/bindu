@@ -11,6 +11,7 @@ import (
 	"github.com/factly/bindu-server/action"
 	"github.com/factly/bindu-server/util/test"
 	"github.com/gavv/httpexpect/v2"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -27,6 +28,10 @@ func TestThemeUpdate(t *testing.T) {
 
 	var updatedTheme = map[string]interface{}{
 		"name": "Dark theme",
+		"description": postgres.Jsonb{
+			RawMessage: []byte(`{"time":1617039625490,"blocks":[{"type":"paragraph","data":{"text":"Test Description"}}],"version":"2.19.0"}`),
+		},
+		"html_description": "<p>Test Description</p>",
 		"config": `{"image": { 
 			"src": "Images/Sun.png",
 			"name": "sun2",
@@ -89,14 +94,14 @@ func TestThemeUpdate(t *testing.T) {
 
 		mock.ExpectBegin()
 		mock.ExpectExec(`UPDATE \"bi_theme\"`).
-			WithArgs(test.AnyTime{}, 1, updatedTheme["name"], updatedByteData, 1).
+			WithArgs(test.AnyTime{}, 1, updatedTheme["name"], updatedByteData, updatedTheme["description"], updatedTheme["html_description"], 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, updatedTheme["name"], updatedByteData, 1))
+				AddRow(1, time.Now(), time.Now(), nil, 1, 1, 1, updatedTheme["name"], updatedByteData, updatedTheme["description"], updatedTheme["html_description"], 1))
 
 		e.PUT(path).
 			WithPath("theme_id", 1).

@@ -44,7 +44,7 @@ func TestTemplateCreate(t *testing.T) {
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "bi_template"`).
-			WithArgs(sqlmock.AnyArg(), test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["is_default"], data["mode"], 1, data["medium_id"]).
+			WithArgs(sqlmock.AnyArg(), test.AnyTime{}, test.AnyTime{}, nil, 1, 1, data["title"], data["slug"], data["spec"], data["properties"], data["category_id"], data["is_default"], data["mode"], data["description"], data["html_description"], 1, data["medium_id"]).
 			WillReturnRows(sqlmock.
 				NewRows([]string{"medium_id"}).
 				AddRow(1))

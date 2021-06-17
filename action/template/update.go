@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/meilisearchx"
@@ -118,15 +120,28 @@ func update(w http.ResponseWriter, r *http.Request) {
 		templateSlug = slugx.Approve(&tx, slugx.Make(template.Title), sID, tableName)
 	}
 
+	// Store HTML description
+	var description string
+	if len(template.Description.RawMessage) > 0 && !reflect.DeepEqual(template.Description, util.NilJsonb()) {
+		description, err = util.HTMLDescription(template.Description)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse template description", http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
 	tx.Model(&result).Updates(model.Template{
-		UpdatedByID: uint(uID),
-		Title:       template.Title,
-		Slug:        templateSlug,
-		Spec:        template.Spec,
-		Properties:  template.Properties,
-		MediumID:    mediumID,
-		CategoryID:  template.CategoryID,
-		Mode:        template.Mode,
+		UpdatedByID:     uint(uID),
+		Title:           template.Title,
+		Slug:            templateSlug,
+		Spec:            template.Spec,
+		Properties:      template.Properties,
+		MediumID:        mediumID,
+		CategoryID:      template.CategoryID,
+		Mode:            template.Mode,
+		Description:     template.Description,
+		HtmlDescription: description,
 	}).Preload("Medium").Preload("Category").First(&result)
 
 	if err = UpdateInMeili(result); err != nil {
@@ -144,15 +159,17 @@ func update(w http.ResponseWriter, r *http.Request) {
 func UpdateInMeili(result *model.Template) error {
 	// Insert into meili index
 	meiliObj := map[string]interface{}{
-		"id":          result.ID,
-		"kind":        "template",
-		"title":       result.Title,
-		"slug":        result.Slug,
-		"category_id": result.CategoryID,
-		"medium_id":   result.MediumID,
-		"is_default":  result.IsDefault,
-		"mode":        result.Mode,
-		"space_id":    result.SpaceID,
+		"id":               result.ID,
+		"kind":             "template",
+		"title":            result.Title,
+		"slug":             result.Slug,
+		"category_id":      result.CategoryID,
+		"medium_id":        result.MediumID,
+		"is_default":       result.IsDefault,
+		"mode":             result.Mode,
+		"description":      result.Description,
+		"html_description": result.HtmlDescription,
+		"space_id":         result.SpaceID,
 	}
 
 	err := meilisearchx.UpdateDocument("bindu", meiliObj)

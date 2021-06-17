@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 	"strconv"
 
 	"github.com/factly/bindu-server/config"
 	"github.com/factly/bindu-server/model"
+	"github.com/factly/bindu-server/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/middlewarex"
@@ -84,10 +86,23 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Store HTML description
+	var description string
+	if len(theme.Description.RawMessage) > 0 && !reflect.DeepEqual(theme.Description, util.NilJsonb()) {
+		description, err = util.HTMLDescription(theme.Description)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse theme description", http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
 	config.DB.Model(&result).Updates(model.Theme{
-		Base:   config.Base{UpdatedByID: uint(uID)},
-		Name:   theme.Name,
-		Config: theme.Config,
+		Base:            config.Base{UpdatedByID: uint(uID)},
+		Name:            theme.Name,
+		Description:     theme.Description,
+		HtmlDescription: description,
+		Config:          theme.Config,
 	}).First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)
