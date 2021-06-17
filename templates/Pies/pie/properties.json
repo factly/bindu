@@ -1,227 +1,171 @@
-[
-  {
-    "name": "Chart Properties",
-    "properties": [
-      {
-        "prop": "title",
-        "path": [
-          "title"
-        ]
-      },
-      {
-        "prop": "width",
-        "path": [
-          "width"
-        ]
-      },
-      {
-        "prop": "height",
-        "path": [
-          "height"
-        ]
-      },
-      {
-        "prop": "background",
-        "path": [
-          "background"
-        ]
-      }
-    ],
-    "Component": "ChartProperties"
-  },
-  {
-    "name": "Colors",
-    "properties": [
-      {
-        "prop": "color",
-        "type": "array",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "scale",
-          "range"
-        ]
-      }
-    ],
-    "Component": "Colors"
-  },
-  {
-    "name": "Segment",
-    "properties": [
-      {
-        "prop": "inner_radius",
-        "path": [
-          "layer",
-          0,
-          "mark",
-          "innerRadius"
-        ]
-      },
-      {
-        "prop": "corner_radius",
-        "path": [
-          "layer",
-          0,
-          "mark",
-          "cornerRadius"
-        ]
-      },
-      {
-        "prop": "pad_angle",
-        "path": [
-          "layer",
-          0,
-          "mark",
-          "padAngle"
-        ]
-      },
-      {
-        "prop": "outer_radius",
-        "path": [
-          "layer",
-          0,
-          "mark",
-          "outerRadius"
-        ]
-      }
-    ],
-    "Component": "Segment"
-  },
-  {
-    "name": "Legend",
-    "properties": [
-      {
-        "prop": "title",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "legend",
-          "title"
-        ]
-      },
-      {
-        "prop": "fill_color",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "legend",
-          "fillColor"
-        ]
-      },
-      {
-        "prop": "symbol_type",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "legend",
-          "symbolType"
-        ]
-      },
-      {
-        "prop": "symbol_size",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "legend",
-          "symbolSize"
-        ]
-      },
-      {
-        "prop": "orient",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "legend",
-          "orient"
-        ]
-      }
-    ],
-    "Component": "Legend"
-  },
-  {
-    "name": "Legend Label",
-    "properties": [
-      {
-        "prop": "label_align",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "legend",
-          "labelAlign"
-        ]
-      },
-      {
-        "prop": "label_baseline",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "legend",
-          "labelBaseline"
-        ]
-      },
-      {
-        "prop": "label_color",
-        "path": [
-          "layer",
-          0,
-          "encoding",
-          "color",
-          "legend",
-          "labelColor"
-        ]
-      }
-    ],
-    "Component": "LegendLabel"
-  },
-  {
-    "name": "Data Labels",
-    "properties": [
-      {
-        "prop": "color",
-        "path": [
-          "layer",
-          1,
-          "encoding",
-          "color",
-          "value"
-        ]
-      },
-      {
-        "prop": "font_size",
-        "path": [
-          "layer",
-          1,
-          "mark",
-          "fontSize"
-        ]
-      },
-      {
-        "prop": "format",
-        "path": [
-          "layer",
-          1,
-          "encoding",
-          "text",
-          "format"
-        ]
-      }
-    ],
-    "Component": "PieDataLabels"
-  }
-]
+{
+    "$schema": "PropertiesSchema",
+    "$components": [
+        {
+            "name": "Chart Properties",
+            "properties": [
+                {
+                    "prop": "title",
+                    "path": ["title"]
+                },
+                {
+                    "prop": "width",
+                    "path": ["width"]
+                },
+                {
+                    "prop": "height",
+                    "path": ["height"]
+                },
+                {
+                    "prop": "background",
+                    "path": ["background"]
+                }
+            ],
+            "Component": "ChartProperties"
+        },
+        {
+            "name": "Colors",
+            "properties": [
+                {
+                    "prop": "color",
+                    "type": "array",
+                    "path": ["layer", 0, "encoding", "color", "scale", "range"]
+                }
+            ],
+            "Component": "Colors"
+        },
+        {
+            "name": "Segment",
+            "properties": [
+                {
+                    "prop": "inner_radius",
+                    "path": ["layer", 0, "mark", "innerRadius"]
+                },
+                {
+                    "prop": "corner_radius",
+                    "path": ["layer", 0, "mark", "cornerRadius"]
+                },
+                {
+                    "prop": "pad_angle",
+                    "path": ["layer", 0, "mark", "padAngle"]
+                },
+                {
+                    "prop": "outer_radius",
+                    "path": ["layer", 0, "mark", "outerRadius"]
+                }
+            ],
+            "Component": "Segment"
+        },
+        {
+            "name": "Legend",
+            "properties": [
+                {
+                    "prop": "title",
+                    "path": ["layer", 0, "encoding", "color", "legend", "title"]
+                },
+                {
+                    "prop": "fill_color",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "fillColor"
+                    ]
+                },
+                {
+                    "prop": "symbol_type",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "symbolType"
+                    ]
+                },
+                {
+                    "prop": "symbol_size",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "symbolSize"
+                    ]
+                },
+                {
+                    "prop": "orient",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "orient"
+                    ]
+                }
+            ],
+            "Component": "Legend"
+        },
+        {
+            "name": "Legend Label",
+            "properties": [
+                {
+                    "prop": "label_align",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "labelAlign"
+                    ]
+                },
+                {
+                    "prop": "label_baseline",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "labelBaseline"
+                    ]
+                },
+                {
+                    "prop": "label_color",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "labelColor"
+                    ]
+                }
+            ],
+            "Component": "LegendLabel"
+        },
+        {
+            "name": "Data Labels",
+            "properties": [
+                {
+                    "prop": "color",
+                    "path": ["layer", 1, "encoding", "color", "value"]
+                },
+                {
+                    "prop": "font_size",
+                    "path": ["layer", 1, "mark", "fontSize"]
+                },
+                {
+                    "prop": "format",
+                    "path": ["layer", 1, "encoding", "text", "format"]
+                }
+            ],
+            "Component": "PieDataLabels"
+        }
+    ]
+}
