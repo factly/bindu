@@ -1,0 +1,32 @@
+[
+    {
+        "name": "All Permissions",
+        "Description": "All Permissions",
+        "permissions": [
+            {
+                "resource": "categories",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
+                "resource": "tags",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
+                "resource": "themes",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
+                "resource": "media",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
+                "resource": "charts",
+                "actions": ["get", "create", "update", "delete", "publish"]
+            },
+            {
+                "resource": "policies",
+                "actions": ["get", "create", "update", "delete"]
+            }
+        ]
+    }
+]

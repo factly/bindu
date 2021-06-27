@@ -1,0 +1,239 @@
+{
+    "$schema": "PropertiesSchema",
+    "$components": [
+        {
+            "name": "Chart Properties",
+            "properties": [
+                {
+                    "prop": "title",
+                    "path": ["title"]
+                },
+                {
+                    "prop": "width",
+                    "path": ["width"]
+                },
+                {
+                    "prop": "height",
+                    "path": ["height"]
+                },
+                {
+                    "prop": "background",
+                    "path": ["background"]
+                }
+            ],
+            "Component": "ChartProperties"
+        },
+        {
+            "name": "Colors",
+            "properties": [
+                {
+                    "prop": "color",
+                    "type": "array",
+                    "path": ["layer", 0, "encoding", "color", "scale", "range"]
+                }
+            ],
+            "Component": "Colors"
+        },
+        {
+            "name": "Bars",
+            "properties": [
+                {
+                    "prop": "opacity",
+                    "path": ["layer", 0, "encoding", "opacity", "value"]
+                },
+                {
+                    "prop": "corner_radius",
+                    "path": ["layer", 0, "mark", "cornerRadius"]
+                }
+            ],
+            "Component": "Bars"
+        },
+        {
+            "name": "X Axis",
+            "properties": [
+                {
+                    "prop": "title",
+                    "path": ["layer", 0, "encoding", "x", "axis", "title"]
+                },
+                {
+                    "prop": "field",
+                    "path": ["layer", 0, "encoding", "x", "field"]
+                },
+                {
+                    "prop": "orient",
+                    "path": ["layer", 0, "encoding", "x", "axis", "orient"]
+                },
+                {
+                    "prop": "format",
+                    "path": ["layer", 0, "encoding", "x", "axis", "format"]
+                },
+                {
+                    "prop": "label_color",
+                    "path": ["layer", 0, "encoding", "x", "axis", "labelColor"]
+                },
+                {
+                    "prop": "type",
+                    "path": ["layer", 0, "encoding", "x", "type"]
+                },
+                {
+                    "prop": "aggregate",
+                    "path": ["layer", 0, "encoding", "x", "aggregate"]
+                },
+                {
+                    "prop": "sort",
+                    "path": ["layer", 0, "encoding", "x", "sort"]
+                }
+            ],
+            "Component": "XAxis"
+        },
+        {
+            "name": "Y Axis",
+            "properties": [
+                {
+                    "prop": "title",
+                    "path": ["layer", 0, "encoding", "y", "axis", "title"]
+                },
+                {
+                    "prop": "field",
+                    "path": ["layer", 0, "encoding", "y", "field"]
+                },
+                {
+                    "prop": "orient",
+                    "path": ["layer", 0, "encoding", "y", "axis", "orient"]
+                },
+                {
+                    "prop": "format",
+                    "path": ["layer", 0, "encoding", "y", "axis", "format"]
+                },
+                {
+                    "prop": "label_color",
+                    "path": ["layer", 0, "encoding", "y", "axis", "labelColor"]
+                },
+                {
+                    "prop": "type",
+                    "path": ["layer", 0, "encoding", "y", "type"]
+                },
+                {
+                    "prop": "aggregate",
+                    "path": ["layer", 0, "encoding", "y", "aggregate"]
+                },
+                {
+                    "prop": "sort",
+                    "path": ["layer", 0, "encoding", "y", "sort"]
+                }
+            ],
+            "Component": "YAxis"
+        },
+        {
+            "name": "Legend",
+            "properties": [
+                {
+                    "prop": "title",
+                    "path": ["layer", 0, "encoding", "color", "legend", "title"]
+                },
+                {
+                    "prop": "fill_color",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "fillColor"
+                    ]
+                },
+                {
+                    "prop": "symbol_type",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "symbolType"
+                    ]
+                },
+                {
+                    "prop": "symbol_size",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "symbolSize"
+                    ]
+                },
+                {
+                    "prop": "orient",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "orient"
+                    ]
+                }
+            ],
+            "Component": "Legend"
+        },
+        {
+            "name": "Legend Label",
+            "properties": [
+                {
+                    "prop": "label_align",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "labelAlign"
+                    ]
+                },
+                {
+                    "prop": "label_baseline",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "labelBaseline"
+                    ]
+                },
+                {
+                    "prop": "label_color",
+                    "path": [
+                        "layer",
+                        0,
+                        "encoding",
+                        "color",
+                        "legend",
+                        "labelColor"
+                    ]
+                }
+            ],
+            "Component": "LegendLabel"
+        },
+        {
+            "name": "Data Labels",
+            "properties": [
+                {
+                    "prop": "color",
+                    "path": ["layer", 1, "encoding", "color", "value"]
+                },
+                {
+                    "prop": "font_size",
+                    "path": ["layer", 1, "mark", "fontSize"]
+                },
+                {
+                    "prop": "format",
+                    "path": ["layer", 1, "encoding", "text", "format"]
+                }
+            ],
+            "Component": "DataLabels"
+        }
+    ]
+}

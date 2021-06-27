@@ -1,0 +1,441 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "mode": "vega",
+  "description": "An interactive world map supporting pan and zoom.",
+  "width": 900,
+  "height": 500,
+  "background": "#f0f8ff",
+  "autosize": "none",
+
+  "signals": [
+    {
+      "name": "tx",
+      "update": "width / 2"
+    },
+    {
+      "name": "ty",
+      "update": "height / 2"
+    },
+    {
+      "name": "scale",
+      "value": 900,
+      "on": [
+        {
+          "events": {
+            "type": "wheel",
+            "consume": true
+          },
+          "update": "clamp(scale * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
+        }
+      ]
+    },
+    {
+      "name": "angles",
+      "value": [0, 0],
+      "on": [
+        {
+          "events": "mousedown",
+          "update": "[rotateX, centerY]"
+        }
+      ]
+    },
+    {
+      "name": "cloned",
+      "value": null,
+      "on": [
+        {
+          "events": "mousedown",
+          "update": "copy('projection')"
+        }
+      ]
+    },
+    {
+      "name": "start",
+      "value": null,
+      "on": [
+        {
+          "events": "mousedown",
+          "update": "invert(cloned, xy())"
+        }
+      ]
+    },
+    {
+      "name": "drag",
+      "value": null,
+      "on": [
+        {
+          "events": "[mousedown, window:mouseup] > window:mousemove",
+          "update": "invert(cloned, xy())"
+        }
+      ]
+    },
+    {
+      "name": "delta",
+      "value": null,
+      "on": [
+        {
+          "events": {
+            "signal": "drag"
+          },
+          "update": "[drag[0] - start[0], start[1] - drag[1]]"
+        }
+      ]
+    },
+    {
+      "name": "rotateX",
+      "value": -80,
+      "on": [
+        {
+          "events": {
+            "signal": "delta"
+          },
+          "update": "angles[0] + delta[0]"
+        }
+      ]
+    },
+    {
+      "name": "centerY",
+      "value": 23,
+      "on": [
+        {
+          "events": {
+            "signal": "delta"
+          },
+          "update": "clamp(angles[1] + delta[1], -60, 60)"
+        }
+      ]
+    }
+  ],
+
+  "projections": [
+    {
+      "name": "projection",
+      "type": "mercator",
+      "scale": {
+        "signal": "scale"
+      },
+      "rotate": [
+        {
+          "signal": "rotateX"
+        },
+        0,
+        0
+      ],
+      "center": [
+        0,
+        {
+          "signal": "centerY"
+        }
+      ],
+      "translate": [
+        {
+          "signal": "tx"
+        },
+        {
+          "signal": "ty"
+        }
+      ]
+    }
+  ],
+
+  "data": [
+    {
+      "name": "table",
+      "values": [
+        {
+          "State": "Andaman and Nicobar",
+          "ID": 1287,
+          "Value": 175
+        },
+        {
+          "State": "Andhra Pradesh",
+          "ID": 1288,
+          "Value": 60
+        },
+        {
+          "State": "Arunachal Pradesh",
+          "ID": 1289,
+          "Value": 126
+        },
+        {
+          "State": "Assam",
+          "ID": 1290,
+          "Value": 243
+        },
+        {
+          "State": "Bihar",
+          "ID": 1291,
+          "Value": 40
+        },
+        {
+          "State": "Chandigarh",
+          "ID": 1292,
+          "Value": 182
+        },
+        {
+          "State": "Chhattisgarh",
+          "ID": 1293,
+          "Value": 90
+        },
+        {
+          "State": "Dadra and Nagar Haveli",
+          "ID": 1294,
+          "Value": 68
+        },
+        {
+          "State": "Daman and Diu",
+          "ID": 1295,
+          "Value": 87
+        },
+        {
+          "State": "Delhi",
+          "ID": 1296,
+          "Value": 224
+        },
+        {
+          "State": "Goa",
+          "ID": 1297,
+          "Value": 140
+        },
+        {
+          "State": "Gujarat",
+          "ID": 1298,
+          "Value": 230
+        },
+        {
+          "State": "Haryana",
+          "ID": 1299,
+          "Value": 288
+        },
+        {
+          "State": "Himachal Pradesh",
+          "ID": 1300,
+          "Value": 60
+        },
+        {
+          "State": "Jammu and Kashmir",
+          "ID": 1301,
+          "Value": 60
+        },
+        {
+          "State": "Jharkhand",
+          "ID": 1302,
+          "Value": 40
+        },
+        {
+          "State": "Karnataka",
+          "ID": 1303,
+          "Value": 60
+        },
+        {
+          "State": "Kerala",
+          "ID": 1304,
+          "Value": 147
+        },
+        {
+          "State": "Lakshadweep",
+          "ID": 1305,
+          "Value": 117
+        },
+        {
+          "State": "Madhya Pradesh",
+          "ID": 1306,
+          "Value": 200
+        },
+        {
+          "State": "Maharashtra",
+          "ID": 1307,
+          "Value": 32
+        },
+        {
+          "State": "Manipur",
+          "ID": 1308,
+          "Value": 234
+        },
+        {
+          "State": "Meghalaya",
+          "ID": 1309,
+          "Value": 60
+        },
+        {
+          "State": "Mizoram",
+          "ID": 1310,
+          "Value": 403
+        },
+        {
+          "State": "Nagaland",
+          "ID": 1311,
+          "Value": 294
+        },
+        {
+          "State": "Orissa",
+          "ID": 1312,
+          "Value": 90
+        },
+        {
+          "State": "Puducherry",
+          "ID": 1313,
+          "Value": 81
+        },
+        {
+          "State": "Punjab",
+          "ID": 1314,
+          "Value": 70
+        },
+        {
+          "State": "Rajasthan",
+          "ID": 1315,
+          "Value": 119
+        },
+        {
+          "State": "Sikkim",
+          "ID": 1316,
+          "Value": 60
+        },
+        {
+          "State": "Tamil Nadu",
+          "ID": 1317,
+          "Value": 403
+        },
+        {
+          "State": "Tripura",
+          "ID": 1318,
+          "Value": 294
+        },
+        {
+          "State": "Uttar Pradesh",
+          "ID": 1319,
+          "Value": 90
+        },
+        {
+          "State": "Uttaranchal",
+          "ID": 1320,
+          "Value": 81
+        },
+        {
+          "State": "West Bengal",
+          "ID": 1321,
+          "Value": 70
+        }
+      ]
+    },
+    {
+      "name": "world",
+      "url": "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/india/india-states.json",
+      "format": {
+        "type": "topojson",
+        "feature": "IND_adm1"
+      },
+      "transform": [
+        {
+          "type": "lookup",
+          "from": "table",
+          "key": "ID",
+          "fields": ["properties.ID_1"],
+          "values": ["ID", "Value", "State"]
+        }
+      ]
+    },
+    {
+      "name": "graticule",
+      "transform": [
+        {
+          "type": "graticule",
+          "step": [15, 15]
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "domain": {
+        "data": "world",
+        "field": "Value"
+      },
+      "interpolate": "hcl",
+      "name": "color",
+      "range": {
+        "scheme": "Oranges"
+      },
+      "type": "linear",
+      "zero": false
+    }
+  ],
+
+  "marks": [
+    {
+      "type": "shape",
+      "from": {
+        "data": "graticule"
+      },
+      "encode": {
+        "enter": {
+          "strokeDash": {
+            "value": 1
+          },
+          "strokeWidth": {
+            "value": 1
+          },
+          "stroke": {
+            "value": "#dddddd"
+          },
+          "strokeOpacity": {
+            "value": 1
+          },
+          "fill": {
+            "value": null
+          }
+        }
+      },
+      "transform": [
+        {
+          "type": "geoshape",
+          "projection": "projection"
+        }
+      ]
+    },
+    {
+      "type": "shape",
+      "from": {
+        "data": "world"
+      },
+      "encode": {
+        "update": {
+          "tooltip": {
+            "signal": "{\"Name\": datum[\"State\"], \"Value\": format(datum[\"Value\"], \".1f\")}"
+          },
+          "strokeOpacity": {
+            "value": 1
+          },
+          "strokeWidth": {
+            "value": 1
+          },
+          "stroke": {
+            "value": "#bbbbbb"
+          },
+          "fill": {
+            "scale": "color",
+            "field": "Value"
+          }
+        },
+        "hover": {
+          "fill": {
+            "value": "red"
+          },
+          "strokeWidth": {
+            "value": 2
+          },
+          "stroke": {
+            "value": "#bbbbbb"
+          }
+        }
+      },
+      "transform": [
+        {
+          "type": "geoshape",
+          "projection": "projection"
+        }
+      ]
+    }
+  ]
+}
