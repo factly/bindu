@@ -1,0 +1,43 @@
+.virtual-table .ant-table-container:before,
+.virtual-table .ant-table-container:after {
+  display: none;
+}
+
+.virtual-table-cell {
+  box-sizing: border-box;
+  padding: 16px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fff;
+  border-right: 1px solid #e8e8e8;
+}
+
+[data-theme='dark'] .virtual-table-cell {
+  box-sizing: border-box;
+  padding: 16px;
+  border-bottom: 1px solid #303030;
+  background: #141414;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.ant-table.ant-table-bordered thead > tr > th {
+  border-right: 1px solid #e8e8e8;
+}

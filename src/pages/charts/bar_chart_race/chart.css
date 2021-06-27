@@ -1,0 +1,39 @@
+#bar-chart-race .chart-title {
+  font-size: 18px;
+  fill: #d3d3d3;
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: center;
+}
+
+#bar-chart-race .current-date {
+  font-size: 45px;
+  fill: #d3d3d3;
+  text-anchor: end;
+}
+
+#bar-chart-race .y-axis text,
+#bar-chart-race .y-axis .domain,
+#bar-chart-race .x-axis .domain {
+  display: none;
+}
+
+#bar-chart-race .x-axis .tick line {
+  color: #d3d3d3;
+}
+
+#bar-chart-race .x-axis .tick text {
+  color: #d3d3d3;
+}
+
+#bar-chart-race .columns .column-container .column-title {
+  text-anchor: end;
+  fill: white;
+  dominant-baseline: middle;
+  font-size: 14px;
+}
+
+#bar-chart-race .columns .column-container .column-value {
+  dominant-baseline: middle;
+  font-size: 14px;
+}

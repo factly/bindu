@@ -1,0 +1,61 @@
+.extra-actions-container li {
+  float: left;
+  margin-left: 12px;
+  cursor: pointer;
+}
+
+.extra-actions-container ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chart-area-container {
+  width: 100%;
+}
+
+.display-container {
+  padding: 1px;
+  overflow: auto;
+  /* min-width: 800px; */
+  width: 60%;
+  height: 100%;
+}
+
+.option-container {
+  position: relative;
+  transition: right 0.5s;
+  width: 400px;
+  overflow: auto;
+  margin-left: auto;
+}
+
+.data-view-container {
+  position: relative;
+  max-width: 600px;
+  min-width: 400px;
+  margin-left: auto;
+  height: inherit;
+}
+
+.data-view-empty-message {
+  text-align: 'center';
+  background-color: #ddd;
+  padding: 100px;
+}
+
+.chart-name {
+  margin-right: 12px;
+  font-style: italic;
+}
+
+.chart-name-editable-container {
+  display: grid;
+  width: 160px;
+  grid-template-columns: 100px 50px;
+  column-gap: 10px;
+}
+
+.property-container .ant-select {
+  width: 100%;
+}
