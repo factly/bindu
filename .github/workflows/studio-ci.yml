@@ -3,17 +3,17 @@ on:
   pull_request:
     branches: [develop, master]
     paths: 
-    - 'server/**'
+    - 'studio/**'
   push:
     branches: [develop, master]
     paths: 
-    - 'server/**'
+    - 'studio/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      working-directory: ./server
+      working-directory: ./studio
     steps:
       - uses: actions/checkout@v2
       - name: Cache node-modules
