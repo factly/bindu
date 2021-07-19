@@ -1,13 +1,19 @@
-name: CI
+name: Studio CI
 on:
   pull_request:
     branches: [develop, master]
+    paths: 
+    - 'studio/**'
   push:
     branches: [develop, master]
+    paths: 
+    - 'studio/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./studio
     steps:
       - uses: actions/checkout@v2
       - name: Cache node-modules
@@ -22,8 +28,11 @@ jobs:
         with:
           node-version: '14.x'
       - run: npm ci
+        working-directory: ${{env.working-directory}}
       - run: npm run format:check
+        working-directory: ${{env.working-directory}}
       - run: npm run test:coverage
+        working-directory: ${{env.working-directory}}
         env:
           CI: true
       - name: Upload Test Coverage
