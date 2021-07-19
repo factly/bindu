@@ -162,4 +162,4 @@ config.*
 n
 
 # .env files
-.env
+*.env
