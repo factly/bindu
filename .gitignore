@@ -163,3 +163,4 @@ n
 
 # .env files
 *.env
+*.db

@@ -19,6 +19,7 @@ require (
 	github.com/meilisearch/meilisearch-go v0.12.0
 	github.com/minio/minio-go/v7 v7.0.5
 	github.com/moul/http2curl v1.0.0 // indirect
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/prometheus/client_golang v1.3.0
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
@@ -29,5 +30,6 @@ require (
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/h2non/gock.v1 v1.0.15
 	gorm.io/driver/postgres v1.0.5
+	gorm.io/driver/sqlite v1.1.4
 	gorm.io/gorm v1.20.7
 )
