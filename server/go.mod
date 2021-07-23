@@ -15,6 +15,7 @@ require (
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/google/uuid v1.1.2
+	github.com/iancoleman/strcase v0.2.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/meilisearch/meilisearch-go v0.12.0
 	github.com/minio/minio-go/v7 v7.0.5
