@@ -158,7 +158,8 @@ main
 
 .DS_Store
 
-config.*
+config.env
+config.js
 n
 
 # .env files
