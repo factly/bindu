@@ -16,6 +16,7 @@ import (
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/slugx"
 	"github.com/google/uuid"
+	"github.com/iancoleman/strcase"
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/minio/minio-go/v7"
 	"github.com/spf13/cobra"
@@ -177,7 +178,7 @@ func MigrateTemplate() error {
 				Spec: postgres.Jsonb{
 					RawMessage: specBytes,
 				},
-				Title:     chart_name,
+				Title:     strcase.ToCamel(chart_name),
 				IsDefault: true,
 				Slug:      slugx.Make(fmt.Sprint("bindu ", chart_name)),
 				Mode:      mode,

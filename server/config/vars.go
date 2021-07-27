@@ -77,4 +77,14 @@ func SetupVars() {
 	if !viper.IsSet("templates_path") {
 		log.Fatal("please provide templates_path in config file")
 	}
+
+	if Sqlite() {
+		if !viper.IsSet("sqlite_db_path") {
+			log.Fatal("please provide sqlite_db_path config param")
+		}
+	}
+}
+
+func Sqlite() bool {
+	return viper.IsSet("use_sqlite") && viper.GetBool("use_sqlite")
 }

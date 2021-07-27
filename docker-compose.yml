@@ -275,6 +275,9 @@ services:
       - type: bind
         source: ./config.env
         target: /app/config.env
+      - type: bind
+        source: ./bindu.db
+        target: /app/bindu.db
     restart: unless-stopped
     networks:
       - bindu
@@ -294,6 +297,9 @@ services:
       - type: bind
         source: ./config.env
         target: /app/config.env
+      - type: bind
+        source: ./bindu.db
+        target: /app/bindu.db
     networks:
       - bindu
 

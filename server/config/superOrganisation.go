@@ -108,7 +108,10 @@ func UserConfigPresent() bool {
 
 // CreateSuperOrganisation creates a super user and organisation in kavach
 func CreateSuperOrganisation() error {
-	if viper.GetBool("create_super_organisation") && !CheckSuperOrganisation() && UserConfigPresent() {
+	if viper.GetBool("create_super_organisation") && UserConfigPresent() {
+		if !CheckSuperOrganisation() {
+			fmt.Println("superorganisation not created or not present in kavach")
+		}
 		// create a user in kratos through api
 		resp, err := createKratosUser()
 		if err != nil {
@@ -300,7 +303,7 @@ func createSuperSpace(oID uint) error {
 		Name:           viper.GetString("super_space_name"),
 		OrganisationID: int(oID),
 	}
-	err := DB.Model(&Space{}).Create(&space).Error
+	err := DB.Model(&Space{}).FirstOrCreate(&space, &space).Error
 	if err != nil {
 		return err
 	}
