@@ -1,0 +1,43 @@
+project_name: bindu
+
+builds:
+- id: bindu-server
+  dir: server
+  binary: bindu-server
+  env:
+  - CGO_ENABLED=0
+  - GO386=softfloat
+  goos:
+  - linux
+  - darwin
+  - windows
+
+archives:
+  - id: bindu-server
+    builds:
+      - bindu-server 
+    name_template: "bindu-server_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+dockers:
+- dockerfile: server/Dockerfile.prod
+  image_templates:
+    - "factly/bindu-server:{{ .Tag }}"
+  use: docker
+  build_flag_templates:
+  - "--platform=linux/amd64"
+
+docker_manifests:
+  - 
+    image_templates:
+    - "factly/bindu-server:{{ .Version }}"
+
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
