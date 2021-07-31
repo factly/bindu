@@ -29,7 +29,7 @@ jobs:
         push: true
         tags: factly/bindu-studio:${{ env.RELEASE_VERSION }}
         context: studio
-        file: studio/Dockerfile.prod
+        file: studio/Dockerfile
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
